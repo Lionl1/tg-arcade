@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Аркада — каталог</title>
+  <link rel="stylesheet" href="sdk/arcade.css">
+  <style>
+    html, body { overflow: auto; -webkit-user-select: auto; user-select: auto; }
+    main { max-width: 720px; margin: 0 auto; padding: 24px 16px; }
+    h1 { margin: 0 0 4px; }
+    .list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-top: 20px; }
+    a.g { display: block; padding: 14px; border-radius: 14px; background: var(--card); color: var(--fg); text-decoration: none; }
+    a.g b { display: block; }
+    a.g span { color: var(--hint); font-size: 13px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>🕹 Аркада</h1>
+    <div class="hint">Локальный каталог для разработки. В Telegram игры открываются через бота.</div>
+    <div class="list" id="list"></div>
+  </main>
+  <script>
+    // Если Mini App настроен на корень сайта — внутри Telegram сразу уходим в плеер
+    if (/tgWebApp/.test(location.hash) || /tgWebApp/.test(location.search)) {
+      location.replace('play.html' + location.search + location.hash);
+    }
+    fetch('games/catalog.json').then(r => r.json()).then(cat => {
+      document.getElementById('list').outerHTML = cat.sections.map(s => {
+        const groups = Object.fromEntries((s.groups || []).map(g => [g.id, g.title]));
+        const games = cat.games.filter(g => g.section === s.id);
+        return `<h2 style="margin:28px 0 0">${s.title} <small class="hint">${games.length}</small></h2><div class="list">` +
+          games.map(g => `<a class="g" href="play.html?g=${g.id}"><b>${g.emoji} ${g.title}</b><span>${groups[g.group] ? groups[g.group] + ' · ' : ''}${g.desc}</span></a>`).join('') +
+          '</div>';
+      }).join('');
+    });
+  </script>
+</body>
+</html>

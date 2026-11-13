@@ -1,0 +1,1613 @@
+{
+ "sections": [
+  {
+   "id": "brain",
+   "title": "🧠 Тренировка мозга",
+   "desc": "Память, внимание, скорость, логика и критическое мышление. Сложность растёт вместе с тобой.",
+   "groups": [
+    {
+     "id": "reaction",
+     "title": "⚡ Реакция"
+    },
+    {
+     "id": "count",
+     "title": "🧮 Счёт"
+    },
+    {
+     "id": "memory",
+     "title": "💭 Память"
+    },
+    {
+     "id": "attention",
+     "title": "👁 Внимание"
+    },
+    {
+     "id": "logic",
+     "title": "🧩 Логика"
+    },
+    {
+     "id": "iq",
+     "title": "🎓 Интеллект"
+    },
+    {
+     "id": "critical",
+     "title": "🛡 Критическое мышление"
+    },
+    {
+     "id": "words",
+     "title": "🔤 Слова"
+    }
+   ]
+  },
+  {
+   "id": "ege",
+   "title": "🎓 ЕГЭ и школа",
+   "desc": "Программы по предметам: задания в формате ЕГЭ с генераторами, карточки с интервальными повторениями, бесконечные уровни.",
+   "groups": [
+    {
+     "id": "emath",
+     "title": "📐 Математика"
+    },
+    {
+     "id": "erus",
+     "title": "✍️ Русский язык"
+    },
+    {
+     "id": "elit",
+     "title": "📖 Литература"
+    },
+    {
+     "id": "ehist",
+     "title": "🏛 История"
+    },
+    {
+     "id": "einf",
+     "title": "💻 Информатика"
+    },
+    {
+     "id": "ephys",
+     "title": "⚛️ Физика"
+    },
+    {
+     "id": "echem",
+     "title": "🧪 Химия"
+    }
+   ]
+  },
+  {
+   "id": "learn",
+   "title": "📚 Учёба и языки",
+   "desc": "Карточки с интервальными повторениями и тест на очки. Уровни: 1–3 — базовые карточки, 4–8 — средние, с 9-го — продвинутые (уровень 10–11 класса).",
+   "groups": [
+    {
+     "id": "geo",
+     "title": "🌍 География"
+    },
+    {
+     "id": "lang",
+     "title": "🗣 Языки"
+    },
+    {
+     "id": "math",
+     "title": "🔢 Математика"
+    },
+    {
+     "id": "science",
+     "title": "🧪 Наука"
+    },
+    {
+     "id": "erudition",
+     "title": "🎓 Эрудиция"
+    }
+   ]
+  },
+  {
+   "id": "algo",
+   "title": "💻 Алгоритмы",
+   "desc": "Как работают алгоритмы и структуры данных — пошаговая анимация с псевдокодом. Можно листать шаги назад и брать новые данные.",
+   "groups": [
+    {
+     "id": "sort",
+     "title": "📊 Сортировки"
+    },
+    {
+     "id": "search",
+     "title": "🔎 Поиск и графы"
+    },
+    {
+     "id": "ds",
+     "title": "🧱 Структуры данных"
+    },
+    {
+     "id": "quiz",
+     "title": "🎯 Тест"
+    }
+   ]
+  },
+  {
+   "id": "arcade",
+   "title": "🕹 Отдых: аркады",
+   "desc": "Когда мозг уже размят: бегалки и игры на ловкость.",
+   "groups": [
+    {
+     "id": "run",
+     "title": "🏃 Бегалки"
+    },
+    {
+     "id": "skill",
+     "title": "🎯 Ловкость"
+    }
+   ]
+  },
+  {
+   "id": "apps",
+   "title": "🛠 Для чата",
+   "desc": "Не игры, а штуки для группы: рисовалка, мемы, честный жребий, команды, раздел счёта — результат сразу в чат.",
+   "groups": []
+  }
+ ],
+ "games": [
+  {
+   "id": "snake",
+   "title": "Змейка",
+   "emoji": "🐍",
+   "section": "arcade",
+   "desc": "Ешь ягоды, расти и не врезайся.",
+   "skills": [
+    "coordination",
+    "spatial"
+   ],
+   "par": 15,
+   "group": "skill"
+  },
+  {
+   "id": "balloon",
+   "title": "Шарик",
+   "emoji": "🎈",
+   "section": "arcade",
+   "desc": "Тапами держи шарик в воздухе и пролетай между колоннами.",
+   "skills": [
+    "coordination"
+   ],
+   "par": 10,
+   "group": "run"
+  },
+  {
+   "id": "dodge",
+   "title": "Уворот",
+   "emoji": "☄️",
+   "section": "arcade",
+   "desc": "Двигай платформу и уклоняйся от падающих глыб.",
+   "skills": [
+    "coordination",
+    "attention"
+   ],
+   "par": 40,
+   "group": "skill"
+  },
+  {
+   "id": "tower",
+   "title": "Башня",
+   "emoji": "🏗",
+   "section": "arcade",
+   "desc": "Ставь блоки ровно друг на друга — лишнее отрезается.",
+   "skills": [
+    "coordination",
+    "spatial"
+   ],
+   "par": 15,
+   "group": "skill"
+  },
+  {
+   "id": "bricks",
+   "title": "Кирпичи",
+   "emoji": "🧱",
+   "section": "arcade",
+   "desc": "Отбивай мяч платформой и разбивай стену.",
+   "skills": [
+    "coordination"
+   ],
+   "par": 25,
+   "group": "skill"
+  },
+  {
+   "id": "jump",
+   "title": "Вверх",
+   "emoji": "🪜",
+   "section": "arcade",
+   "desc": "Прыгай по платформам всё выше. Некоторые ломаются и ездят.",
+   "skills": [
+    "coordination"
+   ],
+   "par": 120,
+   "group": "run"
+  },
+  {
+   "id": "runner",
+   "title": "Бегун",
+   "emoji": "🏃",
+   "section": "arcade",
+   "desc": "Перепрыгивай препятствия на бегу. Есть двойной прыжок.",
+   "skills": [
+    "coordination",
+    "speed"
+   ],
+   "par": 60,
+   "group": "run"
+  },
+  {
+   "id": "catch",
+   "title": "Ловец",
+   "emoji": "🧺",
+   "section": "arcade",
+   "desc": "Лови фрукты корзиной, уворачивайся от бомб.",
+   "skills": [
+    "coordination",
+    "attention"
+   ],
+   "par": 30,
+   "group": "skill"
+  },
+  {
+   "id": "orbit",
+   "title": "Орбита",
+   "emoji": "🪐",
+   "section": "arcade",
+   "desc": "Меняй направление по кругу: собирай звёзды, обходи шипы.",
+   "skills": [
+    "coordination",
+    "flex"
+   ],
+   "par": 15,
+   "group": "skill"
+  },
+  {
+   "id": "pong",
+   "title": "Пинг-понг",
+   "emoji": "🏓",
+   "section": "arcade",
+   "desc": "Забивай компьютеру. Три пропущенных мяча — конец.",
+   "skills": [
+    "coordination"
+   ],
+   "par": 3,
+   "group": "skill",
+   "ceil": 2.0
+  },
+  {
+   "id": "lanes",
+   "title": "Три дорожки",
+   "emoji": "🛣",
+   "section": "arcade",
+   "group": "run",
+   "desc": "Свайпами меняй дорожку и прыгай через барьеры, собирай монеты.",
+   "skills": [
+    "coordination",
+    "speed"
+   ],
+   "par": 150
+  },
+  {
+   "id": "jetpack",
+   "title": "Ранец",
+   "emoji": "🚀",
+   "section": "arcade",
+   "group": "run",
+   "desc": "Держи палец — летишь вверх, отпусти — падаешь. Облетай лазеры.",
+   "skills": [
+    "coordination"
+   ],
+   "par": 120
+  },
+  {
+   "id": "gravity",
+   "title": "Гравитация",
+   "emoji": "🧲",
+   "section": "arcade",
+   "group": "run",
+   "desc": "Тап переворачивает притяжение: бег то по полу, то по потолку.",
+   "skills": [
+    "coordination",
+    "flex"
+   ],
+   "par": 100
+  },
+  {
+   "id": "slalom",
+   "title": "Слалом",
+   "emoji": "⛷️",
+   "section": "arcade",
+   "group": "run",
+   "desc": "Проезжай ворота и объезжай ёлки на всё более крутом склоне.",
+   "skills": [
+    "coordination",
+    "attention"
+   ],
+   "par": 20
+  },
+  {
+   "id": "traffic",
+   "title": "Трасса",
+   "emoji": "🏎",
+   "section": "arcade",
+   "group": "run",
+   "desc": "Перестраивайся и обгоняй поток. Близкий обгон — бонус.",
+   "skills": [
+    "coordination",
+    "speed"
+   ],
+   "par": 120
+  },
+  {
+   "id": "ninja",
+   "title": "Ниндзя",
+   "emoji": "🥷",
+   "section": "arcade",
+   "group": "run",
+   "desc": "Прыгай между стенами, перелетая шипы.",
+   "skills": [
+    "coordination"
+   ],
+   "par": 100
+  },
+  {
+   "id": "reaction",
+   "title": "Реакция",
+   "emoji": "⚡",
+   "section": "brain",
+   "group": "reaction",
+   "desc": "Жми, как только экран станет зелёным. 5 попыток, считается среднее.",
+   "order": "asc",
+   "format": "ms",
+   "skills": [
+    "speed"
+   ],
+   "par": 320,
+   "floor": 0.65
+  },
+  {
+   "id": "tapper",
+   "title": "Тапалка",
+   "emoji": "👆",
+   "section": "brain",
+   "group": "reaction",
+   "desc": "Сколько тапов успеешь за 10 секунд?",
+   "unit": "тапов",
+   "skills": [
+    "speed"
+   ],
+   "par": 65,
+   "timed": true,
+   "ceil": 1.3
+  },
+  {
+   "id": "moles",
+   "title": "Хомяки",
+   "emoji": "🐹",
+   "section": "brain",
+   "group": "reaction",
+   "desc": "Бей хомяков, не трогай бомбы. 30 секунд.",
+   "skills": [
+    "speed",
+    "attention"
+   ],
+   "par": 25,
+   "timed": true
+  },
+  {
+   "id": "aim",
+   "title": "Меткость",
+   "emoji": "🎯",
+   "section": "brain",
+   "group": "reaction",
+   "desc": "Попадай по мишеням, пока они не исчезли. 30 секунд.",
+   "skills": [
+    "speed",
+    "coordination"
+   ],
+   "par": 25,
+   "timed": true
+  },
+  {
+   "id": "nogo",
+   "title": "Не жми красное",
+   "emoji": "🟢",
+   "section": "brain",
+   "group": "reaction",
+   "desc": "Жми зелёные кружки, красные не трогай.",
+   "skills": [
+    "attention",
+    "speed"
+   ],
+   "par": 30
+  },
+  {
+   "id": "rhythm",
+   "title": "Ритм",
+   "emoji": "🥁",
+   "section": "brain",
+   "group": "reaction",
+   "desc": "Тапни, когда круг совпадёт с кольцом.",
+   "skills": [
+    "speed"
+   ],
+   "par": 30,
+   "ceil": 2.2
+  },
+  {
+   "id": "sort",
+   "title": "Сортировка",
+   "emoji": "🗂",
+   "section": "brain",
+   "group": "reaction",
+   "desc": "Раскидывай картинки влево и вправо по категориям. 30 секунд.",
+   "skills": [
+    "speed",
+    "flex"
+   ],
+   "par": 25,
+   "timed": true
+  },
+  {
+   "id": "math",
+   "title": "Устный счёт",
+   "emoji": "🧮",
+   "section": "brain",
+   "group": "count",
+   "desc": "Решай примеры на скорость. Ошибка — минус 3 секунды.",
+   "skills": [
+    "math"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "compare",
+   "title": "Больше-меньше",
+   "emoji": "⚖️",
+   "section": "brain",
+   "group": "count",
+   "desc": "Какой пример даёт больше? 30 секунд.",
+   "skills": [
+    "math",
+    "speed"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "count",
+   "title": "Сколько точек",
+   "emoji": "⚫",
+   "section": "brain",
+   "group": "count",
+   "desc": "Точки мелькнут на миг — сколько их было?",
+   "skills": [
+    "attention",
+    "math"
+   ],
+   "par": 10,
+   "ceil": 2.0
+  },
+  {
+   "id": "sequence",
+   "title": "Повтори",
+   "emoji": "🔁",
+   "section": "brain",
+   "group": "memory",
+   "desc": "Запомни, в каком порядке загораются кнопки, и повтори.",
+   "skills": [
+    "memory"
+   ],
+   "par": 7,
+   "ceil": 1.6
+  },
+  {
+   "id": "memory",
+   "title": "Пары",
+   "emoji": "🃏",
+   "section": "brain",
+   "group": "memory",
+   "desc": "Открой все пары карточек за минимум ходов.",
+   "order": "asc",
+   "unit": "ходов",
+   "skills": [
+    "memory",
+    "spatial"
+   ],
+   "par": 18,
+   "floor": 0.72
+  },
+  {
+   "id": "digits",
+   "title": "Числовая память",
+   "emoji": "🔟",
+   "section": "brain",
+   "group": "memory",
+   "desc": "Запомни число и введи его. Каждый раз на цифру длиннее.",
+   "unit": "цифр",
+   "skills": [
+    "memory"
+   ],
+   "par": 7,
+   "ceil": 1.4
+  },
+  {
+   "id": "stroop",
+   "title": "Цвет или слово",
+   "emoji": "🎨",
+   "section": "brain",
+   "group": "attention",
+   "desc": "Выбирай цвет, которым написано слово, а не само слово.",
+   "skills": [
+    "attention",
+    "flex"
+   ],
+   "par": 20,
+   "timed": true
+  },
+  {
+   "id": "oddone",
+   "title": "Найди лишний",
+   "emoji": "🔍",
+   "section": "brain",
+   "group": "attention",
+   "desc": "Найди картинку, которая отличается от остальных. 30 секунд.",
+   "skills": [
+    "attention"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "shade",
+   "title": "Оттенок",
+   "emoji": "🌈",
+   "section": "brain",
+   "group": "attention",
+   "desc": "Найди квадрат чуть другого цвета. С каждым уровнем сложнее.",
+   "skills": [
+    "attention"
+   ],
+   "par": 12,
+   "timed": true
+  },
+  {
+   "id": "schulte",
+   "title": "Цифры по порядку",
+   "emoji": "🔢",
+   "section": "brain",
+   "group": "attention",
+   "desc": "Нажимай числа от 1 до 25 как можно быстрее.",
+   "order": "asc",
+   "format": "sec",
+   "skills": [
+    "attention",
+    "speed"
+   ],
+   "par": 25000,
+   "floor": 0.6
+  },
+  {
+   "id": "blocks",
+   "title": "Укладка",
+   "emoji": "🟧",
+   "section": "brain",
+   "group": "logic",
+   "desc": "Ставь фигуры на поле 8×8. Заполненная строка или столбец исчезает. Думай, куда влезет следующая.",
+   "skills": [
+    "spatial",
+    "logic"
+   ],
+   "par": 150
+  },
+  {
+   "id": "merge",
+   "title": "Эволюция",
+   "emoji": "🥚",
+   "section": "brain",
+   "group": "logic",
+   "desc": "Сдвигай поле: две одинаковые фигурки сливаются в следующую стадию. Доведи яйцо до дракона.",
+   "skills": [
+    "logic",
+    "spatial"
+   ],
+   "par": 600
+  },
+  {
+   "id": "tubes",
+   "title": "Пробирки",
+   "emoji": "🧪",
+   "section": "brain",
+   "group": "logic",
+   "desc": "Переливай цвета, пока в каждой пробирке не останется один цвет. Генератор делает каждую головоломку новой.",
+   "skills": [
+    "logic",
+    "spatial"
+   ],
+   "par": 12,
+   "timed": true
+  },
+  {
+   "id": "nonogram",
+   "title": "Японский кроссворд",
+   "emoji": "🖼",
+   "section": "brain",
+   "group": "logic",
+   "desc": "Восстанови картинку по числам у строк и столбцов. Поле растёт.",
+   "skills": [
+    "logic"
+   ],
+   "par": 60,
+   "timed": true
+  },
+  {
+   "id": "switches",
+   "title": "Выключатели",
+   "emoji": "💡",
+   "section": "brain",
+   "group": "logic",
+   "desc": "Погаси все лампы: нажатие переключает лампу и её соседей. 90 секунд.",
+   "skills": [
+    "logic"
+   ],
+   "par": 4,
+   "timed": true
+  },
+  {
+   "id": "fifteen",
+   "title": "Пятнашки",
+   "emoji": "🧩",
+   "section": "brain",
+   "group": "logic",
+   "desc": "Расставь фишки от 1 до 15 по порядку.",
+   "order": "asc",
+   "format": "sec",
+   "skills": [
+    "logic",
+    "spatial"
+   ],
+   "par": 120000,
+   "floor": 0.55
+  },
+  {
+   "id": "maze",
+   "title": "Лабиринт",
+   "emoji": "🌀",
+   "section": "brain",
+   "group": "logic",
+   "desc": "Свайпами доведи точку до выхода. Сколько лабиринтов успеешь?",
+   "skills": [
+    "spatial",
+    "logic"
+   ],
+   "par": 5,
+   "timed": true
+  },
+  {
+   "id": "anagram",
+   "title": "Анаграммы",
+   "emoji": "🔤",
+   "section": "brain",
+   "group": "words",
+   "desc": "Собери слово из перемешанных букв. 60 секунд.",
+   "skills": [
+    "language"
+   ],
+   "par": 10,
+   "timed": true
+  },
+  {
+   "id": "nback",
+   "title": "N-назад",
+   "emoji": "🔲",
+   "section": "brain",
+   "group": "memory",
+   "desc": "Классика тренировки рабочей памяти: совпадает ли клетка с той, что была N шагов назад?",
+   "skills": [
+    "memory"
+   ],
+   "par": 15,
+   "ceil": 2.0
+  },
+  {
+   "id": "matrix",
+   "title": "Матрица памяти",
+   "emoji": "🟦",
+   "section": "brain",
+   "group": "memory",
+   "desc": "Запомни, какие клетки вспыхнули, и найди их все. Поле растёт.",
+   "unit": "клеток",
+   "skills": [
+    "memory",
+    "spatial"
+   ],
+   "par": 7,
+   "ceil": 1.8
+  },
+  {
+   "id": "pasat",
+   "title": "Сумма в уме",
+   "emoji": "➕",
+   "section": "brain",
+   "group": "memory",
+   "desc": "Складывай два последних числа, пока темп ускоряется.",
+   "skills": [
+    "memory",
+    "math"
+   ],
+   "par": 15,
+   "ceil": 2.0
+  },
+  {
+   "id": "flanker",
+   "title": "Стрелки",
+   "emoji": "⬅️",
+   "section": "brain",
+   "group": "attention",
+   "desc": "Куда смотрит средняя стрелка? Не дай соседям себя сбить.",
+   "skills": [
+    "attention"
+   ],
+   "par": 25,
+   "timed": true
+  },
+  {
+   "id": "switch",
+   "title": "Переключение",
+   "emoji": "🔀",
+   "section": "brain",
+   "group": "attention",
+   "desc": "Правило зависит от места: сверху «чётное?», снизу «больше 5?».",
+   "skills": [
+    "flex"
+   ],
+   "par": 25,
+   "timed": true
+  },
+  {
+   "id": "sudoku",
+   "title": "Мини-судоку",
+   "emoji": "#️⃣",
+   "section": "brain",
+   "group": "logic",
+   "desc": "Судоку 6×6 с единственным решением. На время.",
+   "order": "asc",
+   "format": "sec",
+   "skills": [
+    "logic"
+   ],
+   "par": 180000,
+   "floor": 0.5
+  },
+  {
+   "id": "hanoi",
+   "title": "Ханойская башня",
+   "emoji": "🗼",
+   "section": "brain",
+   "group": "logic",
+   "desc": "Перенеси башню за минимум ходов. С каждым разом дисков больше.",
+   "skills": [
+    "logic"
+   ],
+   "par": 12,
+   "timed": true
+  },
+  {
+   "id": "bulls",
+   "title": "Быки и коровы",
+   "emoji": "🐂",
+   "section": "brain",
+   "group": "logic",
+   "desc": "Угадай код из 4 цифр по подсказкам за минимум попыток.",
+   "order": "asc",
+   "unit": "попыток",
+   "skills": [
+    "logic"
+   ],
+   "par": 7,
+   "floor": 0.85
+  },
+  {
+   "id": "sumtarget",
+   "title": "Собери сумму",
+   "emoji": "💯",
+   "section": "brain",
+   "group": "count",
+   "desc": "Выделяй числа, которые в сумме дают цель. 60 секунд.",
+   "skills": [
+    "math",
+    "logic"
+   ],
+   "par": 25,
+   "timed": true
+  },
+  {
+   "id": "series",
+   "title": "Продолжи ряд",
+   "emoji": "📈",
+   "section": "brain",
+   "group": "iq",
+   "desc": "Найди закономерность в ряду чисел. Ряды всё хитрее.",
+   "skills": [
+    "logic"
+   ],
+   "par": 10,
+   "timed": true
+  },
+  {
+   "id": "scales",
+   "title": "Фруктовые уравнения",
+   "emoji": "🍎",
+   "section": "brain",
+   "group": "iq",
+   "desc": "Каждый фрукт — число. Реши систему уравнений в картинках.",
+   "skills": [
+    "logic",
+    "math"
+   ],
+   "par": 10,
+   "timed": true
+  },
+  {
+   "id": "raven",
+   "title": "Матрицы",
+   "emoji": "🔷",
+   "section": "brain",
+   "group": "iq",
+   "desc": "Закономерность в таблице 3×3: что должно стоять вместо «?».",
+   "skills": [
+    "logic"
+   ],
+   "par": 10,
+   "timed": true
+  },
+  {
+   "id": "rotation",
+   "title": "Повороты фигур",
+   "emoji": "🔄",
+   "section": "brain",
+   "group": "iq",
+   "desc": "Повёрнутая это фигура или её зеркальное отражение? Мысленное вращение.",
+   "skills": [
+    "spatial"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "capitals",
+   "title": "Столицы мира",
+   "emoji": "🏛",
+   "section": "learn",
+   "group": "geo",
+   "desc": "Все 194 страны: страна → столица и обратно. Варианты — из той же части света.",
+   "skills": [
+    "knowledge"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "flags",
+   "title": "Флаги",
+   "emoji": "🚩",
+   "section": "learn",
+   "group": "geo",
+   "desc": "Флаги всех 194 стран мира.",
+   "skills": [
+    "knowledge"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "continents",
+   "title": "Часть света",
+   "emoji": "🌐",
+   "section": "learn",
+   "group": "geo",
+   "desc": "В какой части света находится страна? Все 194 страны.",
+   "skills": [
+    "knowledge"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "english",
+   "title": "Английский A1",
+   "emoji": "🇬🇧",
+   "section": "learn",
+   "group": "lang",
+   "desc": "Базовые английские слова: перевод в обе стороны.",
+   "skills": [
+    "language"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "english-b",
+   "title": "Английский B1–B2",
+   "emoji": "🇺🇸",
+   "section": "learn",
+   "group": "lang",
+   "desc": "110 слов уровня старшей школы и ЕГЭ: achieve, consequence, inevitable…",
+   "skills": [
+    "language"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "ruswords",
+   "title": "Словарные слова",
+   "emoji": "✏️",
+   "section": "ege",
+   "group": "erus",
+   "desc": "Вставь пропущенную букву в словарное слово.",
+   "skills": [
+    "language"
+   ],
+   "par": 20,
+   "timed": true
+  },
+  {
+   "id": "tsya",
+   "title": "-тся или -ться",
+   "emoji": "📝",
+   "section": "ege",
+   "group": "erus",
+   "desc": "Правило: что делает? → -тся, что делать? → -ться.",
+   "skills": [
+    "language"
+   ],
+   "par": 20,
+   "timed": true
+  },
+  {
+   "id": "multiply",
+   "title": "Умножение",
+   "emoji": "✖️",
+   "section": "learn",
+   "group": "math",
+   "desc": "От таблицы умножения до двузначного на двузначное и квадратов.",
+   "skills": [
+    "math"
+   ],
+   "par": 20,
+   "timed": true
+  },
+  {
+   "id": "roman",
+   "title": "Римские цифры",
+   "emoji": "🏺",
+   "section": "learn",
+   "group": "math",
+   "desc": "Переводи числа из римской записи в обычную и обратно.",
+   "skills": [
+    "math"
+   ],
+   "par": 12,
+   "timed": true
+  },
+  {
+   "id": "elements",
+   "title": "Химические элементы",
+   "emoji": "⚗️",
+   "section": "ege",
+   "group": "echem",
+   "desc": "63 элемента: символ ↔ название. Сложность растёт с порядковым номером.",
+   "skills": [
+    "knowledge"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "ege-chem",
+   "title": "Вещества и формулы",
+   "emoji": "⚗️",
+   "section": "ege",
+   "group": "echem",
+   "desc": "H₂SO₄, NaHCO₃, C₆H₁₂O₆… — формулы и названия веществ в обе стороны.",
+   "skills": [
+    "knowledge"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "algo-bubble",
+   "title": "Пузырьком",
+   "emoji": "🫧",
+   "section": "algo",
+   "group": "sort",
+   "desc": "Соседи меняются местами, пока всё не встанет по порядку.",
+   "skills": [],
+   "par": 1,
+   "app": true
+  },
+  {
+   "id": "algo-selection",
+   "title": "Выбором",
+   "emoji": "👆",
+   "section": "algo",
+   "group": "sort",
+   "desc": "Каждый раз ищем минимум и ставим в начало.",
+   "skills": [],
+   "par": 1,
+   "app": true
+  },
+  {
+   "id": "algo-insertion",
+   "title": "Вставками",
+   "emoji": "🃏",
+   "section": "algo",
+   "group": "sort",
+   "desc": "Как карты в руке: вставляем каждый элемент на своё место.",
+   "skills": [],
+   "par": 1,
+   "app": true
+  },
+  {
+   "id": "algo-merge",
+   "title": "Слиянием",
+   "emoji": "🔀",
+   "section": "algo",
+   "group": "sort",
+   "desc": "Делим пополам, сортируем и сливаем.",
+   "skills": [],
+   "par": 1,
+   "app": true
+  },
+  {
+   "id": "algo-quick",
+   "title": "Быстрая",
+   "emoji": "⚡",
+   "section": "algo",
+   "group": "sort",
+   "desc": "Опорный элемент и разбиение на меньшие и большие.",
+   "skills": [],
+   "par": 1,
+   "app": true
+  },
+  {
+   "id": "algo-binsearch",
+   "title": "Бинарный поиск",
+   "emoji": "🔎",
+   "section": "algo",
+   "group": "search",
+   "desc": "Каждый шаг вдвое сужает поиск.",
+   "skills": [],
+   "par": 1,
+   "app": true
+  },
+  {
+   "id": "algo-bfs",
+   "title": "Обход в ширину (BFS)",
+   "emoji": "🌊",
+   "section": "algo",
+   "group": "search",
+   "desc": "Волна от старта находит кратчайший путь.",
+   "skills": [],
+   "par": 1,
+   "app": true
+  },
+  {
+   "id": "algo-dfs",
+   "title": "Обход в глубину (DFS)",
+   "emoji": "🕳",
+   "section": "algo",
+   "group": "search",
+   "desc": "Идём до упора и возвращаемся из тупиков.",
+   "skills": [],
+   "par": 1,
+   "app": true
+  },
+  {
+   "id": "algo-astar",
+   "title": "Поиск A*",
+   "emoji": "⭐",
+   "section": "algo",
+   "group": "search",
+   "desc": "Кратчайший путь с подсказкой «куда ближе к цели».",
+   "skills": [],
+   "par": 1,
+   "app": true
+  },
+  {
+   "id": "algo-stackqueue",
+   "title": "Стек и очередь",
+   "emoji": "📚",
+   "section": "algo",
+   "group": "ds",
+   "desc": "LIFO против FIFO на одних и тех же операциях.",
+   "skills": [],
+   "par": 1,
+   "app": true
+  },
+  {
+   "id": "algo-bst",
+   "title": "Дерево поиска",
+   "emoji": "🌳",
+   "section": "algo",
+   "group": "ds",
+   "desc": "Вставка и поиск в двоичном дереве поиска.",
+   "skills": [],
+   "par": 1,
+   "app": true
+  },
+  {
+   "id": "algo-heap",
+   "title": "Куча",
+   "emoji": "⛰",
+   "section": "algo",
+   "group": "ds",
+   "desc": "Максимум всегда в корне: всплытие и просеивание.",
+   "skills": [],
+   "par": 1,
+   "app": true
+  },
+  {
+   "id": "algo-hash",
+   "title": "Хеш-таблица",
+   "emoji": "#️⃣",
+   "section": "algo",
+   "group": "ds",
+   "desc": "Хеш-функция, корзины и коллизии.",
+   "skills": [],
+   "par": 1,
+   "app": true
+  },
+  {
+   "id": "bigo",
+   "title": "Сложность алгоритмов",
+   "emoji": "📈",
+   "section": "algo",
+   "group": "quiz",
+   "desc": "O(1), O(log n), O(n²)… Карточки и тест на очки.",
+   "skills": [
+    "logic"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "draw",
+   "title": "Рисовалка",
+   "emoji": "🎨",
+   "section": "apps",
+   "desc": "Нарисуй и отправь в чат или сохрани файлом.",
+   "skills": [],
+   "par": 1,
+   "app": true
+  },
+  {
+   "id": "meme",
+   "title": "Мемы",
+   "emoji": "😹",
+   "section": "apps",
+   "desc": "Фото или шаблон + подпись сверху и снизу.",
+   "skills": [],
+   "par": 1,
+   "app": true
+  },
+  {
+   "id": "wheel",
+   "title": "Колесо выбора",
+   "emoji": "🎡",
+   "section": "apps",
+   "desc": "Куда идём? Кто моет посуду? Честно выбирает сервер, бот объявляет в чате.",
+   "skills": [],
+   "par": 1,
+   "app": true
+  },
+  {
+   "id": "dice",
+   "title": "Кубики и монетка",
+   "emoji": "🎲",
+   "section": "apps",
+   "desc": "Честный бросок: результат публикует бот, подделать нельзя.",
+   "skills": [],
+   "par": 1,
+   "app": true
+  },
+  {
+   "id": "teams",
+   "title": "Команды",
+   "emoji": "👥",
+   "section": "apps",
+   "desc": "Честно делим участников на команды.",
+   "skills": [],
+   "par": 1,
+   "app": true
+  },
+  {
+   "id": "split",
+   "title": "Раздели счёт",
+   "emoji": "🧾",
+   "section": "apps",
+   "desc": "Кто сколько заплатил → кто кому сколько переводит.",
+   "skills": [],
+   "par": 1,
+   "app": true
+  },
+  {
+   "id": "syllogism",
+   "title": "Логические выводы",
+   "emoji": "⚖️",
+   "section": "brain",
+   "group": "critical",
+   "desc": "Следует ли вывод из посылок? Слова выдуманные — работает только логика.",
+   "skills": [
+    "logic"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "biases",
+   "title": "Когнитивные искажения",
+   "emoji": "🧠",
+   "section": "brain",
+   "group": "critical",
+   "desc": "Ловушки мышления: якорь, ошибка выжившего, предвзятость подтверждения…",
+   "skills": [
+    "logic",
+    "knowledge"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "fallacies",
+   "title": "Логические ошибки",
+   "emoji": "🗯",
+   "section": "brain",
+   "group": "critical",
+   "desc": "Соломенное чучело, ложная дилемма, переход на личности — узнай приём по примеру.",
+   "skills": [
+    "logic",
+    "language"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "estimate",
+   "title": "Прикинь",
+   "emoji": "🎯",
+   "section": "brain",
+   "group": "count",
+   "desc": "Оцени результат без точного счёта: чувство числа.",
+   "skills": [
+    "math",
+    "speed"
+   ],
+   "par": 12,
+   "timed": true
+  },
+  {
+   "id": "nback2",
+   "title": "Двойной N-назад",
+   "emoji": "🔲",
+   "section": "brain",
+   "group": "memory",
+   "desc": "Помни и место, и букву N шагов назад. Классика тренировки рабочей памяти.",
+   "skills": [
+    "memory",
+    "attention"
+   ],
+   "par": 15,
+   "timed": false
+  },
+  {
+   "id": "chess",
+   "title": "Шахматные задачи",
+   "emoji": "♞",
+   "section": "brain",
+   "group": "logic",
+   "desc": "1500 задач из открытой базы Lichess. Сложность подстраивается под тебя.",
+   "skills": [
+    "logic",
+    "spatial"
+   ],
+   "par": 5,
+   "timed": true
+  },
+  {
+   "id": "phrases",
+   "title": "Английские фразы",
+   "emoji": "💬",
+   "section": "learn",
+   "group": "lang",
+   "desc": "800 живых фраз из Tatoeba: перевод в обе стороны.",
+   "skills": [
+    "language"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "trivia",
+   "title": "Trivia (English)",
+   "emoji": "🌐",
+   "section": "learn",
+   "group": "erudition",
+   "desc": "600 вопросов на эрудицию на английском — Open Trivia Database.",
+   "skills": [
+    "knowledge",
+    "language"
+   ],
+   "par": 12,
+   "timed": true
+  },
+  {
+   "id": "neighbors",
+   "title": "Соседи стран",
+   "emoji": "🗺",
+   "section": "learn",
+   "group": "geo",
+   "desc": "С кем граничит страна? Все страны мира.",
+   "skills": [
+    "knowledge"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "area",
+   "title": "Кто больше?",
+   "emoji": "📏",
+   "section": "learn",
+   "group": "geo",
+   "desc": "Какая страна больше по площади? Пары всё ближе по размеру.",
+   "skills": [
+    "knowledge"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "biology",
+   "title": "Биология: клетка и организм",
+   "emoji": "🧬",
+   "section": "learn",
+   "group": "science",
+   "desc": "Органоиды, деление клетки, генетика, кровь, экология — термины 9–11 класса.",
+   "skills": [
+    "knowledge"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "ege-calc",
+   "title": "Вычисления",
+   "emoji": "➗",
+   "section": "ege",
+   "group": "emath",
+   "desc": "Дроби, десятичные, степени, корни — как в первой части ЕГЭ.",
+   "skills": [
+    "math"
+   ],
+   "par": 12,
+   "timed": true
+  },
+  {
+   "id": "ege-eq",
+   "title": "Уравнения",
+   "emoji": "🟰",
+   "section": "ege",
+   "group": "emath",
+   "desc": "Линейные, квадратные, показательные, логарифмические.",
+   "skills": [
+    "math",
+    "logic"
+   ],
+   "par": 12,
+   "timed": true
+  },
+  {
+   "id": "ege-log",
+   "title": "Степени и логарифмы",
+   "emoji": "📈",
+   "section": "ege",
+   "group": "emath",
+   "desc": "Свойства логарифмов и степеней.",
+   "skills": [
+    "math"
+   ],
+   "par": 12,
+   "timed": true
+  },
+  {
+   "id": "ege-pct",
+   "title": "Проценты и вероятность",
+   "emoji": "🎲",
+   "section": "ege",
+   "group": "emath",
+   "desc": "Проценты, изменение цены, классическая вероятность.",
+   "skills": [
+    "math"
+   ],
+   "par": 12,
+   "timed": true
+  },
+  {
+   "id": "ege-deriv",
+   "title": "Производная и прогрессии",
+   "emoji": "📉",
+   "section": "ege",
+   "group": "emath",
+   "desc": "Производная многочлена в точке, арифметическая и геометрическая прогрессии.",
+   "skills": [
+    "math"
+   ],
+   "par": 12,
+   "timed": true
+  },
+  {
+   "id": "ege-trig",
+   "title": "Тригонометрия: таблица",
+   "emoji": "📐",
+   "section": "ege",
+   "group": "emath",
+   "desc": "Значения sin, cos, tg для основных углов.",
+   "skills": [
+    "math"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "ege-stress",
+   "title": "Ударения (задание 4)",
+   "emoji": "🗣",
+   "section": "ege",
+   "group": "erus",
+   "desc": "Орфоэпический минимум ЕГЭ: 170+ слов с коварными ударениями.",
+   "skills": [
+    "language"
+   ],
+   "par": 20,
+   "timed": true
+  },
+  {
+   "id": "ege-authors",
+   "title": "Авторы произведений",
+   "emoji": "✒️",
+   "section": "ege",
+   "group": "elit",
+   "desc": "Кто написал? Школьная программа по литературе.",
+   "skills": [
+    "language",
+    "knowledge"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "ege-heroes",
+   "title": "Герои произведений",
+   "emoji": "🎭",
+   "section": "ege",
+   "group": "elit",
+   "desc": "Из какого произведения герой?",
+   "skills": [
+    "language",
+    "knowledge"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "ege-dates",
+   "title": "Даты истории",
+   "emoji": "📜",
+   "section": "ege",
+   "group": "ehist",
+   "desc": "Ключевые даты истории России и мира — в обе стороны.",
+   "skills": [
+    "knowledge"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "ege-bases",
+   "title": "Системы счисления",
+   "emoji": "🔢",
+   "section": "ege",
+   "group": "einf",
+   "desc": "Двоичная, восьмеричная, шестнадцатеричная, десятичная.",
+   "skills": [
+    "math",
+    "logic"
+   ],
+   "par": 12,
+   "timed": true
+  },
+  {
+   "id": "ege-bool",
+   "title": "Логические выражения",
+   "emoji": "🔣",
+   "section": "ege",
+   "group": "einf",
+   "desc": "На скольких наборах выражение истинно? Задание в духе ЕГЭ.",
+   "skills": [
+    "logic"
+   ],
+   "par": 8,
+   "timed": true
+  },
+  {
+   "id": "ege-phys",
+   "title": "Формулы и единицы",
+   "emoji": "⚛️",
+   "section": "ege",
+   "group": "ephys",
+   "desc": "Основные формулы механики, электричества, оптики и единицы СИ.",
+   "skills": [
+    "knowledge",
+    "math"
+   ],
+   "par": 15,
+   "timed": true
+  }
+ ],
+ "skills": [
+  {
+   "id": "speed",
+   "title": "⚡ Скорость",
+   "desc": "Как быстро ты замечаешь и реагируешь"
+  },
+  {
+   "id": "attention",
+   "title": "🎯 Внимание",
+   "desc": "Фокус и умение не отвлекаться"
+  },
+  {
+   "id": "memory",
+   "title": "💭 Память",
+   "desc": "Рабочая и зрительная память"
+  },
+  {
+   "id": "flex",
+   "title": "🔀 Гибкость",
+   "desc": "Переключение между правилами"
+  },
+  {
+   "id": "logic",
+   "title": "🧩 Логика",
+   "desc": "Рассуждение и планирование"
+  },
+  {
+   "id": "spatial",
+   "title": "📐 Пространство",
+   "desc": "Мысленное вращение и ориентация"
+  },
+  {
+   "id": "math",
+   "title": "🧮 Счёт",
+   "desc": "Устный счёт и числа"
+  },
+  {
+   "id": "language",
+   "title": "🗣 Язык",
+   "desc": "Слова, правила, иностранный"
+  },
+  {
+   "id": "knowledge",
+   "title": "📚 Знания",
+   "desc": "География, наука, факты"
+  },
+  {
+   "id": "coordination",
+   "title": "🕹 Координация",
+   "desc": "Точность и ловкость движений"
+  }
+ ]
+}

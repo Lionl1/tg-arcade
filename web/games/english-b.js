@@ -1,0 +1,28 @@
+// Английский B1–B2: слова уровня старшей школы и ЕГЭ. d: 2 — B1, 3 — B2.
+Arcade.register(Learn.deck({
+  ask: 'Переведи на русский',
+  askRev: 'Как это по-английски?',
+  both: true,
+  cards: [
+    ...[['achieve', 'достигать'], ['advantage', 'преимущество'], ['afford', 'позволить себе'], ['although', 'хотя'], ['appear', 'появляться'], ['attempt', 'попытка'],
+      ['avoid', 'избегать'], ['behaviour', 'поведение'], ['borrow', 'брать взаймы'], ['career', 'карьера'], ['cause', 'причина'], ['challenge', 'вызов'],
+      ['compare', 'сравнивать'], ['condition', 'условие'], ['consider', 'рассматривать'], ['convince', 'убеждать'], ['decrease', 'уменьшаться'], ['deny', 'отрицать'],
+      ['depend', 'зависеть'], ['describe', 'описывать'], ['develop', 'развивать'], ['disappointed', 'разочарованный'], ['environment', 'окружающая среда'],
+      ['evidence', 'доказательство'], ['experience', 'опыт'], ['explain', 'объяснять'], ['failure', 'неудача'], ['familiar', 'знакомый'], ['frightened', 'испуганный'],
+      ['government', 'правительство'], ['improve', 'улучшать'], ['include', 'включать'], ['increase', 'увеличиваться'], ['influence', 'влияние'], ['knowledge', 'знание'],
+      ['mention', 'упоминать'], ['opinion', 'мнение'], ['opportunity', 'возможность'], ['prefer', 'предпочитать'], ['prevent', 'предотвращать'], ['probably', 'вероятно'],
+      ['purpose', 'цель'], ['receive', 'получать'], ['reduce', 'сокращать'], ['refuse', 'отказываться'], ['rely', 'полагаться'], ['require', 'требовать'],
+      ['solution', 'решение'], ['succeed', 'преуспевать'], ['suggest', 'предлагать'], ['support', 'поддерживать'], ['survive', 'выживать'], ['therefore', 'поэтому'],
+      ['threat', 'угроза'], ['truth', 'правда'], ['unfortunately', 'к сожалению'], ['worried', 'обеспокоенный']].map(([q, a]) => ({ q, a, d: 2 })),
+    ...[['abandon', 'покидать'], ['acknowledge', 'признавать'], ['ambiguous', 'двусмысленный'], ['anticipate', 'предвидеть'], ['assumption', 'предположение'],
+      ['bias', 'предвзятость'], ['comprehensive', 'всесторонний'], ['consequence', 'последствие'], ['controversial', 'спорный'], ['crucial', 'решающий'],
+      ['decline', 'снижаться'], ['deliberately', 'намеренно'], ['demonstrate', 'демонстрировать'], ['emerge', 'возникать'], ['enhance', 'усиливать'],
+      ['essential', 'необходимый'], ['evaluate', 'оценивать'], ['evident', 'очевидный'], ['exaggerate', 'преувеличивать'], ['feasible', 'осуществимый'],
+      ['genuine', 'подлинный'], ['hesitate', 'колебаться'], ['inevitable', 'неизбежный'], ['inherent', 'присущий'], ['insight', 'проницательность'],
+      ['interpret', 'толковать'], ['justify', 'оправдывать'], ['maintain', 'сохранять'], ['negotiate', 'вести переговоры'], ['notion', 'понятие'],
+      ['phenomenon', 'явление'], ['plausible', 'правдоподобный'], ['precise', 'точный'], ['predict', 'предсказывать'], ['pursue', 'преследовать'],
+      ['reluctant', 'неохотный'], ['relevant', 'уместный'], ['reveal', 'раскрывать'], ['scarce', 'дефицитный'], ['significant', 'значительный'],
+      ['sophisticated', 'утончённый'], ['subtle', 'тонкий'], ['sufficient', 'достаточный'], ['tendency', 'тенденция'], ['thorough', 'тщательный'],
+      ['undermine', 'подрывать'], ['vague', 'расплывчатый'], ['versatile', 'разносторонний'], ['widespread', 'широко распространённый']].map(([q, a]) => ({ q, a, d: 3 })),
+  ],
+}));

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <title>Аркада</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="sdk/arcade.css">
+  <script src="sdk/prefs.js"></script>
+  <style>
+    #hub { position: fixed; inset: 0; display: flex; flex-direction: column; }
+    #view { flex: 1; overflow-y: auto; padding: 16px 16px 24px; -webkit-overflow-scrolling: touch; }
+    #view > * { max-width: 560px; margin-left: auto; margin-right: auto; }
+    #tabs { flex: 0 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); background: var(--card);
+      padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); border-top: 1px solid color-mix(in srgb, var(--fg) 8%, transparent); }
+    #tabs button { border: 0; background: none; color: var(--hint); font-size: 12px; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 0; }
+    #tabs button span { font-size: 22px; }
+    #tabs button.on { color: var(--accent); font-weight: 700; }
+    .panel { background: var(--card); border-radius: 18px; padding: 16px; margin-bottom: 12px; }
+    .panel h2 { margin: 0 0 10px; font-size: 18px; }
+    .hello { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--accent); color: var(--accent-fg); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; flex: none; }
+    .hello .who { flex: 1; min-width: 0; }
+    .hello b { font-size: 19px; display: block; }
+    .chip { display: inline-block; padding: 2px 9px; border-radius: 99px; font-size: 13px; background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent); font-weight: 700; }
+    .streak { display: flex; align-items: center; gap: 14px; }
+    .streak .fire { font-size: 42px; line-height: 1; }
+    .streak .fire.off { filter: grayscale(1); opacity: .5; }
+    .streak b { font-size: 26px; }
+    .gl { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid color-mix(in srgb, var(--fg) 7%, transparent); }
+    .gl:first-of-type { border-top: 0; }
+    .gl .e { font-size: 30px; width: 40px; text-align: center; }
+    .gl .t { flex: 1; min-width: 0; }
+    .gl .t small { display: block; color: var(--hint); }
+    .gl .ok { font-size: 22px; }
+    .games { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+    .gcard { background: var(--card); border: 0; border-radius: 16px; padding: 12px; text-align: left; color: var(--fg); display: flex; flex-direction: column; gap: 4px; }
+    .gcard .e { font-size: 30px; }
+    .gcard b { font-size: 15px; }
+    .gcard small { color: var(--hint); font-size: 12px; }
+    .gcard .st { color: var(--warn); font-size: 12px; }
+    .chips { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 12px; padding-bottom: 2px; }
+    .chips button { flex: none; border: 0; border-radius: 99px; padding: 7px 14px; background: var(--card); color: var(--fg); font-weight: 600; }
+    .chips button.on { background: var(--accent); color: var(--accent-fg); }
+    .skill { margin: 10px 0; }
+    .skill .h { display: flex; justify-content: space-between; font-size: 14px; }
+    .skill small { color: var(--hint); }
+    .achs { display: grid; grid-template-columns: repeat(auto-fill, minmax(98px, 1fr)); gap: 8px; }
+    .ach { border-radius: 14px; padding: 10px 6px; text-align: center; background: color-mix(in srgb, var(--warn) 18%, transparent); }
+    .ach.lock { background: color-mix(in srgb, var(--fg) 6%, transparent); }
+    .ach.lock .ae { filter: grayscale(1); opacity: .45; }
+    .ach .ae { font-size: 28px; }
+    .ach b { display: block; font-size: 12px; margin-top: 2px; }
+    .ach small { display: block; font-size: 10px; color: var(--hint); }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; text-align: center; }
+    .stats b { display: block; font-size: 20px; }
+    .stats small { color: var(--hint); font-size: 11px; }
+    .switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 8px 0; }
+    .switch input[type=time] { font: inherit; padding: 8px 10px; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--fg) 15%, transparent); background: var(--bg); color: var(--fg); }
+    .toggle { width: 52px; height: 30px; border-radius: 99px; border: 0; background: color-mix(in srgb, var(--fg) 18%, transparent); position: relative; flex: none; }
+    .toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: left .2s; }
+    .toggle.on { background: var(--good); }
+    .toggle.on::after { left: 25px; }
+    .sci p, .sci li { color: color-mix(in srgb, var(--fg) 85%, transparent); line-height: 1.45; text-align: left; }
+    .sci ul { padding-left: 18px; }
+    .sci a { color: var(--accent); }
+    .tip { font-size: 14px; color: var(--hint); }
+    .center { text-align: center; }
+    .avatar { font-size: 28px; }
+    .editme { border: 0; background: none; font-size: 15px; padding: 0 4px; }
+    .avgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap: 6px; margin: 10px 0; }
+    .avgrid button { aspect-ratio: 1; border-radius: 12px; border: 2px solid transparent; background: color-mix(in srgb, var(--fg) 7%, transparent); font-size: 24px; }
+    .avgrid button.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 22%, transparent); }
+    .search { width: 100%; font: inherit; padding: 11px 14px; border-radius: 14px; border: 1px solid color-mix(in srgb, var(--fg) 12%, transparent); background: var(--card); color: var(--fg); margin-bottom: 10px; -webkit-user-select: text; user-select: text; }
+    .secs { margin: 4px 0 2px; }
+    .secs button small { opacity: .65; font-weight: 400; }
+    .gh { font-size: 15px; margin: 14px 4px 6px; color: var(--hint); font-weight: 700; }
+    .list { padding: 4px 12px; }
+    .grow { width: 100%; display: flex; align-items: center; gap: 12px; padding: 10px 0; border: 0; background: none; color: var(--fg); text-align: left;
+      border-top: 1px solid color-mix(in srgb, var(--fg) 7%, transparent); }
+    .grow:first-child { border-top: 0; }
+    .grow .e { font-size: 28px; width: 38px; text-align: center; flex: none; }
+    .grow .t { flex: 1; min-width: 0; }
+    .grow .t b { display: block; font-size: 15px; }
+    .grow .t small { display: block; color: var(--hint); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tag { flex: none; font-size: 11px; padding: 3px 8px; border-radius: 99px; background: color-mix(in srgb, var(--fg) 8%, transparent); color: var(--hint); }
+    .tag.on { background: color-mix(in srgb, var(--warn) 25%, transparent); color: var(--fg); }
+    .tag.new { background: color-mix(in srgb, var(--accent) 20%, transparent); color: var(--accent); }
+    .recent { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+    .recent button { flex: none; width: 76px; border: 0; border-radius: 14px; background: var(--card); color: var(--fg); padding: 8px 4px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .recent button span { font-size: 26px; }
+    .recent button small { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: center; }
+  </style>
+</head>
+<body>
+  <div id="hub">
+    <main id="view"></main>
+    <nav id="tabs">
+      <button data-tab="today"><span>🏠</span>Сегодня</button>
+      <button data-tab="games"><span>🎮</span>Игры</button>
+      <button data-tab="profile"><span>🧠</span>Профиль</button>
+      <button data-tab="science"><span>🔬</span>Наука</button>
+      <button data-tab="settings"><span>⚙️</span>Настройки</button>
+    </nav>
+  </div>
+  <script src="sdk/hub.js"></script>
+</body>
+</html>
