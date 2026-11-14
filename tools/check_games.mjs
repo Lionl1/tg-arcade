@@ -27,7 +27,7 @@ async function loadAll(lang) {
   sandbox.L = (ru, en) => (lang === 'en' && en != null ? en : ru);
   sandbox.Arcade = { register: (def) => { registered[current] = def; }, fail: (msg) => bad(current, `[${lang}] не загрузилась: ` + msg) };
   vm.createContext(sandbox);
-  for (const f of ['sdk/countries.js', 'sdk/learn.js', 'sdk/algo-code.js', 'sdk/algo.js', 'sdk/algo-paths.js']) vm.runInContext(fs.readFileSync(path.join(WEB, f), 'utf8'), sandbox);
+  for (const f of ['sdk/countries.js', 'sdk/learn.js', 'sdk/algo-code.js', 'sdk/algo.js', 'sdk/algo-paths.js', 'sdk/fit.js']) vm.runInContext(fs.readFileSync(path.join(WEB, f), 'utf8'), sandbox);
   for (const g of cat.games) {
     current = g.id;
     if (g.id === 'chess' || (g.lang && g.lang !== lang)) continue; // шахматы — отдельно; игры на другом языке не показываются
@@ -96,6 +96,21 @@ for (const lang of ['ru', 'en']) {
   }
 }
 const { registered, sandbox } = LOADED.ru;
+
+// --- тренировки: в каждом дне программы (1–40) есть упражнения, все они есть в наборе, числа разумные ---
+{
+  const ex = JSON.parse(fs.readFileSync(path.join(WEB, 'games/data/fit.json'), 'utf8')).exercises;
+  for (const g of cat.games.filter((x) => x.section === 'fit')) {
+    const def = registered[g.id];
+    if (!def || !def.fit) { bad(g.id, 'тренировка не собрана через Fit.workout'); continue; }
+    for (let lv = 1; lv <= 40; lv++) {
+      const plan = def.fit.plan(lv);
+      if (!plan.length) { bad(g.id, `день ${lv}: пустой план`); break; }
+      const wrong = plan.find((s) => !ex[s.ex] || !(s.reps > 0 || s.sec > 0) || s.reps > 60 || s.sec > 180 || (s.rest || 0) > 180);
+      if (wrong) { bad(g.id, `день ${lv}: плохой шаг ${JSON.stringify(wrong)}`); break; }
+    }
+  }
+}
 
 // --- L() — функция перевода: локальная переменная с именем L ломает строки игры в обоих языках ---
 for (const g of cat.games) {

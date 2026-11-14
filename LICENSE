@@ -30,6 +30,7 @@ their own licenses (see docs/credits.md):
 - web/games/data/chess.json — Lichess puzzle database, CC0
 - web/games/data/phrases.json — Tatoeba, CC BY 2.0 FR
 - web/games/data/trivia.json — Open Trivia Database, CC BY-SA 4.0
+- web/games/data/fit.json and exercise photos — free-exercise-db, Unlicense (public domain)
 - web/games/data/geo.json — mledoze/countries, ODbL 1.0
 - web/games/data/ege-art.json, ege-arch.json, en-art.json — Wikidata, CC0
 - English country names in web/sdk/countries.js — mledoze/countries, ODbL 1.0

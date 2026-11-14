@@ -3,7 +3,7 @@
 window.ArcadePrefs = (() => {
   'use strict';
   const KEY = 'arcade:prefs';
-  const DEF = { lang: 'auto', sound: true, haptics: true, theme: 'tg', text: 'normal', motion: true, open_mode: 'menu', tips: true, daily_size: 3, learn_batch: 20, algo_speed: 1, hide_name: false };
+  const DEF = { lang: 'auto', sound: true, haptics: true, theme: 'tg', text: 'normal', motion: true, open_mode: 'menu', tips: true, daily_size: 3, learn_batch: 20, algo_speed: 1, hide_name: false, breaks: true };
   let p = { ...DEF };
   try { Object.assign(p, JSON.parse(localStorage.getItem(KEY)) || {}); } catch (e) { /* приватный режим и т. п. */ }
 

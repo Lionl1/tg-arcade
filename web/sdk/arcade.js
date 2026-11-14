@@ -216,7 +216,8 @@
     if (p.level_up) html += `<div class="badge">🎉 ${L('Новый уровень профиля', 'New profile level')}: ${p.level}!</div>`;
     if (p.daily_completed) html += `<div class="badge">${L('🔥 Тренировка дня завершена!', '🔥 Daily workout complete!')}</div>`;
     else if (p.in_daily) html += `<div class="muted">${L('Тренировка дня', 'Daily workout')}: ${p.daily.count}/${p.daily.games.length}</div>`;
-    for (const a of p.achievements || []) html += `<div class="ach-new">${a.emoji} <b>${esc(a.title)}</b><small>${esc(a.desc)} · +25 XP</small></div>`;
+    html += `<a class="hublink" href="hub.html?tab=profile#graph">${L('🕸 Граф знаний обновлён — посмотреть', '🕸 Knowledge graph updated — take a look')}</a>`;
+    for (const a of p.achievements || []) html += `<div class="ach-new">${a.secret ? '🥚 ' : ''}${a.emoji} <b>${esc(a.title)}</b><small>${a.secret ? L('Пасхалка! ', 'Easter egg! ') : ''}${esc(a.desc)} · +25 XP</small></div>`;
     return html + '</div>';
   }
   function show(html) {
@@ -362,8 +363,29 @@
     return nt > t ? `<div class="badge">${L('⬆️ Следующая партия сложнее: ступень', '⬆️ Next round is harder: step')} ${nt}/4</div>` : nt < t ? `<p class="muted">${L('Следующая партия чуть проще: ступень', 'Next round is a bit easier: step')} ${nt}/4</p>` : `<p class="muted">${L('Сложность: ступень', 'Difficulty: step')} ${t}/4</p>`;
   }
 
+  // ---------- «засиделся в телефоне»: после ~25 минут игры подряд предлагаем 3-минутную разминку ----------
+  const BREAK_AFTER = 25 * 60 * 1000, SESSION_GAP = 10 * 60 * 1000;
+  function sessionTick() {
+    const now = Date.now();
+    let s = store.get('session') || {};
+    if (!s.start || now - (s.last || 0) > SESSION_GAP) s = { start: now, nudged: 0 };
+    s.last = now;
+    store.set('session', s);
+    return s;
+  }
+  function breakNudge() {
+    if (pref('breaks', true) === false || gameId.startsWith('fit-')) return '';
+    const s = sessionTick(), now = Date.now();
+    if (now - s.start < BREAK_AFTER || now - (s.nudged || 0) < BREAK_AFTER) return '';
+    s.nudged = now; store.set('session', s);
+    const mins = Math.round((now - s.start) / 60000);
+    return `<div class="nudge">📵 ${L(`Ты в телефоне уже ${mins} мин. Разомнёмся 3 минуты? Шея, плечи, запястья — и глазам отдых.`, `You've been on your phone for ${mins} min. A 3-minute break? Neck, shoulders, wrists — and a rest for your eyes.`)}
+      <a class="btn" href="play.html?g=fit-break">${L('🧘 Разминка', '🧘 Take a break')}</a></div>`;
+  }
+
   function finish(score) {
     if (opts.mode === 'level') return finishLevel(score);
+    const nudge = breakNudge();
     const tierNote = tierUpdate(score);
     const prev = opts.mode === 'event' ? null : store.get('best:' + gameId);
     const rec = opts.mode !== 'event' && score != null && (prev != null ? better(score, prev) : asc() || score > 0);
@@ -371,11 +393,13 @@
     const single = event && event.single;
     haptic(rec ? 'success' : 'warning');
     const card = show(`
-      <div class="emoji">${rec ? '🏆' : meta.emoji}</div>
+      <div class="emoji">${score === 42 && !asc() ? '🌌' : rec ? '🏆' : meta.emoji}</div>
+      ${score === 42 && !asc() ? `<p class="muted">${L('42 — ответ на главный вопрос жизни, вселенной и всего такого', '42 — the answer to life, the universe and everything')}</p>` : ''}
       <h1>${L('Игра окончена', 'Game over')}</h1>
       <div class="big">${fmt(score)}</div>
       ${rec && prev != null ? `<div class="badge">${L('Новый личный рекорд!', 'New personal best!')}</div>` : ''}
       ${tierNote}
+      ${nudge}
       <div class="progress"></div>
       <div class="board">${authed ? `<p class="muted">${L('Сохраняю результат…', 'Saving the result…')}</p>` : `<p class="muted">${L('Открой игру из Telegram, чтобы копить опыт и попадать в таблицы', 'Open the game from Telegram to earn XP and get on leaderboards')}</p>`}</div>
       <div class="row"><button class="btn ghost" data-act="menu">${L('Меню', 'Menu')}</button>${single ? '' : `<button class="btn" data-act="again">${L('↻ Ещё раз', '↻ Again')}</button>`}</div>`);
@@ -394,7 +418,7 @@
   }
 
   function finishLevel(score) {
-    const k = opts.level, goal = goalOf(k);
+    const k = opts.level, goal = goalOf(k), nudge = breakNudge();
     const stars = score == null ? 0 : starsOf(k, score);
     const passed = stars > 0;
     haptic(passed ? 'success' : 'warning');
@@ -413,6 +437,7 @@
       <div class="big">${fmt(score)}</div>
       <p class="muted">${L('Цель', 'Goal')}: ${fmt(goal)} · ${DIFF_NAMES[diffOf(k)]} · ${L('скорость', 'speed')} ×${levelOpts(k).speed.toFixed(2)}${modOf(k) ? ' · ' + MOD_INFO[modOf(k)][0] : ''}</p>
       ${near}
+      ${nudge}
       <div class="progress">${authed ? `<p class="muted">${L('Сохраняю…', 'Saving…')}</p>` : ''}</div>
       <div class="row"><button class="btn ghost" data-act="levels">${L('Уровни', 'Levels')}</button><button class="btn ${passed ? 'ghost' : ''}" data-act="again">${L('↻ Ещё раз', '↻ Again')}</button>
       ${passed ? `<button class="btn" data-act="next">${L('Дальше ▶', 'Next ▶')}</button>` : ''}</div>`);
@@ -442,6 +467,7 @@
 
   // ---------- раунд и api для игр ----------
   function startRound(o) {
+    sessionTick();
     opts = Object.assign({ mode: 'free' }, o);
     if (round) round.dispose();
     overlay.hidden = true;
@@ -533,6 +559,11 @@
         return bar;
       },
       toast: toastMsg,
+      /** Пасхалка из игры (код из белого списка сервера) — засчитывается один раз */
+      egg(code) {
+        if (!authed) return;
+        api('egg', { code }).then((d) => { if (d.achievement) toastMsg(`🥚 ${L('Пасхалка найдена', 'Easter egg found')}: ${d.achievement.emoji} ${d.achievement.title}`, 3500); }).catch(() => {});
+      },
       colors: colors(),
       get score() { return score; },
       get ended() { return ended; },

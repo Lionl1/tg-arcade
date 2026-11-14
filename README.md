@@ -20,6 +20,7 @@ In a group:
 | 🎓 Exams & school | **English interface:** math (6 generated topics: arithmetic, equations, logarithms, percent & probability, derivatives & sequences, trig), English (commonly confused words, spelling, grammar & usage, advanced vocabulary), literature (literary terms, who wrote it, famous characters), history (key dates, US presidents, **famous paintings from Wikidata**), civics & economics, computer science, physics, chemistry. **Russian interface:** the same math and sciences plus Russian-exam (ЕГЭ) courses — stress, paronyms, Russian literature and history |
 | 📚 Study & languages | every country (capitals, flags, continents, neighbours, which is bigger), **Russian for English speakers** (basic and advanced words, 800 Tatoeba phrases) / English for Russian speakers, trivia (600 questions), math, biology |
 | 💻 Algorithms | step-by-step animations with pseudocode and real, tested Python and JavaScript; practice (build the code, be the sort, trace the code, find the bug) and flashcards |
+| 💪 Body | pull-up bar, dips, street-workout circuit, push-up programme, full-body circuit, Tabata, core, morning workout, stretching, a 3-minute phone break. Levels are programme days with progression; exercises and photos from the open **free-exercise-db**. After 25 minutes of play in a row the app suggests a short break |
 | 🕹 Chill: arcade | runners and skill games |
 | 🛠 For chats | drawing, memes, fair draws, teams, bill splitting |
 

@@ -68,6 +68,10 @@ class MeIn(AuthIn):
     avatar: str | None = None
 
 
+class EggIn(AuthIn):
+    code: str
+
+
 class SettingsIn(AuthIn):
     changes: dict = {}
 
@@ -256,6 +260,17 @@ def create_app(settings: Settings, store: Store, catalog: Catalog,
                                                lang_of(body, a["user"]))
         except ValueError as e:
             raise HTTPException(400, str(e))
+
+    @app.post("/api/egg")
+    async def api_egg(body: EggIn):
+        """Пасхалки из Mini App (код Конами, «потыкай мозг», дракон)."""
+        a = auth(body)
+        throttle(a["user"]["id"], "egg")
+        try:
+            got = await progress.egg(a["user"]["id"], display_name(a["user"]), body.tz, body.code, lang_of(body, a["user"]))
+        except ValueError:
+            raise HTTPException(400, "unknown egg")
+        return {"achievement": got}
 
     @app.post("/api/settings")
     async def api_settings(body: SettingsIn):

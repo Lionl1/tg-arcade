@@ -51,6 +51,8 @@ USER: list[Opt] = [
     Opt("tips", "Подсказки «как играть»", True, (True, False), group="🎮 Игры", en=("“How to play” tips", (), "", "🎮 Games")),
     Opt("daily_size", "Игр в тренировке дня", 3, (3, 5), ("3 (≈5 минут)", "5 (≈8 минут)"), hint="Меняется со следующего дня", group="🧠 Тренировка",
         en=("Games in the daily workout", ("3 (≈5 minutes)", "5 (≈8 minutes)"), "Takes effect tomorrow", "🧠 Workout")),
+    Opt("breaks", "Предлагать разминку, если долго играю", True, (True, False), hint="Через 25 минут игры подряд — 3 минуты для шеи, плеч и глаз",
+        group="🧠 Тренировка", en=("Suggest a break when I play for long", (), "After 25 minutes in a row — 3 minutes for neck, shoulders and eyes", "🧠 Workout")),
     Opt("learn_batch", "Карточек за подход", 20, (10, 20, 30), ("10", "20", "30"), group="📚 Учёба", en=("Cards per session", (), "", "📚 Study")),
     Opt("algo_speed", "Скорость анимации алгоритмов", 1, (0, 1, 2, 3), ("×0.5", "×1", "×2", "×5"), group="💻 Алгоритмы",
         en=("Algorithm animation speed", (), "", "💻 Algorithms")),

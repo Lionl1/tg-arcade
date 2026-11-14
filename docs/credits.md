@@ -3,6 +3,7 @@
 | Что | Где используется | Источник | Лицензия |
 |---|---|---|---|
 | 1500 шахматных задач (выборка) | `web/games/data/chess.json` → «Шахматные задачи» | [Lichess puzzle database](https://database.lichess.org/) | CC0 (общественное достояние) |
+| 42 упражнения с фото и описанием техники | `web/games/data/fit.json` (фото — с jsDelivr) → раздел «💪 Тело» | [free-exercise-db](https://github.com/yuhonas/free-exercise-db) (yuhonas) | Unlicense (общественное достояние) |
 | Шахматные фигуры (SVG) | `web/vendor/pieces/` → «Шахматные задачи» | набор Cburnett, Colin M.L. Burnett ([Wikimedia Commons](https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces)), файлы — из [Lichess](https://github.com/lichess-org/lila/tree/master/public/piece/cburnett) | GPLv2+ / BSD / GFDL (на выбор; используем BSD) |
 | Правила шахмат | `web/vendor/chess.js` | [chess.js 0.10.3](https://github.com/jhlywa/chess.js), Jeff Hlywa | BSD-2-Clause |
 | 800 пар фраз en↔ru | `web/games/data/phrases.json` → «Английские фразы» | [Tatoeba](https://tatoeba.org) через [ManyThings.org](https://www.manythings.org/anki/); номера предложений — в 3-м поле | CC BY 2.0 FR |

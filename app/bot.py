@@ -410,6 +410,38 @@ def build_router(store: Store, catalog: Catalog, links: Links, events: Events, w
         await c.message.edit_text(text, reply_markup=kb)
         await c.answer()
 
+    # ---------- пасхалки: скрытые команды (их нет в меню команд) ----------
+
+    @r.message(Command("coffee", "tea", "teapot"))
+    async def egg_coffee(m: Message):
+        L = await lang_of(m.from_user, m.chat)
+        got = events.progress and await events.progress.award(m.from_user.id, "teapot") if m.from_user else False
+        await m.answer(tr(L, "🫖 <b>418 I’m a teapot</b>\nКофе не варю — я чайник. Но мозг заварю: /games",
+                          "🫖 <b>418 I’m a teapot</b>\nI don’t brew coffee — I’m a teapot. I can brew your brain though: /games")
+                       + ("\n\n" + tr(L, "🥚 Пасхалка найдена: «Я чайник»!", "🥚 Easter egg found: “I’m a teapot”!") if got else ""))
+
+    @r.message(Command("42"))
+    async def egg_42(m: Message):
+        L = await lang_of(m.from_user, m.chat)
+        await m.answer(tr(L, "🌌 Ответ найден. Осталось понять вопрос.\nПодсказка: набери ровно 42 очка в любой игре.",
+                          "🌌 The answer is found. Now to figure out the question.\nHint: score exactly 42 in any game."))
+
+    @r.message(Command("konami"))
+    async def egg_konami(m: Message):
+        L = await lang_of(m.from_user, m.chat)
+        await m.answer(tr(L, "🎮 ↑ ↑ ↓ ↓ ← → ← → B A\nГде-то в профиле это сработает. На телефоне — свайпами по экрану, B и A — тапы слева и справа.",
+                          "🎮 ↑ ↑ ↓ ↓ ← → ← → B A\nSomewhere in the profile this works. On a phone: swipe on the screen, B and A are taps on the left and right."))
+
+    @r.message(Command("secrets", "eggs"))
+    async def egg_list(m: Message):
+        from .progress import EGGS
+        L = await lang_of(m.from_user, m.chat)
+        rows = await store._all("SELECT code FROM achievements WHERE user_id=?", (m.from_user.id,)) if m.from_user else []
+        have = {c for (c,) in rows}
+        lines = [f"{a.emoji} <b>{escape(a.view(L)['title'])}</b>" if a.code in have else f"❓ <i>{escape(a.hidden(L)['desc'])}</i>" for a in EGGS]
+        found = sum(a.code in have for a in EGGS)
+        await m.answer(tr(L, f"🥚 <b>Пасхалки: {found} из {len(EGGS)}</b>\n\n", f"🥚 <b>Easter eggs: {found} of {len(EGGS)}</b>\n\n") + "\n".join(lines))
+
     # старые кнопки из сообщений, отправленных до появления разделов
     @r.callback_query(F.data.startswith("genres") | F.data.startswith("cat:"))
     async def cb_legacy(c: CallbackQuery):

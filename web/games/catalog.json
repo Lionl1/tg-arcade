@@ -172,6 +172,30 @@
    "desc_en": "Understand → remember → write it yourself. Animations with pseudocode and real Python and JavaScript, practice (build the code, be the sort, trace, find the bug) and flashcards."
   },
   {
+   "id": "fit",
+   "title": "💪 Тело",
+   "desc": "Физические тренировки: турник, брусья, отжимания, круговые, пресс, зарядка, растяжка. Уровни — дни программы с постепенной нагрузкой. Упражнения и фото — открытый набор free-exercise-db.",
+   "groups": [
+    {
+     "id": "bar",
+     "title": "🏋️ Турник и брусья",
+     "title_en": "🏋️ Bar and dips"
+    },
+    {
+     "id": "home",
+     "title": "🏠 Дома без снарядов",
+     "title_en": "🏠 At home, no equipment"
+    },
+    {
+     "id": "mobility",
+     "title": "🧘 Растяжка и разминка",
+     "title_en": "🧘 Stretching and breaks"
+    }
+   ],
+   "title_en": "💪 Body",
+   "desc_en": "Physical training: pull-up bar, dips, push-ups, circuits, core, morning sets, stretching. Levels are programme days with gradual progression. Exercises and photos come from the open free-exercise-db."
+  },
+  {
    "id": "arcade",
    "title": "🕹 Отдых: аркады",
    "desc": "Когда мозг уже размят: бегалки и игры на ловкость.",
@@ -2266,6 +2290,176 @@
    "title_en": "Famous Paintings",
    "desc_en": "Who painted it? ~320 paintings from the open Wikidata database.",
    "lang": "en"
+  },
+  {
+   "id": "fit-pullups",
+   "title": "Турник: подтягивания",
+   "emoji": "🏋️",
+   "section": "fit",
+   "group": "bar",
+   "desc": "От австралийских подтягиваний до серий и выхода силой.",
+   "skills": [
+    "fitness"
+   ],
+   "par": 230,
+   "ceil": 0.35,
+   "unit": "%",
+   "title_en": "Pull-up Bar",
+   "desc_en": "From inverted rows to sets of pull-ups and muscle-ups.",
+   "unit_en": "%"
+  },
+  {
+   "id": "fit-dips",
+   "title": "Брусья",
+   "emoji": "💪",
+   "section": "fit",
+   "group": "bar",
+   "desc": "Обратные отжимания, брусья, брусья на грудь.",
+   "skills": [
+    "fitness"
+   ],
+   "par": 230,
+   "ceil": 0.35,
+   "unit": "%",
+   "title_en": "Dips",
+   "desc_en": "Bench dips, bar dips, chest dips.",
+   "unit_en": "%"
+  },
+  {
+   "id": "fit-workout",
+   "title": "Воркаут: круговая",
+   "emoji": "🔥",
+   "section": "fit",
+   "group": "bar",
+   "desc": "Подтягивания, брусья, пресс, отжимания, приседания кругами.",
+   "skills": [
+    "fitness"
+   ],
+   "par": 230,
+   "ceil": 0.35,
+   "unit": "%",
+   "title_en": "Street Workout Circuit",
+   "desc_en": "Pull-ups, dips, abs, push-ups and squats in rounds.",
+   "unit_en": "%"
+  },
+  {
+   "id": "fit-pushups",
+   "title": "Отжимания: программа",
+   "emoji": "🤸",
+   "section": "fit",
+   "group": "home",
+   "desc": "Пять подходов по дням — до 40+ отжиманий и сложных вариантов.",
+   "skills": [
+    "fitness"
+   ],
+   "par": 230,
+   "ceil": 0.35,
+   "unit": "%",
+   "title_en": "Push-up Programme",
+   "desc_en": "Five sets a day — up to 40+ push-ups and harder variations.",
+   "unit_en": "%"
+  },
+  {
+   "id": "fit-circuit",
+   "title": "Круговая на всё тело",
+   "emoji": "🔄",
+   "section": "fit",
+   "group": "home",
+   "desc": "Без снарядов: работа и отдых по таймеру.",
+   "skills": [
+    "fitness"
+   ],
+   "par": 230,
+   "ceil": 0.35,
+   "unit": "%",
+   "title_en": "Full-Body Circuit",
+   "desc_en": "No equipment: work and rest on the timer.",
+   "unit_en": "%"
+  },
+  {
+   "id": "fit-tabata",
+   "title": "Табата",
+   "emoji": "⏱",
+   "section": "fit",
+   "group": "home",
+   "desc": "20 секунд работы, 10 отдыха, 8 раундов.",
+   "skills": [
+    "fitness"
+   ],
+   "par": 230,
+   "ceil": 0.35,
+   "unit": "%",
+   "title_en": "Tabata",
+   "desc_en": "20 seconds work, 10 rest, 8 rounds.",
+   "unit_en": "%"
+  },
+  {
+   "id": "fit-core",
+   "title": "Пресс и кор",
+   "emoji": "🧱",
+   "section": "fit",
+   "group": "home",
+   "desc": "Планки, скручивания, ножницы, супермен.",
+   "skills": [
+    "fitness"
+   ],
+   "par": 230,
+   "ceil": 0.35,
+   "unit": "%",
+   "title_en": "Core",
+   "desc_en": "Planks, crunches, flutter kicks, superman.",
+   "unit_en": "%"
+  },
+  {
+   "id": "fit-morning",
+   "title": "Утренняя зарядка",
+   "emoji": "🌅",
+   "section": "fit",
+   "group": "home",
+   "desc": "12 упражнений по 30 секунд — разбудить тело.",
+   "skills": [
+    "fitness"
+   ],
+   "par": 230,
+   "ceil": 0.35,
+   "unit": "%",
+   "title_en": "Morning Workout",
+   "desc_en": "12 exercises of 30 seconds to wake the body up.",
+   "unit_en": "%"
+  },
+  {
+   "id": "fit-stretch",
+   "title": "Растяжка",
+   "emoji": "🧘",
+   "section": "fit",
+   "group": "mobility",
+   "desc": "Спокойные удержания на всё тело.",
+   "skills": [
+    "fitness"
+   ],
+   "par": 230,
+   "ceil": 0.35,
+   "unit": "%",
+   "title_en": "Stretching",
+   "desc_en": "Calm holds for the whole body.",
+   "unit_en": "%"
+  },
+  {
+   "id": "fit-break",
+   "title": "Разминка от телефона",
+   "emoji": "📵",
+   "section": "fit",
+   "group": "mobility",
+   "desc": "3 минуты: шея, плечи, запястья, спина. Когда засиделся.",
+   "skills": [
+    "fitness"
+   ],
+   "par": 230,
+   "ceil": 0.35,
+   "unit": "%",
+   "title_en": "Phone Break",
+   "desc_en": "3 minutes: neck, shoulders, wrists, back. When you have been sitting too long.",
+   "unit_en": "%"
   }
  ],
  "skills": [
@@ -2338,6 +2532,13 @@
    "desc": "Точность и ловкость движений",
    "title_en": "🕹 Coordination",
    "desc_en": "Precision and dexterity"
+  },
+  {
+   "id": "fitness",
+   "title": "💪 Тело",
+   "desc": "Сила, выносливость и гибкость",
+   "title_en": "💪 Body",
+   "desc_en": "Strength, endurance and flexibility"
   }
  ]
 }

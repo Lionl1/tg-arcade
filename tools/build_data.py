@@ -5,6 +5,7 @@
 - Tatoeba / ManyThings rus-eng (CC BY 2.0 FR) → web/games/data/phrases.json
 - mledoze/countries (ODbL 1.0) → web/games/data/geo.json (площадь и соседи для наших 194 стран)
 - Wikidata (CC0 1.0), скачать: python tools/wikidata_fetch.py → web/games/data/ege-art.json, ege-arch.json
+- free-exercise-db (Unlicense, общественное достояние), github.com/yuhonas/free-exercise-db → web/games/data/fit.json
 """
 
 import json
@@ -207,6 +208,72 @@ def ege_arch() -> None:
     print(f"ege-arch: {len(cards)} построек", file=sys.stderr)
 
 
+# Упражнения для раздела «Тело»: id из free-exercise-db → (русское название, подсказка по технике; английские)
+FIT = {
+    # турник
+    "Pullups": ("Подтягивания", "Хват чуть шире плеч, подбородок выше перекладины, вниз — до прямых рук", "Pull-ups", "Grip a bit wider than shoulders, chin over the bar, lower to straight arms"),
+    "Chin-Up": ("Подтягивания обратным хватом", "Ладони к себе, локти вдоль тела", "Chin-ups", "Palms facing you, elbows close to the body"),
+    "Scapular_Pull-Up": ("Лопаточные подтягивания", "В висе на прямых руках своди и опускай лопатки", "Scapular pull-ups", "Hanging with straight arms, pull the shoulder blades down and together"),
+    "Inverted_Row": ("Австралийские подтягивания", "Низкая перекладина, тело прямое, тянись грудью к перекладине", "Inverted rows", "Low bar, body straight, pull your chest to the bar"),
+    "Band_Assisted_Pull-Up": ("Подтягивания с резинкой", "Резинка под колено или стопу помогает в нижней точке", "Band-assisted pull-ups", "A band under the knee or foot helps at the bottom"),
+    "Hanging_Leg_Raise": ("Подъём ног в висе", "Без раскачки, ноги до горизонтали или выше", "Hanging leg raises", "No swinging, legs to horizontal or higher"),
+    "One_Handed_Hang": ("Вис на турнике", "Расслабь плечи, дыши ровно; можно на двух руках", "Dead hang", "Relax the shoulders, breathe evenly; two hands are fine"),
+    "Muscle_Up": ("Выход силой", "Мощное подтягивание к поясу и перевод корпуса над перекладиной", "Muscle-up", "Explosive pull to the waist, then move the torso over the bar"),
+    # брусья
+    "Parallel_Bar_Dip": ("Отжимания на брусьях", "Опускайся до угла 90° в локтях, корпус чуть вперёд", "Parallel bar dips", "Lower to 90° at the elbows, lean slightly forward"),
+    "Dips_-_Chest_Version": ("Брусья на грудь", "Сильнее наклонись вперёд, локти в стороны", "Chest dips", "Lean further forward, elbows out"),
+    "Bench_Dips": ("Обратные отжимания от скамьи", "Руки за спиной на опоре, локти назад", "Bench dips", "Hands behind you on a bench, elbows back"),
+    # отжимания
+    "Pushups": ("Отжимания", "Тело — прямая линия, грудь почти касается пола", "Push-ups", "Body in a straight line, chest almost to the floor"),
+    "Incline_Push-Up": ("Отжимания от опоры", "Руки на скамье или стене — легче, чем от пола", "Incline push-ups", "Hands on a bench or wall — easier than from the floor"),
+    "Push-Up_Wide": ("Широкие отжимания", "Руки шире плеч — больше нагрузки на грудь", "Wide push-ups", "Hands wider than shoulders — more chest"),
+    "Push-Ups_-_Close_Triceps_Position": ("Узкие отжимания", "Руки под грудью, локти вдоль тела — трицепс", "Close-grip push-ups", "Hands under the chest, elbows in — triceps"),
+    "Push-Ups_With_Feet_Elevated": ("Отжимания с ногами на опоре", "Ноги выше рук — нагрузка на верх груди и плечи", "Feet-elevated push-ups", "Feet above the hands — upper chest and shoulders"),
+    "Plyo_Push-up": ("Взрывные отжимания", "Оттолкнись так, чтобы ладони оторвались от пола", "Plyo push-ups", "Push hard so your hands leave the floor"),
+    "Single-Arm_Push-Up": ("Отжимания на одной руке", "Ноги широко, корпус не скручивай", "One-arm push-ups", "Feet wide, don’t twist the torso"),
+    # ноги
+    "Bodyweight_Squat": ("Приседания", "Пятки на полу, колени по направлению носков, спина ровная", "Squats", "Heels down, knees over toes, back straight"),
+    "Freehand_Jump_Squat": ("Приседания с выпрыгиванием", "Мягко приземляйся на носки и сразу в присед", "Jump squats", "Land softly on your toes and go straight into a squat"),
+    "Bodyweight_Walking_Lunge": ("Выпады", "Колено задней ноги почти касается пола", "Lunges", "The back knee almost touches the floor"),
+    "Butt_Lift_Bridge": ("Ягодичный мост", "Лёжа на спине, поднимай таз, сжимай ягодицы", "Glute bridge", "Lying on your back, lift the hips and squeeze the glutes"),
+    "Step-up_with_Knee_Raise": ("Зашагивания на опору", "Устойчивая опора, колено вверх в верхней точке", "Step-ups", "A stable step, knee up at the top"),
+    # кор
+    "Plank": ("Планка", "Тело прямое, живот подтянут, не провисай", "Plank", "Body straight, belly tight, don’t sag"),
+    "Side_Bridge": ("Боковая планка", "Опора на локоть, таз не опускай", "Side plank", "On your elbow, keep the hips up"),
+    "Crunches": ("Скручивания", "Поднимай лопатки, поясница прижата", "Crunches", "Lift the shoulder blades, lower back pressed down"),
+    "Reverse_Crunch": ("Обратные скручивания", "Подтягивай колени к груди, отрывая таз", "Reverse crunches", "Pull the knees to the chest, lifting the hips"),
+    "Flutter_Kicks": ("Ножницы", "Лёжа на спине, попеременно поднимай прямые ноги", "Flutter kicks", "On your back, alternate straight-leg kicks"),
+    "Superman": ("Супермен", "Лёжа на животе, поднимай руки и ноги", "Superman", "Lying face down, lift arms and legs"),
+    "Mountain_Climbers": ("Скалолаз", "Из упора лёжа быстро подтягивай колени к груди", "Mountain climbers", "From a plank, drive the knees to the chest fast"),
+    # кардио
+    "Star_Jump": ("Прыжки «звезда»", "Прыжок с разведением рук и ног", "Star jumps", "Jump spreading arms and legs"),
+    "Knee_Tuck_Jump": ("Прыжки с подтягиванием коленей", "Колени к груди в прыжке, мягкое приземление", "Tuck jumps", "Knees to the chest in the air, land softly"),
+    "Rope_Jumping": ("Скакалка", "Прыгай на носках, кисти крутят скакалку", "Jump rope", "Bounce on your toes, turn the rope with your wrists"),
+    # растяжка и разминка
+    "Hamstring_Stretch": ("Растяжка задней поверхности бедра", "Тянись к носку прямой ноги, не округляй спину", "Hamstring stretch", "Reach for the toes of the straight leg, back flat"),
+    "Cat_Stretch": ("Кошка", "На четвереньках выгибай и округляй спину", "Cat stretch", "On all fours, arch and round your back"),
+    "Quad_Stretch": ("Растяжка передней поверхности бедра", "Стоя, подтяни пятку к ягодице", "Quad stretch", "Standing, pull your heel to your glutes"),
+    "Shoulder_Stretch": ("Растяжка плеч", "Прижми прямую руку к груди другой рукой", "Shoulder stretch", "Press a straight arm across the chest"),
+    "Chest_And_Front_Of_Shoulder_Stretch": ("Раскрытие груди", "Сцепи руки за спиной и раскрой грудь", "Chest opener", "Clasp your hands behind you and open the chest"),
+    "Side_Neck_Stretch": ("Растяжка шеи", "Мягко наклони голову к плечу, без рывков", "Neck stretch", "Gently tilt your head to the shoulder, no jerking"),
+    "Kneeling_Forearm_Stretch": ("Растяжка предплечий", "Ладони на полу пальцами к себе, плавно отклоняйся", "Forearm stretch", "Palms on the floor, fingers towards you, lean back gently"),
+    "Spinal_Stretch": ("Скрутка позвоночника", "Сидя, поверни корпус и задержись", "Spinal twist", "Sitting, rotate your torso and hold"),
+    "Standing_Lateral_Stretch": ("Наклоны в стороны", "Руку вверх и тянись в сторону", "Side bends", "Arm up and reach to the side"),
+}
+
+
+def fit() -> None:
+    raw = {x["id"]: x for x in json.loads((RAW / "free-exercise-db" / "exercises.json").read_text("utf-8"))}
+    out = {}
+    for eid, (ru, cue_ru, en, cue_en) in FIT.items():
+        x = raw[eid]
+        out[eid] = {"ru": ru, "en": en, "cue_ru": cue_ru, "cue_en": cue_en, "img": x["images"][:2],
+                    "muscles": x["primaryMuscles"], "level": x["level"], "how_en": x["instructions"][:4]}
+    data = {"source": "free-exercise-db by yuhonas (Unlicense, public domain), https://github.com/yuhonas/free-exercise-db", "exercises": out}
+    (OUT / "fit.json").write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), "utf-8")
+    print(f"fit: {len(out)} упражнений", file=sys.stderr)
+
+
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
     phrases()
@@ -215,3 +282,5 @@ if __name__ == "__main__":
         ege_art()
         ege_arch()
         en_art()
+    if (RAW / "free-exercise-db").exists():
+        fit()

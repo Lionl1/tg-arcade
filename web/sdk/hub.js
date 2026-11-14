@@ -30,7 +30,7 @@
     return r.json();
   }
 
-  let cat = null, prof = null, tab = 'today', sectionFilter = 'all';
+  let cat = null, prof = null, tab = 'today', sectionFilter = 'all', season = '';
   const game = (id) => cat.games.find((g) => g.id === id);
   const skill = (id) => cat.skills.find((s) => s.id === id);
   const playUrl = (id) => `play.html?g=${id}&from=hub${devQ}`;
@@ -84,7 +84,8 @@
           : `<div class="badge" style="display:block;text-align:center;margin-top:10px">${L('🎉 Готово на сегодня! Возвращайся завтра', '🎉 Done for today! Come back tomorrow')}</div>`}
       </div>
       ${weakest()}
-      <div class="panel"><div class="tip">💡 ${tip}</div></div>`;
+      <div class="panel"><div class="tip">💡 ${tip}</div></div>
+      ${season ? `<div class="panel"><div class="tip">${season}</div></div>` : ''}`;
   }
 
   function weakest() {
@@ -97,7 +98,7 @@
   }
 
   function guest() {
-    return `<div class="panel center"><div class="emoji" style="font-size:52px">🧠</div><h2>${L('Аркада для мозга', 'Brain Arcade')}</h2>
+    return `<div class="panel center"><div class="emoji brainpoke" style="font-size:52px">🧠</div><h2>${L('Аркада для мозга', 'Brain Arcade')}</h2>
       <p class="tip">${L('Открой Mini App из Telegram (бот → /profile), чтобы копить опыт, проходить уровни, получать ачивки и тренировку дня.', 'Open the Mini App from Telegram (bot → /profile) to earn XP, clear levels, unlock achievements and get a daily workout.')}</p>
       <button class="btn" data-tab="games">${L('🎮 Смотреть игры', '🎮 Browse games')}</button></div>`;
   }
@@ -173,19 +174,89 @@
         <div><b>${st.plays}</b><small>${L('партий', 'rounds')}</small></div><div><b>${st.days}</b><small>${L('дней', 'days')}</small></div>
         <div><b>${st.games}</b><small>${L('игр', 'games')}</small></div><div><b>${st.stars}</b><small>${L('звёзд', 'stars')}</small></div>
       </div>
+      ${window.KnowledgeGraph ? window.KnowledgeGraph.html(prof) : ''}
       <div class="panel"><button class="btn ghost" style="width:100%" data-tab="settings">${L('⚙️ Настройки и напоминание', '⚙️ Settings and reminder')}</button></div>
       <div class="panel"><h2>${L('🧩 Навыки', '🧩 Skills')}</h2>
         ${prof.skills.map((s) => `<div class="skill"><div class="h"><span>${esc(s.title)}</span><b>${L('ур.', 'lv.')} ${s.level}</b></div>
           ${bar(s.xp - s.start, s.next - s.start)}<small>${esc(s.desc)}</small></div>`).join('')}
       </div>
-      <div class="panel"><h2>${L('🏅 Ачивки', '🏅 Achievements')} · ${got}/${prof.achievements.length}</h2>
-        <div class="achs">${prof.achievements.map((a) => `<div class="ach ${a.unlocked ? '' : 'lock'}"><div class="ae">${a.emoji}</div><b>${esc(a.title)}</b>
-          <small>${esc(a.desc)}</small>${a.unlocked ? '' : `<small>${a.progress}/${a.goal}</small>`}</div>`).join('')}</div>
+      <div class="panel"><h2>${L('🏅 Ачивки', '🏅 Achievements')} · ${got}/${prof.achievements.length}${prof.eggs ? ` · 🥚 ${prof.eggs.found}/${prof.eggs.total}` : ''}</h2>
+        <div class="achs">${prof.achievements.map((a) => `<div class="ach ${a.unlocked ? '' : 'lock'}${a.secret ? ' secret' : ''}"><div class="ae">${a.emoji}</div><b>${esc(a.title)}</b>
+          <small>${esc(a.desc)}</small>${a.unlocked || a.secret ? '' : `<small>${a.progress}/${a.goal}</small>`}</div>`).join('')}</div>
       </div>`;
   }
 
+  const link = (url, text) => `<a href="${url}" data-link="${url}">${text}</a>`;
+
+  // «Наука»: исследования + как мы проверяем контент + открытые источники + благодарности
   function science() {
-    const link = (url, text) => `<a href="${url}" data-link="${url}">${text}</a>`;
+    return research() + method() + sources() + thanks();
+  }
+
+  function method() {
+    return `<div class="panel sci"><h2>${L('🧪 Как мы проверяем материалы', '🧪 How we check the content')}</h2><ul>
+      <li>${L('Каждый генератор заданий прогоняется тысячи раз: нет пустых, битых и неоднозначных вопросов, у каждого вопроса ровно один верный ответ.', 'Every task generator runs thousands of times: no empty, broken or ambiguous questions, exactly one correct answer each.')}</li>
+      <li>${L('Весь учебный код (алгоритмы, «Собери код», «Найди ошибку», «Что выведет код?») исполняется в настоящем Python и JavaScript с тестами.', 'All teaching code (algorithms, Build the Code, Find the Bug, What Does It Print?) runs in real Python and JavaScript with tests.')}</li>
+      <li>${L('Все 1500 шахматных задач проигрываются по правилам до конца решения.', 'All 1500 chess puzzles are replayed by the rules to the end of the solution.')}</li>
+      <li>${L('Игры проверяются на двух языках: в английской версии не остаётся русского текста.', 'Games are checked in both languages: no Russian text is left in the English version.')}</li>
+      <li>${L('Данные из открытых баз чистятся: убираем неоднозначные и ошибочные записи (например, картину, «написанную» после смерти автора).', 'Open data is cleaned: we drop ambiguous and wrong records (for example, a painting “made” after the artist died).')}</li>
+    </ul></div>`;
+  }
+
+  const SOURCES = [
+    ['♟', 'Lichess puzzle database', 'https://database.lichess.org/', 'CC0', L('1500 шахматных задач с рейтингом', '1500 rated chess puzzles')],
+    ['♞', 'chess.js', 'https://github.com/jhlywa/chess.js', 'BSD-2-Clause', L('правила шахмат: проверка ходов', 'chess rules: move validation')],
+    ['♛', L('Фигуры Cburnett', 'Cburnett chess pieces'), 'https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces', 'GPL / BSD / GFDL', L('понятные фигуры на доске', 'clear pieces on the board')],
+    ['🗣', 'Tatoeba · ManyThings.org', 'https://tatoeba.org', 'CC BY 2.0 FR', L('800 живых фраз en↔ru', '800 everyday en↔ru phrases')],
+    ['❓', 'Open Trivia Database', 'https://opentdb.com', 'CC BY-SA 4.0', L('600 вопросов викторины', '600 trivia questions')],
+    ['💪', 'free-exercise-db', 'https://github.com/yuhonas/free-exercise-db', 'Unlicense', L('42 упражнения с фото и описанием техники для раздела «Тело»', '42 exercises with photos and technique notes for the Body section')],
+    ['🌍', 'mledoze/countries', 'https://github.com/mledoze/countries', 'ODbL 1.0', L('границы и площади стран, английские названия', 'borders, areas and English names of countries')],
+    ['🏳️', 'Twemoji (jdecked)', 'https://github.com/jdecked/twemoji', 'CC BY 4.0', L('флаги, которые видны на любом устройстве', 'flags that show on any device')],
+    ['🖼', 'Wikidata', 'https://www.wikidata.org', 'CC0', L('картины и художники, постройки и архитекторы', 'paintings and artists, buildings and architects')],
+    ['📏', L('ФИПИ (ориентир)', 'FIPI (reference)'), 'https://fipi.ru', L('факты языка', 'language facts'), L('орфоэпический словник и паронимы ЕГЭ — только как ориентир по темам', 'Russian exam word lists — used only as a topic reference')],
+    ['🐍', 'Python · aiogram · FastAPI · uvicorn · aiosqlite', 'https://github.com/aiogram/aiogram', L('открытые лицензии', 'open licences'), L('бот и сервер', 'the bot and the server')],
+    ['✈️', 'Telegram Mini Apps', 'https://core.telegram.org/bots/webapps', '—', L('игры прямо внутри Telegram', 'games right inside Telegram')],
+  ];
+  function sources() {
+    return `<div class="panel sci"><h2>${L('📂 Открытые источники', '📂 Open sources')}</h2>
+      <p>${L('Аркада собрана на открытых данных и открытом коде. Каждый набор хранит свою лицензию; полный список — в', 'The Arcade is built on open data and open code. Every dataset keeps its own licence; the full list is in')} ${link('https://github.com/Lionl1/tg-arcade/blob/main/docs/credits.md', 'docs/credits.md')}.</p>
+      <div class="src-list">${SOURCES.map(([e, name, url, lic, what]) => `<div class="src"><span>${e}</span><div><b>${link(url, esc(name))}</b><small>${esc(what)}</small></div><em>${esc(lic)}</em></div>`).join('')}</div>
+      <p class="tip">${L('Сам проект — открытый (MIT):', 'The project itself is open source (MIT):')} ${link('https://github.com/Lionl1/tg-arcade', 'github.com/Lionl1/tg-arcade')}. ${L('Исправления и новые игры приветствуются.', 'Fixes and new games are welcome.')}</p></div>`;
+  }
+
+  function thanks() {
+    const T = L([
+      'сообществу <b>Lichess</b> — за свободную шахматную платформу и открытую базу задач;',
+      'тысячам редакторов <b>Wikidata и Википедии</b> — за знания, доступные всем;',
+      'волонтёрам <b>Tatoeba</b> и Чарльзу Келли (<b>ManyThings.org</b>) — за живые фразы с переводами;',
+      'авторам вопросов <b>Open Trivia Database</b>;',
+      'Мохаммеду Ле Дозу (<b>mledoze/countries</b>) и всем, кто поддерживает данные о странах;',
+      'Джеффу Хлайве (<b>chess.js</b>) и Колину Бёрнетту (<b>шахматные фигуры</b>);',
+      'команде <b>Twemoji</b> — за открытые эмодзи;',
+      'автору <b>free-exercise-db</b> — за открытую базу упражнений с фотографиями;',
+      'авторам <b>aiogram, FastAPI, uvicorn</b> и всему open source-сообществу Python;',
+      'учёным, чьи исследования легли в основу тренировок и интервальных повторений;',
+      'всем игрокам и тестировщикам — за ошибки, идеи и «а можно ещё…».',
+    ], [
+      'the <b>Lichess</b> community — for a free chess platform and an open puzzle database;',
+      'thousands of <b>Wikidata and Wikipedia</b> editors — for knowledge open to everyone;',
+      '<b>Tatoeba</b> volunteers and Charles Kelly (<b>ManyThings.org</b>) — for everyday phrases with translations;',
+      'the authors of <b>Open Trivia Database</b> questions;',
+      'Mohammed Le Doze (<b>mledoze/countries</b>) and everyone who maintains country data;',
+      'Jeff Hlywa (<b>chess.js</b>) and Colin M.L. Burnett (<b>chess pieces</b>);',
+      'the <b>Twemoji</b> team — for open emoji;',
+      'the author of <b>free-exercise-db</b> — for an open exercise database with photos;',
+      'the authors of <b>aiogram, FastAPI, uvicorn</b> and the whole Python open-source community;',
+      'the researchers whose work shaped the training and spaced repetition;',
+      'every player and tester — for bug reports, ideas and “could you also add…”.',
+    ]);
+    return `<div class="panel sci"><h2>${L('🙏 Благодарности', '🙏 Thanks')}</h2>
+      <p>${L('Спасибо всем, без кого этой аркады бы не было:', 'Thank you to everyone who made this arcade possible:')}</p>
+      <ul>${T.map((t) => `<li>${t}</li>`).join('')}</ul>
+      <p class="tip">${L('Нашёл ошибку в вопросе или хочешь предложить игру — пиши на GitHub. 🧠', 'Found a mistake in a question or want to suggest a game? Write on GitHub. 🧠')}</p></div>`;
+  }
+
+  function research() {
     if (LANG === 'en') return `<div class="panel sci"><h2>🔬 What the research says</h2>
       <p>We built the Arcade on research findings — and we are honest about their limits.</p>
       <ul>
@@ -195,6 +266,8 @@
         <li><b>Learning a new, demanding skill</b> improves memory more than simply pleasant activities. Hence the Study section and the levels. ${link('https://pubmed.ncbi.nlm.nih.gov/24214244/', 'Park et al., 2014')}</li>
         <li><b>Retrieval practice with spaced repetition</b> is one of the most reliable ways to learn. That is exactly how the flashcards work. ${link('https://link.springer.com/10.1007/s10648-020-09572-8', 'meta-analysis, 2020')}</li>
         <li><b>Action games</b> train attention and spatial thinking. ${link('https://archive-ouverte.unige.ch/unige:101941', 'Bediou et al., 2018')}</li>
+        <li><b>Movement trains the brain too.</b> The WHO recommends 150–300 minutes of moderate activity a week plus strength training 2+ times a week for adults, and breaking up long sitting. Hence the Body section and the break reminder. ${link('https://www.who.int/publications/i/item/9789240015128', 'WHO, 2020')}</li>
+        <li><b>Short intense intervals</b> (morning sets, Tabata) give a noticeable effect in just minutes. ${link('https://pubmed.ncbi.nlm.nih.gov/8897392/', 'Tabata et al., 1996')}</li>
       </ul>
       <p><b>What we do not promise:</b> higher IQ, protection from dementia or treatment of anything. Games are a fun and useful warm-up, not a medicine.</p></div>`;
     return `<div class="panel sci"><h2>🔬 Что говорят исследования</h2>
@@ -206,6 +279,8 @@
         <li><b>Освоение нового сложного навыка</b> улучшает память сильнее, чем просто приятное времяпрепровождение. Отсюда раздел «Учёба» и уровни. ${link('https://pubmed.ncbi.nlm.nih.gov/24214244/', 'Park et al., 2014')}</li>
         <li><b>Вспоминать и повторять с интервалами</b> — один из самых надёжных способов учиться. Карточки работают именно так. ${link('https://link.springer.com/10.1007/s10648-020-09572-8', 'метаанализ, 2020')}</li>
         <li><b>Динамичные игры</b> тренируют внимание и пространственное мышление. ${link('https://archive-ouverte.unige.ch/unige:101941', 'Bediou et al., 2018')}</li>
+        <li><b>Движение — тоже тренировка мозга.</b> ВОЗ советует взрослым 150–300 минут умеренной активности в неделю и силовые упражнения 2+ раза в неделю, а долгое сидение — прерывать. Отсюда раздел «Тело» и напоминание размяться. ${link('https://www.who.int/publications/i/item/9789240015128', 'ВОЗ, 2020')}</li>
+        <li><b>Короткие интенсивные интервалы</b> (зарядка, табата) дают заметный эффект за считанные минуты. ${link('https://pubmed.ncbi.nlm.nih.gov/8897392/', 'Tabata et al., 1996')}</li>
       </ul>
       <p><b>Чего мы не обещаем:</b> рост IQ, защиту от деменции или лечение чего-либо. Игры — это весёлая и полезная разминка, а не лекарство.</p></div>`;
   }
@@ -250,6 +325,10 @@
     const keep = view.scrollTop;
     view.innerHTML = { today, games, profile, science, settings }[tab]();
     view.scrollTop = arguments[0] ? keep : 0;
+    if (tab === 'profile' && prof && window.KnowledgeGraph) {
+      window.KnowledgeGraph.bind(view, prof, cat.games);
+      if (location.hash === '#graph' && !arguments[0]) { const g = view.querySelector('#graph'); if (g) g.scrollIntoView(); }
+    }
   }
   view.addEventListener('click', async (e) => {
     const t = e.target.closest('[data-play],[data-sec],[data-tab],[data-act],[data-link],[data-set],[data-av]');
@@ -307,6 +386,81 @@
     } catch (err) { const p = view.querySelector('[data-rem]'); if (p) p.textContent = err.message; }
   }
 
+  // ---------- пасхалки ----------
+  const motionOk = () => !window.ArcadePrefs || window.ArcadePrefs.get('motion') !== false;
+  function burst(emojis, n = 28) { // конфетти из эмодзи
+    if (!motionOk()) return;
+    for (let i = 0; i < n; i++) {
+      const e = document.createElement('div');
+      e.className = 'egg-fx';
+      e.textContent = emojis[i % emojis.length];
+      e.style.left = Math.random() * 100 + 'vw';
+      e.style.animationDuration = 1.6 + Math.random() * 1.8 + 's';
+      e.style.animationDelay = Math.random() * 0.6 + 's';
+      document.body.appendChild(e);
+      setTimeout(() => e.remove(), 4200);
+    }
+  }
+  function toast(t) { const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 3200); }
+  async function foundEgg(code, fx) {
+    burst(fx);
+    haptic();
+    if (!authed) return toast(L('🥚 Пасхалка! Открой из Telegram, чтобы она засчиталась', '🥚 Easter egg! Open from Telegram for it to count'));
+    try {
+      const r = await api('egg', { code });
+      if (r.achievement) {
+        toast(`🥚 ${L('Пасхалка найдена', 'Easter egg found')}: ${r.achievement.emoji} ${r.achievement.title} · +25 XP`);
+        prof = await api('profile'); render(true);
+      } else toast(L('🥚 Эту пасхалку ты уже нашёл', '🥚 You already found this one'));
+    } catch (e) { /* не страшно */ }
+  }
+  // код Конами: стрелки и B A на клавиатуре; на телефоне — свайпы и тапы слева (B) / справа (A)
+  const KONAMI = ['up', 'up', 'down', 'down', 'left', 'right', 'left', 'right', 'b', 'a'];
+  let seq = [];
+  const push = (k) => { seq = seq.concat(k).slice(-KONAMI.length); if (seq.join() === KONAMI.join()) { seq = []; foundEgg('konami', ['🎮', '👾', '⭐', '🕹']); } };
+  window.addEventListener('keydown', (e) => {
+    const k = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right', KeyB: 'b', KeyA: 'a' }[e.code];
+    if (k) push(k);
+  });
+  let t0 = null;
+  window.addEventListener('touchstart', (e) => { const t = e.touches[0]; t0 = { x: t.clientX, y: t.clientY }; }, { passive: true });
+  window.addEventListener('touchend', (e) => {
+    if (!t0) return;
+    const t = e.changedTouches[0], dx = t.clientX - t0.x, dy = t.clientY - t0.y;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) > 40) push(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up'));
+    else if (seq.length >= 8) push(t.clientX < innerWidth / 2 ? 'b' : 'a'); // B и A — только в конце кода, чтобы обычные тапы не мешали
+    t0 = null;
+  }, { passive: true });
+  // «не трогай мозг»: 10 тапов по аватарке/мозгу за 4 секунды
+  let pokes = [];
+  view.addEventListener('click', (e) => {
+    const a = e.target.closest('.avatar, .brainpoke');
+    if (!a) return;
+    const now = Date.now();
+    pokes = pokes.filter((t) => now - t < 4000).concat(now);
+    a.classList.remove('wobble'); void a.offsetWidth; a.classList.add('wobble');
+    if (pokes.length === 5) toast(L('🧠 Эй, щекотно!', '🧠 Hey, that tickles!'));
+    if (pokes.length >= 10) { pokes = []; foundEgg('brainpoke', ['🧠', '💥', '✨', '😵‍💫']); }
+  });
+  // сезонные сюрпризы
+  function seasonal() {
+    const d = new Date(), m = d.getMonth() + 1, day = d.getDate();
+    if ((m === 12 && day >= 20) || (m === 1 && day <= 10)) { // Новый год: снег
+      if (motionOk()) for (let i = 0; i < 18; i++) {
+        const f = document.createElement('div');
+        f.className = 'snow'; f.textContent = '❄';
+        f.style.left = Math.random() * 100 + 'vw'; f.style.animationDuration = 6 + Math.random() * 8 + 's'; f.style.animationDelay = -Math.random() * 10 + 's';
+        f.style.fontSize = 10 + Math.random() * 14 + 'px';
+        document.body.appendChild(f);
+      }
+      return L('🎄 С наступающим! Лучший подарок мозгу — серия тренировок без пропусков.', '🎄 Happy holidays! The best gift for your brain is an unbroken workout streak.');
+    }
+    if (m === 10 && day === 31) { burst(['🎃', '🦇', '👻'], 16); return L('🎃 Страшно полезная тренировка сегодня!', '🎃 A scarily good workout today!'); }
+    if (m === 4 && day === 1) { document.body.classList.add('april'); return L('🐟 С 1 апреля! Мозг сегодня вверх ногами — проверь, не перевернулось ли что-нибудь.', '🐟 April Fools! The brain is upside down today — check if anything flipped.'); }
+    if (m === 3 && day === 14) return L('🥧 Сегодня день числа π. Сыграй в 3:14 — вдруг что-то случится…', '🥧 It’s Pi Day. Play at 3:14 — something might happen…');
+    return '';
+  }
+
   (async () => {
     document.querySelectorAll('#tabs button').forEach((b) => {
       const t = { today: L('Сегодня', 'Today'), games: L('Игры', 'Games'), profile: L('Профиль', 'Profile'), science: L('Наука', 'Science'), settings: L('Настройки', 'Settings') }[b.dataset.tab];
@@ -320,6 +474,7 @@
     cat.sections.forEach((s) => { localize(s); (s.groups || []).forEach(localize); });
     cat.skills.forEach(localize);
     cat.sections = cat.sections.filter((s) => cat.games.some((g) => g.section === s.id));
+    season = seasonal();
     if (authed) { try { prof = await api('profile'); window.ArcadePrefs.save(prof.prefs); } catch (e) { prof = null; } } // синхронизация настроек на это устройство
     const want = qs.get('tab');
     if (want) tab = want;

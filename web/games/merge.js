@@ -52,7 +52,7 @@ Arcade.register({
         for (let j = 0; j < vals.length; j++) {
           if (j + 1 < vals.length && vals[j] === vals[j + 1] && vals[j] < STAGES.length - 1) {
             const nv = vals[j] + 1;
-            out.push(nv); pts += 2 ** (nv + 1); top = Math.max(top, nv);
+            out.push(nv); pts += 2 ** (nv + 1); if (nv === STAGES.length - 1 && top < nv) api.egg('dragon'); top = Math.max(top, nv);
             merged.add(idx[out.length - 1]); j++;
           } else out.push(vals[j]);
         }

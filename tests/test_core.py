@@ -554,3 +554,43 @@ def test_chapters_and_boss_reward(client):
     assert r["progress"]["chapter_clear"] == 1 and r["progress"]["play_xp"] >= 50
     assert any(a["code"] == "boss1" for a in r["progress"]["achievements"])
     assert r["levels"][9]["mod"] == "boss" and len(r["levels"]) % 10 == 0
+
+
+# ---------- пасхалки ----------
+
+def test_easter_eggs(client):
+    from datetime import datetime
+
+    from app.progress import EGGS, server_eggs
+
+    c = client
+    g = c.catalog.get("snake")
+    assert "answer42" in server_eggs(g, 42, datetime(2026, 1, 5, 10, 0))
+    assert "pi" in server_eggs(g, 1, datetime(2026, 3, 14, 15, 14)) and "friday13" in server_eggs(g, 1, datetime(2026, 2, 13, 12, 0))
+    assert "palindrome" in server_eggs(g, 121, datetime(2026, 1, 5, 10, 0)) and "palindrome" not in server_eggs(g, 120, datetime(2026, 1, 5, 10, 0))
+    assert "lightning" in server_eggs(c.catalog.get("reaction"), 180, datetime(2026, 1, 5, 10, 0))
+    # 42 очка в игре → секретная ачивка в ответе, в профиле видна, остальные — скрыты
+    r = c.post("/api/score", json={"initData": init_data(95), "ctx": "snake", "score": 42}).json()
+    assert any(a["code"] == "answer42" and a["secret"] for a in r["progress"]["achievements"])
+    prof = c.post("/api/profile", json={"initData": init_data(95), "lang": "en"}).json()
+    eggs = {a["code"]: a for a in prof["achievements"] if a["secret"]}
+    assert len(eggs) == len(EGGS) and prof["eggs"] == {"found": 1, "total": len(EGGS)}
+    assert eggs["answer42"]["title"] == "The Answer" and eggs["konami"]["title"] == "Secret" and eggs["konami"]["emoji"] == "❓"
+    # пасхалки из Mini App: только из белого списка и один раз
+    assert c.post("/api/egg", json={"initData": init_data(95), "code": "konami"}).json()["achievement"]["code"] == "konami"
+    time.sleep(1.05)
+    assert c.post("/api/egg", json={"initData": init_data(95), "code": "konami"}).json()["achievement"] is None
+    time.sleep(1.05)
+    assert c.post("/api/egg", json={"initData": init_data(95), "code": "answer42"}).status_code == 400
+
+
+def test_knowledge_graph(client):
+    c = client
+    c.post("/api/score", json={"initData": init_data(97), "ctx": "math", "score": 20})
+    prof = c.post("/api/profile", json={"initData": init_data(97), "lang": "en"}).json()
+    topics = {t["id"]: t for t in prof["graph"]["topics"]}
+    assert topics["brain:count"]["xp"] > 0 and topics["brain:count"]["played"] == 1
+    assert "math" in topics["brain:count"]["links"]
+    assert all(t["title"] and t["games"] > 0 for t in topics.values())
+    assert not any(t["id"].startswith("apps") for t in topics.values()), "приложения — не темы знаний"
+    assert "ege:erus" in topics and topics["ege:erus"]["title"].endswith("Language")

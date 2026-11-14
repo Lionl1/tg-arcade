@@ -133,9 +133,23 @@ class Ach:
     goal: int
     title_en: str = ""
     desc_en: str = ""
+    secret: bool = False  # пасхалка: в профиле скрыта, пока не найдена
 
     def view(self, lang: str) -> dict:
-        return {"code": self.code, "emoji": self.emoji, "title": tr(lang, self.title, self.title_en), "desc": tr(lang, self.desc, self.desc_en)}
+        return {"code": self.code, "emoji": self.emoji, "title": tr(lang, self.title, self.title_en), "desc": tr(lang, self.desc, self.desc_en),
+                "secret": self.secret}
+
+    def hidden(self, lang: str) -> dict:
+        """Как выглядит ещё не найденная пасхалка: только загадочная подсказка."""
+        return {"code": self.code, "emoji": "❓", "title": tr(lang, "Секрет", "Secret"), "desc": tr(lang, self.hint, self.hint_en), "secret": True}
+
+    @property
+    def hint(self) -> str:
+        return EGG_HINTS.get(self.code, ("Найди сам 🤫", ""))[0]
+
+    @property
+    def hint_en(self) -> str:
+        return EGG_HINTS.get(self.code, ("", "Find it yourself 🤫"))[1]
 
 
 ACHIEVEMENTS: list[Ach] = [
@@ -170,7 +184,52 @@ ACHIEVEMENTS: list[Ach] = [
     Ach("night", "🦉", "Сова", "Потренируйся после 23:00", "night", 1, "Night owl", "Train after 11 pm"),
     Ach("comeback", "🔁", "Возвращение", "Вернись после перерыва в неделю", "comeback", 1, "Comeback", "Return after a week-long break"),
 ]
-ACH_BY_CODE = {a.code: a for a in ACHIEVEMENTS}
+# ---------- пасхалки: секретные ачивки ----------
+EGGS: list[Ach] = [
+    Ach("answer42", "🌌", "Ответ на главный вопрос", "Набери ровно 42 очка", "", 1, "The Answer", "Score exactly 42", secret=True),
+    Ach("pi", "🥧", "Время π", "Сыграй в 3:14", "", 1, "Pi time", "Play at 3:14", secret=True),
+    Ach("midnight", "🕛", "Полночь", "Сыграй ровно в 00:00", "", 1, "Midnight", "Play at exactly 00:00", secret=True),
+    Ach("friday13", "🐈‍⬛", "Пятница, 13-е", "Сыграй в пятницу 13-го", "", 1, "Friday the 13th", "Play on Friday the 13th", secret=True),
+    Ach("lightning", "⚡", "Молния", "Средняя реакция быстрее 200 мс", "", 1, "Lightning", "Average reaction under 200 ms", secret=True),
+    Ach("palindrome", "🪞", "Палиндром", "Счёт читается одинаково в обе стороны (от 101)", "", 1, "Palindrome", "A score that reads the same both ways (101+)", secret=True),
+    Ach("konami", "🎮", "Код Конами", "↑↑↓↓←→←→BA в профиле", "", 1, "Konami code", "↑↑↓↓←→←→BA in the hub", secret=True),
+    Ach("brainpoke", "🧠", "Не трогай мозг!", "Потыкай в мозг 10 раз", "", 1, "Don’t poke the brain!", "Poke the brain 10 times", secret=True),
+    Ach("dragon", "🐉", "Мать драконов", "Вырасти дракона в «Эволюции»", "", 1, "Mother of dragons", "Grow a dragon in Evolution", secret=True),
+    Ach("teapot", "🫖", "Я чайник", "Найди секретную команду бота про кофе", "", 1, "I’m a teapot", "Find the bot’s secret coffee command", secret=True),
+]
+EGG_HINTS = {
+    "answer42": ("Жизнь, вселенная и всё такое…", "Life, the universe and everything…"),
+    "pi": ("Иррациональное время для игры", "An irrational time to play"),
+    "midnight": ("Когда часы бьют двенадцать", "When the clock strikes twelve"),
+    "friday13": ("Не самый удачный день недели", "Not the luckiest day of the week"),
+    "lightning": ("Быстрее мысли", "Faster than thought"),
+    "palindrome": ("Число-перевёртыш", "A number that reads both ways"),
+    "konami": ("Старый добрый чит-код", "A good old cheat code"),
+    "brainpoke": ("Мозг щекотки не любит", "The brain is ticklish"),
+    "dragon": ("Из яйца — в легенду", "From an egg to a legend"),
+    "teapot": ("418", "418"),
+}
+CLIENT_EGGS = {"konami", "brainpoke", "dragon"}  # срабатывают в Mini App (безобидные — без влияния на рекорды)
+ALL_ACHIEVEMENTS = ACHIEVEMENTS + EGGS
+ACH_BY_CODE = {a.code: a for a in ALL_ACHIEVEMENTS}
+
+
+def server_eggs(game: Game, score: int, now: datetime) -> list[str]:
+    """Пасхалки, которые проверяет сервер при записи партии."""
+    out = []
+    if score == 42 and not game.asc:
+        out.append("answer42")
+    if now.minute == 14 and now.hour in (3, 15):
+        out.append("pi")
+    if now.hour == 0 and now.minute == 0:
+        out.append("midnight")
+    if now.weekday() == 4 and now.day == 13:
+        out.append("friday13")
+    if game.id == "reaction" and 0 < score < 200:
+        out.append("lightning")
+    if score >= 101 and str(score) == str(score)[::-1] and game.format == "pts":
+        out.append("palindrome")
+    return out
 
 
 class Progress:
@@ -359,6 +418,13 @@ class Progress:
             "days": len(days), "_have": have, "_total_xp": total,
         }
 
+    async def egg(self, user_id: int, name: str, tz: int | None, code: str, lang: str = "ru") -> dict | None:
+        """Пасхалка из Mini App. Возвращает ачивку, если найдена впервые."""
+        if code not in CLIENT_EGGS:
+            raise ValueError("unknown egg")
+        await self.touch_user(user_id, name, tz, lang)
+        return ACH_BY_CODE[code].view(lang) if await self.award(user_id, code) else None
+
     async def award(self, user_id: int, code: str) -> bool:
         return await self.store._exec(
             "INSERT OR IGNORE INTO achievements (user_id, code, ts) VALUES (?, ?, ?)", (user_id, code, int(time.time()))
@@ -427,11 +493,13 @@ class Progress:
             (user_id, game.id, score, mode, level, stars, record, xp, day, now.hour, int(time.time())),
         )
         daily_after = await self.daily_state(user_id, day, set(today) | {game.id}, daily_games)  # без повторного запроса
+        eggs = [ACH_BY_CODE[c].view(lang) for c in server_eggs(game, score, now) if await self.award(user_id, c)]
         st = await self.stats(user_id, day)
-        after_play_xp = st["_total_xp"]
+        after_play_xp = st["_total_xp"]  # уже с опытом за найденные пасхалки
         new_ach = await self.check_achievements(user_id, day, st, lang)
         after_xp = after_play_xp + ACH_XP * len(new_ach)
-        before_xp = after_play_xp - xp
+        before_xp = after_play_xp - xp - ACH_XP * len(eggs)
+        new_ach = eggs + new_ach
         lv_before = level_from_xp(before_xp, 25)[0]
         lv, start, nxt = level_from_xp(after_xp, 25)
         return {
@@ -452,7 +520,8 @@ class Progress:
         xp = st.pop("_total_xp")  # опыт и навыки — из уже посчитанной статистики, без лишних запросов
         have = st.pop("_have")
         lv, start, nxt = level_from_xp(xp, 25)
-        sk = await self.skill_xp(user_id)
+        per_game = await self._xp_per_game(user_id)
+        sk = self._skills_from(per_game)
         games = {}
         for game_id, stars, mx in await self.store._all(
                 "SELECT game, SUM(stars), MAX(CASE WHEN stars>0 THEN level ELSE 0 END) FROM levels WHERE user_id=? GROUP BY game", (user_id,)):
@@ -473,12 +542,46 @@ class Progress:
                 {**a.view(lang), "unlocked": a.code in have,
                  "progress": min(a.goal, st.get(a.key, 0)), "goal": a.goal}
                 for a in ACHIEVEMENTS
+            ] + [
+                {**(a.view(lang) if a.code in have else a.hidden(lang)), "unlocked": a.code in have, "progress": int(a.code in have), "goal": 1}
+                for a in EGGS
             ],
+            "eggs": {"found": sum(a.code in have for a in EGGS), "total": len(EGGS)},
+            "graph": self.knowledge_graph(per_game, lang),
             "reminder": {"on": bool(user[0]), "time": user[1], "can_write": bool(user[2])},
             "nickname": user[3], "avatar": user[4], "avatars": AVATARS,
             "prefs": await self.prefs.user(user_id),
             "prefs_schema": schema(USER, lang),
         }
+
+    # ---------- граф знаний ----------
+
+    def knowledge_graph(self, per_game: dict[str, float], lang: str = "ru") -> dict:
+        """Темы (группы разделов) с опытом и связи «тема → навык» для графа знаний в профиле."""
+        topics: dict[str, dict] = {}
+        for sec in self.catalog.sections:
+            groups = sec.groups or [None]
+            for gr in groups:
+                games = self.catalog.list(sec.id, gr.id if gr else None, lang)
+                games = [g for g in games if not g.app]
+                if not games:
+                    continue
+                tid = f"{sec.id}:{gr.id}" if gr else sec.id
+                links: dict[str, float] = {}
+                xp = 0.0
+                played = 0
+                for g in games:
+                    gx = per_game.get(g.id, 0)
+                    xp += gx
+                    played += gx > 0
+                    for sk in g.skills:
+                        links[sk] = links.get(sk, 0) + (gx / len(g.skills) if g.skills else 0) + 0.001
+                topics[tid] = {
+                    "id": tid, "section": sec.id, "title": (gr.t(lang) if gr else sec.t(lang)), "section_title": sec.t(lang),
+                    "xp": round(xp), "games": len(games), "played": played,
+                    "links": {k: round(v, 1) for k, v in sorted(links.items(), key=lambda kv: -kv[1])[:3]},
+                }
+        return {"topics": sorted(topics.values(), key=lambda t: -t["xp"])}
 
     # ---------- напоминания ----------
 

@@ -168,3 +168,68 @@ html.nomotion .qbar { transition: none !important; }
 .lesson-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; background: var(--card); border-radius: 12px; padding: 8px 10px; font-size: 15px; text-align: left; }
 .lesson-row b { color: var(--hint); }
 .lesson-row.rev { opacity: .7; border: 1px dashed color-mix(in srgb, var(--fg) 25%, transparent); }
+
+/* пасхалки */
+.egg-fx { position: fixed; top: -40px; font-size: 26px; pointer-events: none; z-index: 99; animation: eggfall linear forwards; }
+@keyframes eggfall { to { transform: translateY(110vh) rotate(540deg); } }
+.snow { position: fixed; top: -20px; color: #fff; opacity: .7; pointer-events: none; z-index: 1; animation: snowfall linear infinite; text-shadow: 0 0 3px rgba(0,0,0,.3); }
+@keyframes snowfall { to { transform: translateY(105vh) translateX(30px); } }
+.wobble { animation: wobble .4s; }
+@keyframes wobble { 25% { transform: rotate(-12deg) scale(1.1); } 75% { transform: rotate(12deg) scale(1.1); } }
+.april .avatar, .april .brainpoke, .april #tabs button span { transform: rotate(180deg); display: inline-block; }
+.ach.secret { background: color-mix(in srgb, var(--accent) 16%, transparent); }
+
+/* граф знаний */
+.kg { width: 100%; max-width: 420px; display: block; margin: 0 auto; touch-action: manipulation; }
+.kg line { stroke: var(--accent); }
+.kg .kg-e0 { stroke: var(--hint); stroke-width: 1; opacity: .25; stroke-dasharray: 3 3; }
+.kg .kg-new { stroke: var(--good); }
+.kg text { text-anchor: middle; dominant-baseline: middle; font-size: 13px; fill: var(--fg); pointer-events: none; }
+.kg .kg-n { cursor: pointer; }
+.kg .kg-skill circle { fill: color-mix(in srgb, var(--accent) 30%, var(--card)); stroke: var(--accent); stroke-width: 2; }
+.kg .kg-topic circle { fill: color-mix(in srgb, var(--warn) 30%, var(--card)); stroke: var(--warn); stroke-width: 1.5; }
+.kg .kg-ghost circle { fill: var(--card); stroke: var(--hint); opacity: .5; }
+.kg .kg-ghost text { opacity: .45; }
+.kg .kg-me circle { fill: var(--accent); }
+.kg .kg-me text { fill: var(--accent-fg); font-size: 18px; }
+.kg .kg-me .kg-lv { font-size: 9px; fill: var(--accent-fg); }
+.kg .kg-lv { font-size: 10px; font-weight: 700; fill: var(--hint); }
+.kg .kg-plus { font-size: 10px; font-weight: 800; fill: var(--good); }
+.kg .kg-grew circle { stroke: var(--good); stroke-width: 3; animation: kgpulse 1.4s ease-in-out 3; }
+.kg .kg-sel circle { stroke: var(--fg); stroke-width: 3; }
+@keyframes kgpulse { 50% { stroke-width: 7; stroke-opacity: .4; } }
+.nomotion .kg .kg-grew circle { animation: none; }
+.kg-info { min-height: 2.6em; text-align: center; margin: 6px 0; }
+.kg-go { margin-top: 6px; padding: 6px 12px; font-size: 13px; }
+.kg-dirs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.kg-dir { display: flex; gap: 8px; align-items: flex-start; background: color-mix(in srgb, var(--fg) 5%, transparent); border-radius: 12px; padding: 8px; font-size: 13px; text-align: left; }
+.kg-dir span { font-size: 20px; }
+.kg-dir b { display: block; font-size: 12px; color: var(--hint); }
+.kg-dir small { font-size: 13px; }
+
+/* «Наука»: открытые источники */
+.src-list { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
+.src { display: flex; gap: 10px; align-items: center; background: color-mix(in srgb, var(--fg) 5%, transparent); border-radius: 12px; padding: 8px 10px; text-align: left; }
+.src > span { font-size: 22px; flex: none; width: 28px; text-align: center; }
+.src > div { flex: 1; min-width: 0; }
+.src b { display: block; font-size: 14px; }
+.src small { display: block; color: var(--hint); font-size: 12px; }
+.src em { font-style: normal; font-size: 11px; color: var(--accent); flex: none; max-width: 30%; text-align: right; }
+
+/* напоминание размяться и тренировки */
+.nudge { background: color-mix(in srgb, var(--good) 16%, transparent); border-radius: 14px; padding: 10px 12px; margin: 8px 0; font-size: 14px; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+.nudge .btn { text-decoration: none; padding: 8px 16px; }
+.fit { gap: 8px; align-items: center; text-align: center; }
+.fit-img { width: 64px; height: 64px; border-radius: 12px; overflow: hidden; background: #fff; flex: none; display: flex; align-items: center; justify-content: center; font-size: 30px; }
+.fit-img img { width: 100%; height: 100%; object-fit: cover; }
+.fit-img.big { width: min(78vw, 300px); height: min(52vw, 200px); border-radius: 16px; }
+.fit-img.big img { object-fit: contain; }
+.fit-plan { display: flex; flex-direction: column; gap: 6px; width: min(92vw, 440px); max-height: 46vh; overflow-y: auto; }
+.fit-row { display: flex; align-items: center; gap: 10px; background: var(--card); border-radius: 12px; padding: 6px 10px 6px 6px; text-align: left; font-size: 14px; }
+.fit-row .fit-img { width: 44px; height: 44px; }
+.fit-row span { flex: 1; }
+.fit-reps { display: flex; align-items: center; gap: 18px; }
+.fit-reps b { font-size: 44px; min-width: 64px; text-align: center; font-variant-numeric: tabular-nums; }
+.fit-reps .btn { width: 56px; height: 56px; font-size: 28px; padding: 0; flex: none; }
+.fit-timer { font-size: 56px; font-weight: 900; font-variant-numeric: tabular-nums; color: var(--accent); }
+.fit-timer.rest { color: var(--good); }
