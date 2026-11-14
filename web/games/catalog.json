@@ -47,7 +47,8 @@
     }
    ],
    "title_en": "🧠 Brain training",
-   "desc_en": "Memory, attention, speed, logic and critical thinking. Difficulty grows with you."
+   "desc_en": "Memory, attention, speed, logic and critical thinking. Difficulty grows with you.",
+   "pillar": "mind"
   },
   {
    "id": "ege",
@@ -96,7 +97,8 @@
     }
    ],
    "title_en": "🎓 Exams & school",
-   "desc_en": "Subject courses: exam-style tasks with generators, flashcards with spaced repetition, endless levels."
+   "desc_en": "Subject courses: exam-style tasks with generators, flashcards with spaced repetition, endless levels.",
+   "pillar": "knowledge"
   },
   {
    "id": "learn",
@@ -130,7 +132,8 @@
     }
    ],
    "title_en": "📚 Study & languages",
-   "desc_en": "Flashcards with spaced repetition and a points test. Levels: 1–3 basic cards, 4–8 intermediate, from 9 advanced (high-school level)."
+   "desc_en": "Flashcards with spaced repetition and a points test. Levels: 1–3 basic cards, 4–8 intermediate, from 9 advanced (high-school level).",
+   "pillar": "knowledge"
   },
   {
    "id": "algo",
@@ -169,7 +172,8 @@
     }
    ],
    "title_en": "💻 Algorithms",
-   "desc_en": "Understand → remember → write it yourself. Animations with pseudocode and real Python and JavaScript, practice (build the code, be the sort, trace, find the bug) and flashcards."
+   "desc_en": "Understand → remember → write it yourself. Animations with pseudocode and real Python and JavaScript, practice (build the code, be the sort, trace, find the bug) and flashcards.",
+   "pillar": "code"
   },
   {
    "id": "fit",
@@ -193,7 +197,8 @@
     }
    ],
    "title_en": "💪 Body",
-   "desc_en": "Physical training: pull-up bar, dips, push-ups, circuits, core, morning sets, stretching. Levels are programme days with gradual progression. Exercises and photos come from the open free-exercise-db."
+   "desc_en": "Physical training: pull-up bar, dips, push-ups, circuits, core, morning sets, stretching. Levels are programme days with gradual progression. Exercises and photos come from the open free-exercise-db.",
+   "pillar": "body"
   },
   {
    "id": "arcade",
@@ -212,7 +217,8 @@
     }
    ],
    "title_en": "🕹 Chill: arcade",
-   "desc_en": "When your brain is warmed up: runners and skill games."
+   "desc_en": "When your brain is warmed up: runners and skill games.",
+   "pillar": "play"
   },
   {
    "id": "apps",
@@ -220,7 +226,8 @@
    "desc": "Не игры, а штуки для группы: рисовалка, мемы, честный жребий, команды, раздел счёта — результат сразу в чат.",
    "groups": [],
    "title_en": "🛠 For chats",
-   "desc_en": "Not games but tools for a group: drawing, memes, fair draws, teams, bill splitting — results go straight to the chat."
+   "desc_en": "Not games but tools for a group: drawing, memes, fair draws, teams, bill splitting — results go straight to the chat.",
+   "pillar": "together"
   }
  ],
  "games": [
@@ -2539,6 +2546,413 @@
    "desc": "Сила, выносливость и гибкость",
    "title_en": "💪 Body",
    "desc_en": "Strength, endurance and flexibility"
+  }
+ ],
+ "pillars": [
+  {
+   "id": "mind",
+   "emoji": "🧠",
+   "title": "Ум",
+   "title_en": "Mind",
+   "desc": "Внимание, память, скорость, логика и критическое мышление",
+   "desc_en": "Attention, memory, speed, logic and critical thinking"
+  },
+  {
+   "id": "knowledge",
+   "emoji": "📚",
+   "title": "Знания",
+   "title_en": "Knowledge",
+   "desc": "Учёба с интервальными повторениями и подготовка к экзаменам",
+   "desc_en": "Study with spaced repetition and exam prep"
+  },
+  {
+   "id": "code",
+   "emoji": "💻",
+   "title": "Код",
+   "title_en": "Code",
+   "desc": "Алгоритмы и программирование: понять, запомнить, написать самому",
+   "desc_en": "Algorithms and programming: understand, remember, write it yourself"
+  },
+  {
+   "id": "body",
+   "emoji": "💪",
+   "title": "Тело",
+   "title_en": "Body",
+   "desc": "Сила, выносливость и гибкость — мозгу нужно движение",
+   "desc_en": "Strength, endurance and flexibility — the brain needs movement"
+  },
+  {
+   "id": "play",
+   "emoji": "🕹",
+   "title": "Отдых",
+   "title_en": "Play",
+   "desc": "Аркады для передышки — ловкость и реакция",
+   "desc_en": "Arcade games for a breather — dexterity and reaction"
+  },
+  {
+   "id": "together",
+   "emoji": "👥",
+   "title": "Вместе",
+   "title_en": "Together",
+   "desc": "Турниры, дуэли и приложения для чата",
+   "desc_en": "Tournaments, duels and chat apps"
+  }
+ ],
+ "mission": {
+  "ru": "ИИ думает за нас всё больше. Аркада — ежедневная тренировка, чтобы не отупеть: ум, знания, код и тело в одной системе прогресса.",
+  "en": "AI does more and more of our thinking. The Arcade is a daily workout to stay sharp: mind, knowledge, code and body in one progress system."
+ },
+ "paths": [
+  {
+   "id": "start",
+   "emoji": "🚀",
+   "title": "Первые шаги",
+   "title_en": "First steps",
+   "desc": "Знакомство со всеми опорами: по одной игре из каждого раздела.",
+   "desc_en": "A tour of every pillar: one game from each section.",
+   "steps": [
+    {
+     "game": "reaction",
+     "lv": 1
+    },
+    {
+     "game": "capitals",
+     "lv": 1
+    },
+    {
+     "game": "fit-break",
+     "lv": 0
+    },
+    {
+     "game": "trace",
+     "lv": 1
+    },
+    {
+     "game": "schulte",
+     "lv": 1
+    },
+    {
+     "game": "ege-calc",
+     "lv": 1
+    },
+    {
+     "game": "algo-bubble",
+     "lv": 1
+    },
+    {
+     "game": "snake",
+     "lv": 1
+    },
+    {
+     "game": "fit-morning",
+     "lv": 1
+    },
+    {
+     "game": "nback",
+     "lv": 1
+    }
+   ]
+  },
+  {
+   "id": "sharp",
+   "emoji": "🧠",
+   "title": "Острый ум",
+   "title_en": "Sharp mind",
+   "desc": "Скорость, внимание, рабочая память и логика — от простого к сложному.",
+   "desc_en": "Speed, attention, working memory and logic — from easy to hard.",
+   "steps": [
+    {
+     "game": "reaction",
+     "lv": 3
+    },
+    {
+     "game": "schulte",
+     "lv": 3
+    },
+    {
+     "game": "stroop",
+     "lv": 3
+    },
+    {
+     "game": "nback",
+     "lv": 3
+    },
+    {
+     "game": "sudoku",
+     "lv": 3
+    },
+    {
+     "game": "series",
+     "lv": 5
+    },
+    {
+     "game": "syllogism",
+     "lv": 5
+    },
+    {
+     "game": "nback2",
+     "lv": 5
+    },
+    {
+     "game": "chess",
+     "lv": 5
+    },
+    {
+     "game": "raven",
+     "lv": 8
+    }
+   ]
+  },
+  {
+   "id": "skeptic",
+   "emoji": "🛡",
+   "title": "Не обманешь",
+   "title_en": "Hard to fool",
+   "desc": "Критическое мышление: логика, искажения, числа и вероятности.",
+   "desc_en": "Critical thinking: logic, biases, numbers and probability.",
+   "steps": [
+    {
+     "game": "syllogism",
+     "lv": 3
+    },
+    {
+     "game": "fallacies",
+     "lv": 3
+    },
+    {
+     "game": "biases",
+     "lv": 3
+    },
+    {
+     "game": "estimate",
+     "lv": 3
+    },
+    {
+     "game": "ege-pct",
+     "lv": 3
+    },
+    {
+     "game": "scales",
+     "lv": 3
+    },
+    {
+     "game": "raven",
+     "lv": 5
+    },
+    {
+     "game": "biases",
+     "lv": 8
+    }
+   ]
+  },
+  {
+   "id": "coder",
+   "emoji": "💻",
+   "title": "Программист",
+   "title_en": "Programmer",
+   "desc": "От сложности алгоритмов к своему коду: понять, предсказать, собрать, найти баг.",
+   "desc_en": "From complexity to your own code: understand, predict, build, debug.",
+   "steps": [
+    {
+     "game": "bigo",
+     "lv": 2
+    },
+    {
+     "game": "algo-bubble",
+     "lv": 3
+    },
+    {
+     "game": "sortplay",
+     "lv": 3
+    },
+    {
+     "game": "algo-binsearch",
+     "lv": 3
+    },
+    {
+     "game": "trace",
+     "lv": 3
+    },
+    {
+     "game": "parsons",
+     "lv": 3
+    },
+    {
+     "game": "findbug",
+     "lv": 3
+    },
+    {
+     "game": "ds-choice",
+     "lv": 5
+    },
+    {
+     "game": "algo-dijkstra",
+     "lv": 5
+    },
+    {
+     "game": "py-complexity",
+     "lv": 5
+    },
+    {
+     "game": "algo-coins",
+     "lv": 5
+    }
+   ]
+  },
+  {
+   "id": "scholar",
+   "emoji": "🌍",
+   "title": "Эрудит",
+   "title_en": "Polymath",
+   "desc": "География, наука, история и искусство — карта мира в голове.",
+   "desc_en": "Geography, science, history and art — a map of the world in your head.",
+   "steps": [
+    {
+     "game": "capitals",
+     "lv": 3
+    },
+    {
+     "game": "flags",
+     "lv": 3
+    },
+    {
+     "game": "continents",
+     "lv": 3
+    },
+    {
+     "game": "neighbors",
+     "lv": 3
+    },
+    {
+     "game": "elements",
+     "lv": 3
+    },
+    {
+     "game": "ege-art",
+     "game_en": "en-art",
+     "lv": 3
+    },
+    {
+     "game": "ege-dates",
+     "game_en": "en-dates",
+     "lv": 3
+    },
+    {
+     "game": "biology",
+     "lv": 3
+    },
+    {
+     "game": "trivia",
+     "lv": 5
+    },
+    {
+     "game": "area",
+     "lv": 5
+    }
+   ]
+  },
+  {
+   "id": "exam",
+   "emoji": "🎓",
+   "title": "Абитуриент",
+   "title_en": "Exam ready",
+   "desc": "Математика, язык, литература и обществознание — по программе экзаменов.",
+   "desc_en": "Math, language, literature and civics — exam-style.",
+   "steps": [
+    {
+     "game": "ege-calc",
+     "lv": 3
+    },
+    {
+     "game": "ege-eq",
+     "lv": 3
+    },
+    {
+     "game": "ege-pct",
+     "lv": 3
+    },
+    {
+     "game": "ege-log",
+     "lv": 3
+    },
+    {
+     "game": "ege-deriv",
+     "lv": 3
+    },
+    {
+     "game": "ege-stress",
+     "game_en": "en-spelling",
+     "lv": 3
+    },
+    {
+     "game": "ege-paronyms",
+     "game_en": "en-confused",
+     "lv": 3
+    },
+    {
+     "game": "ege-authors",
+     "game_en": "en-authors",
+     "lv": 3
+    },
+    {
+     "game": "ege-social",
+     "lv": 3
+    },
+    {
+     "game": "ege-bases",
+     "lv": 3
+    }
+   ]
+  },
+  {
+   "id": "athlete",
+   "emoji": "💪",
+   "title": "Сильное тело",
+   "title_en": "Strong body",
+   "desc": "От разминки до турника и брусьев — по дням, без спешки.",
+   "desc_en": "From warm-ups to the bar and dips — day by day, no rush.",
+   "steps": [
+    {
+     "game": "fit-break",
+     "lv": 0
+    },
+    {
+     "game": "fit-morning",
+     "lv": 3
+    },
+    {
+     "game": "fit-pushups",
+     "lv": 5
+    },
+    {
+     "game": "fit-core",
+     "lv": 3
+    },
+    {
+     "game": "fit-circuit",
+     "lv": 3
+    },
+    {
+     "game": "fit-stretch",
+     "lv": 3
+    },
+    {
+     "game": "fit-pullups",
+     "lv": 5
+    },
+    {
+     "game": "fit-dips",
+     "lv": 5
+    },
+    {
+     "game": "fit-workout",
+     "lv": 5
+    },
+    {
+     "game": "fit-tabata",
+     "lv": 5
+    }
+   ]
   }
  ]
 }

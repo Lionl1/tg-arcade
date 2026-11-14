@@ -47,12 +47,12 @@ async def main() -> None:
         dp.include_router(build_router(store, catalog, links, events, settings.webapp_url))
         # меню команд: английское по умолчанию, русское — для русскоязычных клиентов Telegram
         cmds = {
-            "en": [("profile", "Profile, daily workout, achievements"), ("games", "Game catalog"),
+            "en": [("profile", "Profile, daily workout, achievements"), ("games", "Game catalog"), ("paths", "Paths through sections towards a goal"),
                    ("apps", "For chats: drawing, memes, draws, teams"), ("algo", "Algorithms and data structures, animated"),
                    ("play", "Open a game: /play snake"), ("tournament", "Tournament: /tournament snake 30m"),
                    ("duel", "Duel: /duel snake (as a reply — challenge that person)"), ("events", "Running tournaments and duels"),
                    ("top", "Chat records: /top snake"), ("settings", "Settings (admins only in groups)")],
-            "ru": [("profile", "Профиль, тренировка дня, ачивки"), ("games", "Каталог игр"),
+            "ru": [("profile", "Профиль, тренировка дня, ачивки"), ("games", "Каталог игр"), ("paths", "Пути через разделы к цели"),
                    ("apps", "Для чата: рисовалка, мемы, жребий, команды"), ("algo", "Алгоритмы и структуры данных с анимацией"),
                    ("play", "Открыть игру: /play змейка"), ("tournament", "Турнир: /tournament змейка 30м"),
                    ("duel", "Дуэль: /duel змейка (ответом — вызвать человека)"), ("events", "Идущие турниры и дуэли"),

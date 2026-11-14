@@ -99,6 +99,10 @@ class Catalog:
             for s in data["sections"]
         ]
         self.skills: list[Skill] = [Skill(**s) for s in data.get("skills", [])]
+        self.pillars: list[dict] = data.get("pillars", [])
+        self.pillar_of: dict[str, str] = {s["id"]: s.get("pillar", "") for s in data["sections"]}
+        self.paths: list[dict] = data.get("paths", [])
+        self.mission: dict = data.get("mission", {})
         self.games: dict[str, Game] = {
             g["id"]: Game(**{**g, "skills": tuple(g.get("skills", ()))}) for g in data["games"]
         }

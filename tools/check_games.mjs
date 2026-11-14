@@ -112,6 +112,18 @@ const { registered, sandbox } = LOADED.ru;
   }
 }
 
+// --- пути и опоры: каждый шаг — существующая игра нужного языка, у каждого раздела есть опора ---
+for (const sec of cat.sections) if (!(cat.pillars || []).some((p) => p.id === sec.pillar)) bad(sec.id, 'у раздела нет опоры (pillar)');
+for (const p of cat.paths || []) {
+  for (const lang of ['ru', 'en']) {
+    const steps = p.steps.map((st) => (lang === 'en' && st.game_en) || st.game).map((id) => cat.games.find((g) => g.id === id));
+    if (steps.some((g) => !g)) bad(`путь ${p.id}`, 'шаг ссылается на несуществующую игру');
+    const vis = steps.filter((g) => g && (!g.lang || g.lang === lang) && !g.app);
+    if (vis.length < 6) bad(`путь ${p.id} [${lang}]`, `слишком мало доступных шагов: ${vis.length}`);
+  }
+  if (!p.title_en || !p.desc_en) bad(`путь ${p.id}`, 'нет английского названия/описания');
+}
+
 // --- L() — функция перевода: локальная переменная с именем L ломает строки игры в обоих языках ---
 for (const g of cat.games) {
   const src = fs.readFileSync(path.join(WEB, 'games', g.id + '.js'), 'utf8');

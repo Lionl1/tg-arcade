@@ -594,3 +594,27 @@ def test_knowledge_graph(client):
     assert all(t["title"] and t["games"] > 0 for t in topics.values())
     assert not any(t["id"].startswith("apps") for t in topics.values()), "приложения — не темы знаний"
     assert "ege:erus" in topics and topics["ege:erus"]["title"].endswith("Language")
+
+
+# ---------- общая идея: опоры, пути, тренировка дня ----------
+
+def test_pillars_paths_and_daily(client):
+    c = client
+    cat = c.catalog
+    assert {s.id for s in cat.sections} == set(cat.pillar_of) and all(cat.pillar_of.values())
+    prof = c.post("/api/profile", json={"initData": init_data(98), "lang": "en"}).json()
+    # тренировка дня: ум → знания → тело
+    pillars = [cat.pillar_of[cat.get(i["id"]).section] for i in prof["daily"]["games"]]
+    assert pillars[0] == "mind" and pillars[-1] == "body" and "knowledge" in pillars
+    # пути: первые шаги ведут по разным опорам, английская версия подменяет русские игры
+    paths = {p["id"]: p for p in prof["paths"]}
+    start = paths["start"]
+    assert len({cat.pillar_of[cat.get(st["game"]).section] for st in start["steps"]}) >= 4
+    assert all(cat.get(st["game"]).lang != "ru" for p in paths.values() for st in p["steps"])
+    assert start["done"] == 0 and start["next"]["game"] == "reaction"
+    # сыграли первый шаг → путь продвинулся
+    c.post("/api/level", json={"initData": init_data(98), "ctx": "reaction", "level": 1, "score": 200})
+    prof = c.post("/api/profile", json={"initData": init_data(98), "lang": "en"}).json()
+    start = {p["id"]: p for p in prof["paths"]}["start"]
+    assert start["done"] == 1 and start["next"]["game"] == "capitals"
+    assert "reaction" in prof["today_games"]

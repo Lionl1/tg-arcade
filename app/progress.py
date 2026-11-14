@@ -330,8 +330,8 @@ class Progress:
         first = min(["speed", "attention"], key=lambda s: (skills.get(s, 0), rnd.random()))
         rest = sorted((s for s in COGNITIVE if s != first), key=lambda s: (skills.get(s, 0), rnd.random()))
         size = (await self.prefs.user(user_id))["daily_size"]
-        # тренировка мозга: скорость/внимание + самые слабые навыки; последней — учёба (вспоминание = лучшая доказанная техника)
-        picked = [first] + rnd.sample(rest[: max(4, size)], size - 2)
+        # по опорам: 🧠 ум (скорость/внимание + самые слабые навыки) → 📚 знания (вспоминание — лучшая доказанная техника) → 💪 тело (короткая разминка)
+        picked = [first] + rnd.sample(rest[: max(4, size)], size - 3)
         games: list[str] = []
         for s in picked:
             pool = [g.id for g in self.catalog.games.values() if s in g.skills and g.id not in games and g.section == "brain" and g.visible(lang)]
@@ -341,6 +341,9 @@ class Progress:
                  if g.section in ("ege", "learn") and not g.app and g.id not in games and g.visible(lang)]
         if study:
             games.append(rnd.choice(sorted(study)))
+        body = [g for g in ("fit-break", "fit-stretch") if self.catalog.get(g)]
+        if body:
+            games.append(rnd.choice(body))
         await self.store._exec("INSERT OR IGNORE INTO daily (user_id, day, games) VALUES (?, ?, ?)", (user_id, day, json.dumps(games)))
         return json.loads((await self.store._one("SELECT games FROM daily WHERE user_id=? AND day=?", (user_id, day)))[0])
 
@@ -548,11 +551,43 @@ class Progress:
             ],
             "eggs": {"found": sum(a.code in have for a in EGGS), "total": len(EGGS)},
             "graph": self.knowledge_graph(per_game, lang),
+            "paths": self.paths_progress(games, lang),
+            "today_games": sorted(await self._played_today(user_id, day)),
             "reminder": {"on": bool(user[0]), "time": user[1], "can_write": bool(user[2])},
             "nickname": user[3], "avatar": user[4], "avatars": AVATARS,
             "prefs": await self.prefs.user(user_id),
             "prefs_schema": schema(USER, lang),
         }
+
+    # ---------- пути: сквозные маршруты через разделы ----------
+
+    def paths_progress(self, games: dict[str, dict], lang: str = "ru") -> list[dict]:
+        """games — {игра: {passed, plays}} из профиля. Шаг пройден: lv=0 — сыграно, иначе пройден уровень lv."""
+        out = []
+        for p in self.catalog.paths:
+            steps = []
+            for st in p["steps"]:
+                gid = st.get("game_en", st["game"]) if lang == "en" else st["game"]
+                g = self.catalog.get(gid)
+                if not g or not g.visible(lang):
+                    continue
+                info = games.get(gid, {})
+                done = (info.get("plays", 0) > 0) if st["lv"] == 0 else (info.get("passed", 0) or 0) >= st["lv"]
+                steps.append({"game": gid, "lv": st["lv"], "done": done})
+            nxt = next((st for st in steps if not st["done"]), None)
+            out.append({"id": p["id"], "emoji": p["emoji"], "title": tr(lang, p["title"], p.get("title_en", p["title"])),
+                        "desc": tr(lang, p["desc"], p.get("desc_en", p["desc"])), "steps": steps,
+                        "done": sum(st["done"] for st in steps), "total": len(steps), "next": nxt})
+        return out
+
+    async def paths_for(self, user_id: int, lang: str = "ru") -> list[dict]:
+        games: dict[str, dict] = {}
+        for gid, mx in await self.store._all(
+                "SELECT game, MAX(CASE WHEN stars>0 THEN level ELSE 0 END) FROM levels WHERE user_id=? GROUP BY game", (user_id,)):
+            games[gid] = {"passed": mx}
+        for gid, n in await self.store._all("SELECT game, COUNT(*) FROM plays WHERE user_id=? GROUP BY game", (user_id,)):
+            games.setdefault(gid, {})["plays"] = n
+        return self.paths_progress(games, lang)
 
     # ---------- граф знаний ----------
 

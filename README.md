@@ -12,6 +12,15 @@ In a group:
 2. The game opens right inside Telegram and the result goes to the server (the `initData` signature is checked).
 3. Every chat has its own leaderboard (`/top snake` or the 🏆 button); when someone sets a chat record the bot announces it with “⚔️ Beat the record”.
 
+## The idea: one system, four pillars
+
+Everything serves one mission — **stay sharp in the age of AI** — and rests on four pillars: 🧠 **Mind** (brain training), 📚 **Knowledge** (study and exams), 💻 **Code** (algorithms), 💪 **Body** (workouts), plus 🕹 Play (arcade breaks) and 👥 Together (chat apps, tournaments, duels).
+
+- **One progress system**: every game feeds the same XP, skills, achievements and the knowledge graph.
+- **Daily workout by pillar**: mind → knowledge → body, picked for your weak skills; the hub shows which pillars you covered today.
+- **Paths** (`paths` in `catalog.json`): routes through different sections towards one goal — First steps (a tour of every pillar), Sharp mind, Hard to fool, Programmer, Polymath, Exam ready, Strong body. Progress is tracked on the server, the active path is on the home tab, `/paths` in the bot.
+- **Linked games**: every game shows its pillar, skills and paths; after a round it suggests the next step on your path and related games from other sections that train the same skills.
+
 ## Sections (in order of importance)
 
 | Section | What's inside |

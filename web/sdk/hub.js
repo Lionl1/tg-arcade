@@ -63,7 +63,7 @@
       <div class="hello">${avatarHtml()}
         <div class="who"><b>${L('Привет', 'Hi')}, ${esc(myName().split(' ')[0])}!</b><span class="chip">${L('Ур.', 'Lv.')} ${prof.level} · ${esc(prof.title)}</span>
         ${bar(lvHave, lvSpan)}<small class="muted" style="margin:0">${lvHave} / ${lvSpan} ${L('XP до уровня', 'XP to level')} ${prof.level + 1}</small></div></div>
-      <div class="panel"><div class="tip">${L('🧠 Нейросети думают за нас всё больше. Чтобы мозг оставался в форме, ему нужна ежедневная нагрузка: 5 минут тренировки + вспоминание выученного.', '🧠 AI does more and more of our thinking. To keep your brain in shape it needs a daily workout: 5 minutes of training + recalling what you have learned.')}</div></div>
+      <div class="panel"><div class="tip">${esc((cat.mission || {})[LANG] || '')}</div>${pillarsToday()}</div>
       <div class="panel streak">
         <div class="fire ${s.current ? '' : 'off'}">🔥</div>
         <div><b>${s.current}</b> ${L(plural(s.current, 'день', 'дня', 'дней') + ' подряд', (s.current === 1 ? 'day' : 'days') + ' in a row')}
@@ -72,20 +72,66 @@
       </div>
       <div class="panel">
         <h2>${L('🎯 Тренировка дня', '🎯 Daily workout')} · ${d.count}/${d.games.length}</h2>
-        <p class="tip" style="margin:-4px 0 6px">${L('Игры на разные навыки, ≈5 минут. Подобраны под твои слабые места.', 'Games for different skills, ≈5 minutes. Picked for your weak spots.')}</p>
+        <p class="tip" style="margin:-4px 0 6px">${L('По опорам: ум → знания → тело, ≈6 минут. Подобрано под твои слабые места.', 'By pillar: mind → knowledge → body, ≈6 minutes. Picked for your weak spots.')}</p>
         ${d.games.map((it) => {
           const g = game(it.id);
           if (!g) return '';
+          const pl = pillarOf(g);
           return `<div class="gl" data-play="${g.id}"><div class="e">${g.emoji}</div><div class="t"><b>${esc(g.title)}</b>
-            <small>${(g.skills || []).map((x) => skill(x) ? skill(x).title : x).join(' · ')}</small></div>
+            <small>${pl ? pl.emoji + ' ' + esc(pl.title) + ' · ' : ''}${(g.skills || []).map((x) => skill(x) ? skill(x).title : x).join(' · ')}</small></div>
             <div class="ok">${it.done ? '✅' : '▶️'}</div></div>`;
         }).join('')}
         ${next ? `<button class="btn" style="width:100%;margin-top:10px" data-play="${next.id}">▶ ${d.count ? L('Продолжить', 'Continue') : L('Начать тренировку', 'Start the workout')}</button>`
           : `<div class="badge" style="display:block;text-align:center;margin-top:10px">${L('🎉 Готово на сегодня! Возвращайся завтра', '🎉 Done for today! Come back tomorrow')}</div>`}
       </div>
+      ${pathCard()}
       ${weakest()}
       <div class="panel"><div class="tip">💡 ${tip}</div></div>
       ${season ? `<div class="panel"><div class="tip">${season}</div></div>` : ''}`;
+  }
+
+  // ---------- общая идея: опоры и пути ----------
+  const pillarOf = (g) => { const sec = cat.sections.find((x) => x.id === g.section); return sec && (cat.pillars || []).find((p) => p.id === sec.pillar); };
+  /** Опоры дня: что из главного (ум, знания, код, тело) уже сделано сегодня */
+  function pillarsToday() {
+    const played = new Set(prof.today_games || []);
+    const done = (pid) => cat.games.some((g) => played.has(g.id) && (pillarOf(g) || {}).id === pid);
+    return `<div class="pillars">${(cat.pillars || []).filter((p) => ['mind', 'knowledge', 'code', 'body'].includes(p.id))
+      .map((p) => `<span class="pl ${done(p.id) ? 'on' : ''}" title="${esc(p.desc)}">${p.emoji} ${esc(p.title)} ${done(p.id) ? '✓' : ''}</span>`).join('')}</div>`;
+  }
+  const PATH_KEY = 'arcade:path';
+  function activePath() {
+    const list = prof.paths || [];
+    let id = null;
+    try { id = localStorage.getItem(PATH_KEY); } catch (e) { /* noop */ }
+    return list.find((p) => p.id === id) || list.find((p) => p.done < p.total) || list[0];
+  }
+  function stepRow(st, i, cur) {
+    const g = game(st.game);
+    if (!g) return '';
+    const goal = st.lv ? L(`уровень ${st.lv}`, `level ${st.lv}`) : L('сыграть', 'play once');
+    return `<div class="gl step ${st.done ? 'done' : ''} ${cur ? 'cur' : ''}" data-play="${g.id}"><div class="e">${g.emoji}</div><div class="t"><b>${i + 1}. ${esc(g.title)}</b>
+      <small>${(pillarOf(g) || {}).emoji || ''} ${esc(goal)}</small></div><div class="ok">${st.done ? '✅' : cur ? '▶️' : '·'}</div></div>`;
+  }
+  /** «Твой путь» на главной: прогресс и следующий шаг */
+  function pathCard() {
+    const p = activePath();
+    if (!p) return '';
+    const i = p.next ? p.steps.indexOf(p.steps.find((x) => x.game === p.next.game && x.lv === p.next.lv)) : -1;
+    return `<div class="panel"><h2>${L('🧭 Твой путь', '🧭 Your path')}: ${p.emoji} ${esc(p.title)} · ${p.done}/${p.total}</h2>
+      <p class="tip" style="margin:-4px 0 6px">${esc(p.desc)}</p>${bar(p.done, p.total)}
+      ${i >= 0 ? stepRow(p.steps[i], i, true) : `<div class="badge" style="display:block;text-align:center">${L('🏁 Путь пройден! Выбери следующий', '🏁 Path complete! Pick the next one')}</div>`}
+      <button class="btn ghost" style="width:100%;margin-top:8px" data-act="paths">${L('🗺 Все пути', '🗺 All paths')}</button></div>`;
+  }
+  /** Все пути — в профиле */
+  function pathsPanel() {
+    const cur = activePath();
+    return `<div class="panel" id="paths"><h2>${L('🗺 Пути', '🗺 Paths')}</h2>
+      <p class="tip" style="margin:-4px 0 6px">${L('Путь — маршрут через разные разделы к одной цели. Игры связаны: каждая следующая опирается на прошлые.', 'A path is a route through different sections towards one goal. Games are linked: each one builds on the previous ones.')}</p>
+      ${(prof.paths || []).map((p) => `<details class="path" ${p.id === (cur || {}).id ? 'open' : ''}><summary><span>${p.emoji}</span><b>${esc(p.title)}</b><small>${p.done}/${p.total}</small>
+        ${p.id === (cur || {}).id ? `<em>${L('выбран', 'active')}</em>` : `<button class="btn ghost" data-path="${p.id}">${L('Выбрать', 'Choose')}</button>`}</summary>
+        <p class="tip">${esc(p.desc)}</p>${p.steps.map((st, i) => stepRow(st, i, p.next === st || (p.next && st.game === p.next.game && st.lv === p.next.lv))).join('')}</details>`).join('')}
+    </div>`;
   }
 
   function weakest() {
@@ -175,6 +221,7 @@
         <div><b>${st.games}</b><small>${L('игр', 'games')}</small></div><div><b>${st.stars}</b><small>${L('звёзд', 'stars')}</small></div>
       </div>
       ${window.KnowledgeGraph ? window.KnowledgeGraph.html(prof) : ''}
+      ${pathsPanel()}
       <div class="panel"><button class="btn ghost" style="width:100%" data-tab="settings">${L('⚙️ Настройки и напоминание', '⚙️ Settings and reminder')}</button></div>
       <div class="panel"><h2>${L('🧩 Навыки', '🧩 Skills')}</h2>
         ${prof.skills.map((s) => `<div class="skill"><div class="h"><span>${esc(s.title)}</span><b>${L('ур.', 'lv.')} ${s.level}</b></div>
@@ -331,7 +378,7 @@
     }
   }
   view.addEventListener('click', async (e) => {
-    const t = e.target.closest('[data-play],[data-sec],[data-tab],[data-act],[data-link],[data-set],[data-av]');
+    const t = e.target.closest('[data-path],[data-play],[data-sec],[data-tab],[data-act],[data-link],[data-set],[data-av]');
     if (!t) return;
     if (t.dataset.link) { e.preventDefault(); if (tg && tg.openLink) tg.openLink(t.dataset.link); else window.open(t.dataset.link, '_blank'); return; }
     if (t.dataset.play) { haptic(); location.href = playUrl(t.dataset.play); return; }
@@ -344,6 +391,8 @@
       try { prof.prefs = (await api('settings', { changes: def })).prefs; } catch (err) { /* noop */ }
       return;
     }
+    if (t.dataset.path) { e.preventDefault(); try { localStorage.setItem(PATH_KEY, t.dataset.path); } catch (err) { /* noop */ } haptic('select'); render(true); return; }
+    if (t.dataset.act === 'paths') { tab = 'profile'; render(); const el = view.querySelector('#paths'); if (el) el.scrollIntoView(); return; }
     if (t.dataset.act === 'edit') { editing = true; draftAvatar = null; render(); return; }
     if (t.dataset.act === 'cancel') { editing = false; render(); return; }
     if (t.dataset.av !== undefined) { draftAvatar = t.dataset.av; view.querySelectorAll('[data-av]').forEach((b) => b.classList.toggle('on', b === t)); haptic('select'); return; }
@@ -473,6 +522,7 @@
     cat.games = cat.games.filter((g) => !g.lang || g.lang === LANG).map(localize);
     cat.sections.forEach((s) => { localize(s); (s.groups || []).forEach(localize); });
     cat.skills.forEach(localize);
+    (cat.pillars || []).forEach(localize);
     cat.sections = cat.sections.filter((s) => cat.games.some((g) => g.section === s.id));
     season = seasonal();
     if (authed) { try { prof = await api('profile'); window.ArcadePrefs.save(prof.prefs); } catch (e) { prof = null; } } // синхронизация настроек на это устройство

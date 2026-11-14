@@ -55,7 +55,7 @@
   const hud = { title: $('#hud-title'), score: $('#hud-score'), timer: $('#hud-timer') };
   const stage = $('#stage');
   const overlay = $('#overlay');
-  let meta = null, def = null, round = null, opts = { mode: 'free' }, levels = null;
+  let meta = null, def = null, round = null, opts = { mode: 'free' }, levels = null, CAT = null;
 
   // ---------- Telegram + тема ----------
   if (tg) {
@@ -236,6 +236,45 @@
       : meta.emoji + ' ' + meta.title;
   }
 
+  // ---------- связи между играми: опора, навыки, пути, «что дальше» ----------
+  const visible = (g) => g && (!g.lang || g.lang === LANG);
+  const gameById = (id) => CAT && CAT.games.find((g) => g.id === id);
+  const titleOf = (g) => (LANG === 'en' && g.title_en) || g.title;
+  const stepGame = (st) => (LANG === 'en' && st.game_en) || st.game;
+  function pathsOfGame() {
+    if (!CAT || !CAT.paths) return [];
+    return CAT.paths.map((p) => {
+      const steps = p.steps.map(stepGame).filter((id) => visible(gameById(id)));
+      const i = steps.indexOf(gameId);
+      return i < 0 ? null : { p, steps, i };
+    }).filter(Boolean);
+  }
+  function aboutHtml() {
+    if (!CAT) return '';
+    const sec = CAT.sections.find((x) => x.id === meta.section);
+    const pl = sec && (CAT.pillars || []).find((x) => x.id === sec.pillar);
+    const sk = (meta.skills || []).map((id) => CAT.skills.find((x) => x.id === id)).filter(Boolean);
+    const paths = pathsOfGame();
+    return `<div class="chips-skills">${pl ? `<span>${pl.emoji} ${esc(L(pl.title, pl.title_en))}</span>` : ''}${sk.map((x) => `<span>${esc(L(x.title, x.title_en))}</span>`).join('')}</div>`
+      + (paths.length ? `<p class="muted" style="font-size:12px">🧭 ${L('В путях', 'In paths')}: ${paths.map(({ p, steps, i }) => `${p.emoji} ${esc(L(p.title, p.title_en))} (${i + 1}/${steps.length})`).join(' · ')}</p>` : '');
+  }
+  /** После партии: следующий шаг пути и похожие игры из других разделов (общий навык) */
+  function relatedHtml() {
+    if (!CAT) return '';
+    let active = null;
+    try { active = localStorage.getItem('arcade:path'); } catch (e) { /* noop */ }
+    const paths = pathsOfGame();
+    const pp = paths.find((x) => x.p.id === active) || paths[0];
+    const links = [];
+    if (pp && pp.i < pp.steps.length - 1) links.push({ g: gameById(pp.steps[pp.i + 1]), next: `${pp.p.emoji} ${L('Дальше по пути', 'Next on the path')}: ` });
+    const mine = new Set(meta.skills || []);
+    const near = CAT.games.filter((g) => visible(g) && !g.app && g.id !== gameId && !links.some((l) => l.g && l.g.id === g.id) && (g.skills || []).some((x) => mine.has(x)))
+      .sort((a, b) => (a.section === meta.section) - (b.section === meta.section) || ((a.id.length * 7 + gameId.length) % 5) - ((b.id.length * 7 + gameId.length) % 5));
+    near.slice(0, 2).forEach((g) => links.push({ g }));
+    const ok = links.filter((l) => l.g);
+    return ok.length ? `<div class="related">${ok.map((l) => `<a class="${l.next ? 'next' : ''}" href="play.html?g=${l.g.id}${devAuth ? '&dev' : ''}">${l.next || ''}${l.g.emoji} ${esc(titleOf(l.g))}</a>`).join('')}</div>` : '';
+  }
+
   // ---------- меню ----------
   let firstMenu = true;
   function showMenu() {
@@ -253,6 +292,7 @@
     const card = show(`
       <div class="emoji">${meta.emoji}</div>
       <h1>${esc(meta.title)}</h1>
+      ${aboutHtml()}
       <p class="howto">${esc(def.howto || meta.desc)}</p>
       <div class="modes">
         <button class="btn" data-act="levels">${L('🎯 Уровни', '🎯 Levels')}<small class="lvinfo">${L('Бесконечные уровни: каждый новый сложнее, до 3 ★ за каждый', 'Endless levels: each one harder, up to 3 ★ each')}</small></button>
@@ -400,6 +440,7 @@
       ${rec && prev != null ? `<div class="badge">${L('Новый личный рекорд!', 'New personal best!')}</div>` : ''}
       ${tierNote}
       ${nudge}
+      ${relatedHtml()}
       <div class="progress"></div>
       <div class="board">${authed ? `<p class="muted">${L('Сохраняю результат…', 'Saving the result…')}</p>` : `<p class="muted">${L('Открой игру из Telegram, чтобы копить опыт и попадать в таблицы', 'Open the game from Telegram to earn XP and get on leaderboards')}</p>`}</div>
       <div class="row"><button class="btn ghost" data-act="menu">${L('Меню', 'Menu')}</button>${single ? '' : `<button class="btn" data-act="again">${L('↻ Ещё раз', '↻ Again')}</button>`}</div>`);
@@ -438,6 +479,7 @@
       <p class="muted">${L('Цель', 'Goal')}: ${fmt(goal)} · ${DIFF_NAMES[diffOf(k)]} · ${L('скорость', 'speed')} ×${levelOpts(k).speed.toFixed(2)}${modOf(k) ? ' · ' + MOD_INFO[modOf(k)][0] : ''}</p>
       ${near}
       ${nudge}
+      ${relatedHtml()}
       <div class="progress">${authed ? `<p class="muted">${L('Сохраняю…', 'Saving…')}</p>` : ''}</div>
       <div class="row"><button class="btn ghost" data-act="levels">${L('Уровни', 'Levels')}</button><button class="btn ${passed ? 'ghost' : ''}" data-act="again">${L('↻ Ещё раз', '↻ Again')}</button>
       ${passed ? `<button class="btn" data-act="next">${L('Дальше ▶', 'Next ▶')}</button>` : ''}</div>`);
@@ -732,6 +774,7 @@
     try {
       const cat = await (await fetch('games/catalog.json', { cache: 'no-cache' })).json();
       meta = localize(cat.games.find((g) => g.id === gameId));
+      CAT = cat;
     } catch (e) { /* ниже покажем ошибку */ }
     if (!meta) {
       show(`<div class="emoji">🤷</div><h1>${L('Игра не найдена', 'Game not found')}</h1><p>${L('Открой игру из каталога бота.', "Open a game from the bot's catalog.")}</p><a class="hublink" href="hub.html">${L('🧠 В профиль', '🧠 To profile')}</a>`);

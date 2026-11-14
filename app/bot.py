@@ -28,13 +28,19 @@ def home_text(L: str) -> str:
     return tr(
         L,
         "🧠 <b>Аркада для мозга</b>\n"
-        "Нейросети думают за нас всё больше — мозгу нужна ежедневная нагрузка. "
-        "5 минут в день: тренировка дня, учёба с интервальными повторениями, подготовка к ЕГЭ.\n\n"
-        "Выбирай раздел:",
+        "ИИ думает за нас всё больше. Здесь — ежедневная тренировка, чтобы не отупеть.\n\n"
+        "Четыре опоры, одна система прогресса:\n"
+        "🧠 <b>Ум</b> — внимание, память, логика · 📚 <b>Знания</b> — учёба и экзамены\n"
+        "💻 <b>Код</b> — алгоритмы и программирование · 💪 <b>Тело</b> — тренировки и разминки\n\n"
+        "🎯 Тренировка дня берёт по игре из каждой опоры, 🧭 пути ведут через разделы к цели, "
+        "а опыт, навыки и граф знаний — общие для всего.\n\nВыбирай:",
         "🧠 <b>Brain Arcade</b>\n"
-        "AI does more and more of our thinking — your brain needs a daily workout. "
-        "5 minutes a day: a daily workout, study with spaced repetition, exam prep.\n\n"
-        "Pick a section:",
+        "AI does more and more of our thinking. This is a daily workout to stay sharp.\n\n"
+        "Four pillars, one progress system:\n"
+        "🧠 <b>Mind</b> — attention, memory, logic · 📚 <b>Knowledge</b> — study and exams\n"
+        "💻 <b>Code</b> — algorithms and programming · 💪 <b>Body</b> — workouts and breaks\n\n"
+        "🎯 The daily workout takes a game from each pillar, 🧭 paths lead through sections towards a goal, "
+        "and XP, skills and the knowledge graph are shared by everything.\n\nChoose:",
     )
 
 
@@ -68,7 +74,8 @@ def build_router(store: Store, catalog: Catalog, links: Links, events: Events, w
     def home_kb(L: str) -> InlineKeyboardMarkup:
         # главное — ежедневная тренировка и учёба; аркады и приложения в конце
         kb = InlineKeyboardBuilder()
-        kb.row(InlineKeyboardButton(text=tr(L, "🎯 Тренировка дня — 5 минут", "🎯 Daily workout — 5 minutes"), url=links.hub()))
+        kb.row(InlineKeyboardButton(text=tr(L, "🎯 Тренировка дня", "🎯 Daily workout"), url=links.hub()),
+               InlineKeyboardButton(text=tr(L, "🧭 Пути", "🧭 Paths"), callback_data="paths"))
         for s in catalog.sections:
             n = len(catalog.list(s.id, lang=L))
             if n:
@@ -408,6 +415,31 @@ def build_router(store: Store, catalog: Catalog, links: Links, events: Events, w
             return await c.answer(tr(L, "Раздел не найден", "Section not found"))
         text, kb = list_view(sid, gid, int(page), L)
         await c.message.edit_text(text, reply_markup=kb)
+        await c.answer()
+
+    # ---------- пути: сквозные маршруты через разделы ----------
+
+    async def paths_text(user: User, L: str) -> str:
+        paths = await events.progress.paths_for(user.id, L) if events.progress else []
+        lines = [tr(L, "🧭 <b>Пути</b> — маршруты через разные разделы к одной цели. Каждая игра в пути опирается на предыдущие.\n",
+                    "🧭 <b>Paths</b> — routes through different sections towards one goal. Each game on a path builds on the previous ones.\n")]
+        for p in paths:
+            filled = round(10 * p["done"] / max(1, p["total"]))
+            nxt = catalog.get(p["next"]["game"]) if p["next"] else None
+            step = (tr(L, "дальше: ", "next: ") + nxt.label(L)) if nxt else tr(L, "🏁 пройден", "🏁 complete")
+            lines.append(f"{p['emoji']} <b>{escape(p['title'])}</b> {'▰' * filled}{'▱' * (10 - filled)} {p['done']}/{p['total']}\n<i>{escape(step)}</i>")
+        return "\n".join(lines)
+
+    @r.message(Command("paths", "path"))
+    async def paths_cmd(m: Message):
+        L = await lang_of(m.from_user, m.chat)
+        await m.answer(await paths_text(m.from_user, L), reply_markup=InlineKeyboardMarkup(inline_keyboard=[[hub_button(m, L, tr(L, "🧭 Открыть пути", "🧭 Open paths"))]]))
+
+    @r.callback_query(F.data == "paths")
+    async def cb_paths(c: CallbackQuery):
+        L = await lang_of(c.from_user, c.message.chat)
+        await c.message.answer(await paths_text(c.from_user, L), reply_markup=InlineKeyboardMarkup(inline_keyboard=[[
+            InlineKeyboardButton(text=tr(L, "🧭 Открыть пути", "🧭 Open paths"), url=links.hub())]]))
         await c.answer()
 
     # ---------- пасхалки: скрытые команды (их нет в меню команд) ----------
