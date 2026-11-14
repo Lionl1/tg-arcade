@@ -240,10 +240,10 @@ class Progress:
     async def table_name(self, user_id: int, name: str) -> str:
         """Имя для таблиц и сообщений в чат: «Игрок №…» (приватность), свой ник или имя из Telegram — с эмодзи-аватаром."""
         p = await self.prefs.user(user_id)
-        if p["hide_name"]:
-            return tr(p.get("lang") or "ru", "Игрок №", "Player #") + str(user_id)[-4:]
-        row = await self.store._one("SELECT nickname, avatar FROM users WHERE user_id=?", (user_id,))
-        nick, avatar = (row or (None, None))
+        row = await self.store._one("SELECT nickname, avatar, lang FROM users WHERE user_id=?", (user_id,))
+        nick, avatar, ulang = (row or (None, None, None))
+        if p["hide_name"]:  # язык — сохранённый язык интерфейса игрока (настройка «auto» сама по себе языка не задаёт)
+            return tr(p["lang"] if p["lang"] in ("ru", "en") else ulang or "ru", "Игрок №", "Player #") + str(user_id)[-4:]
         base = nick or name
         return f"{avatar} {base}" if avatar else base
 
@@ -552,11 +552,35 @@ class Progress:
             "eggs": {"found": sum(a.code in have for a in EGGS), "total": len(EGGS)},
             "graph": self.knowledge_graph(per_game, lang),
             "paths": self.paths_progress(games, lang),
+            "activity": await self.activity(user_id, day),
             "today_games": sorted(await self._played_today(user_id, day)),
             "reminder": {"on": bool(user[0]), "time": user[1], "can_write": bool(user[2])},
             "nickname": user[3], "avatar": user[4], "avatars": AVATARS,
             "prefs": await self.prefs.user(user_id),
             "prefs_schema": schema(USER, lang),
+        }
+
+    # ---------- активность: календарь за 4 недели и итоги недели ----------
+
+    async def activity(self, user_id: int, today: str, days: int = 28) -> dict:
+        end = date.fromisoformat(today)
+        start = (end - timedelta(days=days - 1)).isoformat()
+        rows = {d: (n, xp) for d, n, xp in await self.store._all(
+            "SELECT day, COUNT(*), COALESCE(SUM(xp), 0) FROM plays WHERE user_id=? AND day>=? GROUP BY day", (user_id, start))}
+        cal = [{"day": (end - timedelta(days=i)).isoformat(), "plays": rows.get((end - timedelta(days=i)).isoformat(), (0, 0))[0],
+                "xp": rows.get((end - timedelta(days=i)).isoformat(), (0, 0))[1]} for i in range(days - 1, -1, -1)]
+        week, prev = cal[-7:], cal[-14:-7]
+        per_pillar: dict[str, int] = {}
+        for gid, n in await self.store._all(
+                "SELECT game, COUNT(*) FROM plays WHERE user_id=? AND day>=? GROUP BY game", (user_id, week[0]["day"])):
+            g = self.catalog.get(gid)
+            if g:
+                pl = self.catalog.pillar_of.get(g.section, "")
+                per_pillar[pl] = per_pillar.get(pl, 0) + n
+        return {
+            "days": cal,
+            "week": {"plays": sum(d["plays"] for d in week), "xp": sum(d["xp"] for d in week), "active_days": sum(d["plays"] > 0 for d in week),
+                     "prev_xp": sum(d["xp"] for d in prev), "pillars": per_pillar},
         }
 
     # ---------- пути: сквозные маршруты через разделы ----------

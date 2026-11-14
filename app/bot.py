@@ -442,6 +442,33 @@ def build_router(store: Store, catalog: Catalog, links: Links, events: Events, w
             InlineKeyboardButton(text=tr(L, "🧭 Открыть пути", "🧭 Open paths"), url=links.hub())]]))
         await c.answer()
 
+    @r.message(Command("week", "stats"))
+    async def week_cmd(m: Message):
+        """Итоги недели: активность, опыт, опоры — и что подтянуть."""
+        from .progress import local_now
+        L = await lang_of(m.from_user, m.chat)
+        if not events.progress:
+            return
+        row = await store._one("SELECT tz FROM users WHERE user_id=?", (m.from_user.id,))
+        day = local_now(row[0] if row else -180).date().isoformat()
+        a = await events.progress.activity(m.from_user.id, day)
+        w = a["week"]
+        bars = "".join("🟩" if d["plays"] >= 3 else "🟨" if d["plays"] else "⬜" for d in a["days"][-7:])
+        trend = ""
+        if w["prev_xp"]:
+            diff = round(100 * (w["xp"] - w["prev_xp"]) / w["prev_xp"])
+            trend = f" ({'+' if diff >= 0 else ''}{diff}% " + tr(L, "к прошлой неделе)", "vs last week)")
+        pil = {p["id"]: p for p in catalog.pillars}
+        main = ["mind", "knowledge", "code", "body"]
+        got = " · ".join(f"{pil[k]['emoji']} {w['pillars'].get(k, 0)}" for k in main if k in pil)
+        missing = [pil[k] for k in main if k in pil and not w["pillars"].get(k)]
+        tip = (tr(L, "Подтяни на этой неделе: ", "Work on this week: ") + ", ".join(f"{p['emoji']} {tr(L, p['title'], p['title_en'])}" for p in missing)
+               if missing else tr(L, "Все четыре опоры в деле — так держать! 💪", "All four pillars covered — keep it up! 💪"))
+        await m.answer(
+            tr(L, f"📅 <b>Твоя неделя</b>\n{bars}\nДней с тренировкой: {w['active_days']}/7 · партий: {w['plays']} · опыт: +{w['xp']} XP{trend}\nПо опорам: {got}\n\n{tip}",
+               f"📅 <b>Your week</b>\n{bars}\nActive days: {w['active_days']}/7 · rounds: {w['plays']} · XP: +{w['xp']}{trend}\nBy pillar: {got}\n\n{tip}"),
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[[hub_button(m, L)]]))
+
     # ---------- пасхалки: скрытые команды (их нет в меню команд) ----------
 
     @r.message(Command("coffee", "tea", "teapot"))

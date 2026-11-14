@@ -618,3 +618,21 @@ def test_pillars_paths_and_daily(client):
     start = {p["id"]: p for p in prof["paths"]}["start"]
     assert start["done"] == 1 and start["next"]["game"] == "capitals"
     assert "reaction" in prof["today_games"]
+
+
+def test_activity_week(client):
+    c = client
+    c.post("/api/score", json={"initData": init_data(99), "ctx": "math", "score": 9})
+    time.sleep(1.05)
+    c.post("/api/score", json={"initData": init_data(99), "ctx": "fit-break", "score": 100})
+    a = c.post("/api/profile", json={"initData": init_data(99)}).json()["activity"]
+    assert len(a["days"]) == 28 and a["days"][-1]["plays"] == 2
+    assert a["week"]["plays"] == 2 and a["week"]["active_days"] == 1 and a["week"]["xp"] > 0
+    assert a["week"]["pillars"] == {"mind": 1, "body": 1}
+
+
+def test_hidden_name_language(client):
+    c = client
+    c.post("/api/settings", json={"initData": init_data(100), "lang": "en", "changes": {"hide_name": True}})
+    r = c.post("/api/score", json={"initData": init_data(100), "ctx": "snake", "score": 5, "lang": "en"}).json()
+    assert r["top"][0]["name"].startswith("Player #")

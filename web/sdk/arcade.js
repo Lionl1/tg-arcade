@@ -122,7 +122,11 @@
   };
   // главы (как в app/progress.py): 4-й и 8-й уровни — испытания с модификатором, 10-й — босс
   const MODS = ['fast', 'rush', 'sharp'];
-  const modOf = (k) => { const i = (k - 1) % PAGE + 1, c = Math.floor((k - 1) / PAGE) + 1; return i === PAGE ? 'boss' : i === 4 || i === 8 ? MODS[(2 * c + (i === 8 ? 1 : 0)) % 3] : null; };
+  const modOf = (k) => {
+    const i = (k - 1) % PAGE + 1, c = Math.floor((k - 1) / PAGE) + 1;
+    const m = i === PAGE ? 'boss' : i === 4 || i === 8 ? MODS[(2 * c + (i === 8 ? 1 : 0)) % 3] : null;
+    return meta && meta.section === 'fit' && m !== 'boss' ? null : m; // тренировки тела не ускоряем и не штрафуем — только «контрольный день» в конце главы
+  };
   const modGoal = (k) => { const m = modOf(k); return m === 'boss' ? (asc() ? 0.9 : 1.15) : m === 'rush' && meta.timed && !asc() ? 0.85 : 1; };
   const MOD_INFO = {
     fast: ['⚡', L('Ускорение: всё на 15 % быстрее', 'Speed-up: everything is 15% faster')],
@@ -367,7 +371,7 @@
       const map = card.querySelector('.lvmap');
       map.innerHTML = '';
       list.forEach((l, i) => {
-        const open = l.n <= levels.unlocked, m = l.mod || modOf(l.n);
+        const open = l.n <= levels.unlocked, m = modOf(l.n);
         const b = document.createElement('button');
         b.className = 'lvl node' + (open ? '' : ' locked') + (l.n === levels.unlocked ? ' cur' : '') + (m === 'boss' ? ' boss' : '');
         b.style.borderColor = DIFF_COLORS[l.diff];

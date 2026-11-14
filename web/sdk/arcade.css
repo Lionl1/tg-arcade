@@ -253,3 +253,8 @@ details.path summary .btn { padding: 4px 10px; font-size: 12px; flex: none; }
 .related a.next { background: color-mix(in srgb, var(--accent) 22%, transparent); font-weight: 700; }
 .chips-skills { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 4px 0; }
 .chips-skills span { font-size: 12px; padding: 3px 9px; border-radius: 99px; background: color-mix(in srgb, var(--accent) 14%, transparent); }
+
+/* календарь активности */
+.cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; max-width: 280px; margin: 0 auto; }
+.cal i { aspect-ratio: 1; border-radius: 5px; background: color-mix(in srgb, var(--good) calc(var(--k, 0) * 100%), color-mix(in srgb, var(--fg) 8%, transparent)); }
+.cal i.pad { background: none; }

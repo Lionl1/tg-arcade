@@ -276,6 +276,7 @@ def create_app(settings: Settings, store: Store, catalog: Catalog,
     async def api_settings(body: SettingsIn):
         a = auth(body)
         uid = a["user"]["id"]
+        await progress.touch_user(uid, display_name(a["user"]), body.tz)  # сначала создать игрока — иначе настройки новичка некуда сохранить
         prefs = await progress.prefs.set_user(uid, body.changes)
         # язык для напоминаний: явная настройка, иначе — что прислал Mini App
         lang = prefs["lang"] if prefs["lang"] in LANGS else lang_of(body, a["user"])

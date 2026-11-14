@@ -58,6 +58,7 @@ for (const lang of ['ru', 'en']) {
     const def = registered[g.id];
     if (!def) { if (g.id !== 'chess') bad(id(g), 'не вызвал Arcade.register'); continue; }
     if (def.howto && leak(g, 'howto', def.howto)) continue;
+    if (def.chapters && Object.values(def.chapters).some((t) => leak(g, 'chapters', t))) continue;
     if (!def.cfg) continue;
     const cfg = def.cfg;
     if (['ask', 'askRev', 'rule'].some((k) => cfg[k] && leak(g, k, cfg[k]))) continue;

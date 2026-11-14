@@ -40,6 +40,12 @@
         const total = plan.reduce((a, s) => a + units(s), 0);
         let done = 0, i = 0, cancel = () => {};
         const box = api.el('div', 'appbox fit');
+        // не даём экрану погаснуть во время подходов и отдыха
+        let lock = null;
+        const keepAwake = async () => { try { lock = await navigator.wakeLock.request('screen'); } catch (e) { /* не поддерживается — не страшно */ } };
+        const onVis = () => { if (document.visibilityState === 'visible') keepAwake(); };
+        keepAwake(); document.addEventListener('visibilitychange', onVis);
+        api.onDispose(() => { document.removeEventListener('visibilitychange', onVis); try { lock && lock.release(); } catch (e) { /* noop */ } });
 
         const beep = (f = 880) => api.tone(f, 120, 'triangle');
         function photo(parent, id, big) {

@@ -123,6 +123,42 @@
       ${i >= 0 ? stepRow(p.steps[i], i, true) : `<div class="badge" style="display:block;text-align:center">${L('🏁 Путь пройден! Выбери следующий', '🏁 Path complete! Pick the next one')}</div>`}
       <button class="btn ghost" style="width:100%;margin-top:8px" data-act="paths">${L('🗺 Все пути', '🗺 All paths')}</button></div>`;
   }
+  /** Календарь активности за 4 недели и итоги недели */
+  function activityPanel() {
+    const a = prof.activity;
+    if (!a) return '';
+    const w = a.week, max = Math.max(1, ...a.days.map((d) => d.plays));
+    const trend = w.prev_xp ? Math.round((100 * (w.xp - w.prev_xp)) / w.prev_xp) : null;
+    const main = (cat.pillars || []).filter((p) => ['mind', 'knowledge', 'code', 'body'].includes(p.id));
+    const missing = main.filter((p) => !w.pillars[p.id]);
+    const first = new Date(a.days[0].day + 'T00:00').getDay(), pad = (first + 6) % 7; // неделя с понедельника
+    return `<div class="panel"><h2>${L('📅 Активность', '📅 Activity')}</h2>
+      <div class="cal">${'<i class="pad"></i>'.repeat(pad)}${a.days.map((d) => `<i title="${d.day}: ${d.plays}" style="--k:${d.plays ? 0.25 + 0.75 * Math.min(1, d.plays / Math.max(3, max)) : 0}"></i>`).join('')}</div>
+      <div class="stats" style="margin-top:10px">
+        <div><b>${w.active_days}/7</b><small>${L('дней за неделю', 'days this week')}</small></div><div><b>${w.plays}</b><small>${L('партий', 'rounds')}</small></div>
+        <div><b>+${w.xp}</b><small>XP</small></div><div><b>${trend == null ? '—' : (trend >= 0 ? '+' : '') + trend + '%'}</b><small>${L('к прошлой', 'vs last')}</small></div>
+      </div>
+      <div class="pillars">${main.map((p) => `<span class="pl ${w.pillars[p.id] ? 'on' : ''}">${p.emoji} ${esc(p.title)} · ${w.pillars[p.id] || 0}</span>`).join('')}</div>
+      <p class="tip" style="margin:8px 0 0">${missing.length ? L('На этой неделе не хватает: ', 'Missing this week: ') + missing.map((p) => p.emoji + ' ' + esc(p.title)).join(', ') : L('Все четыре опоры в деле — отличный баланс!', 'All four pillars covered — great balance!')}</p></div>`;
+  }
+
+  // ---------- знакомство: один экран при первом входе — выбери цель (путь) ----------
+  const ONB_KEY = 'arcade:onboarded';
+  function needOnboarding() {
+    if (!prof || prof.stats.plays > 0) return false;
+    try { return !localStorage.getItem(ONB_KEY); } catch (e) { return false; }
+  }
+  function onboarding() {
+    return `<div class="panel center"><div class="emoji brainpoke" style="font-size:52px">🧠</div>
+      <h2>${L('Аркада для мозга', 'Brain Arcade')}</h2><p class="tip">${esc((cat.mission || {})[LANG] || '')}</p>
+      <div class="pillars" style="justify-content:center">${(cat.pillars || []).slice(0, 4).map((p) => `<span class="pl on">${p.emoji} ${esc(p.title)}</span>`).join('')}</div></div>
+      <div class="panel"><h2>${L('🎯 С чего начнём?', '🎯 Where shall we start?')}</h2>
+      <p class="tip" style="margin:-4px 0 6px">${L('Выбери цель — это твой путь. Его можно сменить в профиле в любой момент.', 'Pick a goal — that is your path. You can change it in the profile at any time.')}</p>
+      ${(prof.paths || []).map((p) => `<button class="grow" data-onb="${p.id}"><span class="e">${p.emoji}</span><span class="t"><b>${esc(p.title)}</b><small style="white-space:normal">${esc(p.desc)}</small></span><span class="tag">${p.total} ${L('шагов', 'steps')}</span></button>`).join('')}
+      </div>
+      <div class="panel"><p class="tip">${L('Каждый день — короткая тренировка по опорам: ум → знания → тело. Серия дней, опыт и граф знаний покажут прогресс.', 'Every day — a short workout by pillar: mind → knowledge → body. Your streak, XP and knowledge graph will show the progress.')}</p></div>`;
+  }
+
   /** Все пути — в профиле */
   function pathsPanel() {
     const cur = activePath();
@@ -220,6 +256,7 @@
         <div><b>${st.plays}</b><small>${L('партий', 'rounds')}</small></div><div><b>${st.days}</b><small>${L('дней', 'days')}</small></div>
         <div><b>${st.games}</b><small>${L('игр', 'games')}</small></div><div><b>${st.stars}</b><small>${L('звёзд', 'stars')}</small></div>
       </div>
+      ${activityPanel()}
       ${window.KnowledgeGraph ? window.KnowledgeGraph.html(prof) : ''}
       ${pathsPanel()}
       <div class="panel"><button class="btn ghost" style="width:100%" data-tab="settings">${L('⚙️ Настройки и напоминание', '⚙️ Settings and reminder')}</button></div>
@@ -370,7 +407,7 @@
   function render() {
     document.querySelectorAll('#tabs button').forEach((b) => b.classList.toggle('on', b.dataset.tab === tab));
     const keep = view.scrollTop;
-    view.innerHTML = { today, games, profile, science, settings }[tab]();
+    view.innerHTML = tab === 'today' && needOnboarding() ? onboarding() : { today, games, profile, science, settings }[tab]();
     view.scrollTop = arguments[0] ? keep : 0;
     if (tab === 'profile' && prof && window.KnowledgeGraph) {
       window.KnowledgeGraph.bind(view, prof, cat.games);
@@ -378,7 +415,7 @@
     }
   }
   view.addEventListener('click', async (e) => {
-    const t = e.target.closest('[data-path],[data-play],[data-sec],[data-tab],[data-act],[data-link],[data-set],[data-av]');
+    const t = e.target.closest('[data-onb],[data-path],[data-play],[data-sec],[data-tab],[data-act],[data-link],[data-set],[data-av]');
     if (!t) return;
     if (t.dataset.link) { e.preventDefault(); if (tg && tg.openLink) tg.openLink(t.dataset.link); else window.open(t.dataset.link, '_blank'); return; }
     if (t.dataset.play) { haptic(); location.href = playUrl(t.dataset.play); return; }
@@ -389,6 +426,12 @@
       const def = window.ArcadePrefs.DEF;
       window.ArcadePrefs.save(def); prof.prefs = { ...prof.prefs, ...def }; render(true);
       try { prof.prefs = (await api('settings', { changes: def })).prefs; } catch (err) { /* noop */ }
+      return;
+    }
+    if (t.dataset.onb) {
+      try { localStorage.setItem(PATH_KEY, t.dataset.onb); localStorage.setItem(ONB_KEY, '1'); } catch (err) { /* noop */ }
+      haptic(); tab = 'today'; render();
+      toast(L('Путь выбран! Начни с первого шага или с тренировки дня 👇', 'Path chosen! Start with the first step or the daily workout 👇'));
       return;
     }
     if (t.dataset.path) { e.preventDefault(); try { localStorage.setItem(PATH_KEY, t.dataset.path); } catch (err) { /* noop */ } haptic('select'); render(true); return; }
