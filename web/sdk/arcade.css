@@ -141,3 +141,13 @@ html.notips .card p.howto { display: none; }
 
 .qbar { height: 4px; border-radius: 4px; background: var(--warn); width: 0; max-width: 420px; align-self: center; }
 html.nomotion .qbar { transition: none !important; }
+
+/* --- код: трассировка, «Собери код», «Найди ошибку» --- */
+.learn-q.code { font: 600 14px/1.5 ui-monospace, Menlo, monospace; text-align: left; white-space: pre; background: var(--card); padding: 12px 14px; border-radius: 12px; max-width: 100%; overflow-x: auto; }
+.learn-q.code.long { font-size: 13px; }
+.codebox { display: flex; flex-direction: column; gap: 4px; padding: 8px; border-radius: 12px; background: color-mix(in srgb, var(--fg) 5%, transparent); min-height: 44px; }
+.codebox.pool { background: transparent; padding: 0; }
+.codebox.ok { outline: 2px solid var(--good); }
+.cline { text-align: left; font: 13px/1.4 ui-monospace, Menlo, monospace; white-space: pre; border: 0; border-radius: 8px; padding: 7px 10px; background: var(--card); color: var(--fg); overflow-x: auto; }
+.cline.bad { background: color-mix(in srgb, var(--bad) 35%, var(--card)); }
+.cline.okline { background: color-mix(in srgb, var(--good) 35%, var(--card)); }

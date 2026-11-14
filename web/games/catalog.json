@@ -61,6 +61,10 @@
      "title": "🏛 История"
     },
     {
+     "id": "esoc",
+     "title": "⚖️ Обществознание"
+    },
+    {
      "id": "einf",
      "title": "💻 Информатика"
     },
@@ -104,8 +108,12 @@
   {
    "id": "algo",
    "title": "💻 Алгоритмы",
-   "desc": "Как работают алгоритмы и структуры данных — пошаговая анимация с псевдокодом. Можно листать шаги назад и брать новые данные.",
+   "desc": "Понять → запомнить → написать самому. Анимации с псевдокодом и настоящим кодом на Python и JavaScript, практика (собери код, будь сортировкой, трассировка, найди ошибку) и карточки.",
    "groups": [
+    {
+     "id": "practice",
+     "title": "🛠 Практика: пишем сами"
+    },
     {
      "id": "sort",
      "title": "📊 Сортировки"
@@ -119,8 +127,12 @@
      "title": "🧱 Структуры данных"
     },
     {
+     "id": "dp",
+     "title": "🧮 Динамика"
+    },
+    {
      "id": "quiz",
-     "title": "🎯 Тест"
+     "title": "🎯 Запомнить"
     }
    ]
   },
@@ -1175,6 +1187,169 @@
    "timed": true
   },
   {
+   "id": "parsons",
+   "title": "Собери код",
+   "emoji": "🧩",
+   "section": "algo",
+   "group": "practice",
+   "desc": "Строки работающей функции перемешаны — расставь по порядку. Лучший способ научиться писать код.",
+   "skills": [
+    "logic",
+    "language"
+   ],
+   "par": 5,
+   "timed": true
+  },
+  {
+   "id": "sortplay",
+   "title": "Будь сортировкой",
+   "emoji": "🙋",
+   "section": "algo",
+   "group": "practice",
+   "desc": "Сделай сам те обмены, которые сделал бы пузырёк, выбор или вставки.",
+   "skills": [
+    "logic",
+    "attention"
+   ],
+   "par": 25,
+   "timed": true
+  },
+  {
+   "id": "trace",
+   "title": "Что выведет код?",
+   "emoji": "🖨",
+   "section": "algo",
+   "group": "practice",
+   "desc": "Исполни программу на Python в уме и выбери вывод.",
+   "skills": [
+    "logic",
+    "memory"
+   ],
+   "par": 12,
+   "timed": true
+  },
+  {
+   "id": "findbug",
+   "title": "Найди ошибку",
+   "emoji": "🐞",
+   "section": "algo",
+   "group": "practice",
+   "desc": "В функции одна строка с багом — найди её и узнай, как исправить.",
+   "skills": [
+    "logic",
+    "attention"
+   ],
+   "par": 8,
+   "timed": true
+  },
+  {
+   "id": "algo-heapsort",
+   "title": "Пирамидальная",
+   "emoji": "⛰",
+   "section": "algo",
+   "group": "sort",
+   "desc": "Куча и перенос максимума в конец.",
+   "skills": [],
+   "par": 1,
+   "app": true
+  },
+  {
+   "id": "algo-counting",
+   "title": "Подсчётом",
+   "emoji": "🔢",
+   "section": "algo",
+   "group": "sort",
+   "desc": "Сортировка без сравнений — считаем значения.",
+   "skills": [],
+   "par": 1,
+   "app": true
+  },
+  {
+   "id": "algo-dijkstra",
+   "title": "Дейкстра",
+   "emoji": "🛣",
+   "section": "algo",
+   "group": "search",
+   "desc": "Кратчайшие пути по дорогам разной длины.",
+   "skills": [],
+   "par": 1,
+   "app": true
+  },
+  {
+   "id": "algo-traversal",
+   "title": "Обходы дерева",
+   "emoji": "🌲",
+   "section": "algo",
+   "group": "ds",
+   "desc": "Прямой, симметричный и обратный обход.",
+   "skills": [],
+   "par": 1,
+   "app": true
+  },
+  {
+   "id": "algo-linkedlist",
+   "title": "Связный список",
+   "emoji": "🔗",
+   "section": "algo",
+   "group": "ds",
+   "desc": "Разворот списка тремя указателями.",
+   "skills": [],
+   "par": 1,
+   "app": true
+  },
+  {
+   "id": "algo-coins",
+   "title": "Размен монет (ДП)",
+   "emoji": "🪙",
+   "section": "algo",
+   "group": "dp",
+   "desc": "Динамическое программирование: таблица ответов для всех сумм.",
+   "skills": [],
+   "par": 1,
+   "app": true
+  },
+  {
+   "id": "algo-ideas",
+   "title": "Идеи алгоритмов",
+   "emoji": "💡",
+   "section": "algo",
+   "group": "quiz",
+   "desc": "Узнай алгоритм по идее — и наоборот.",
+   "skills": [
+    "logic",
+    "knowledge"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "ds-choice",
+   "title": "Что использовать?",
+   "emoji": "🧰",
+   "section": "algo",
+   "group": "quiz",
+   "desc": "Стек, очередь, куча, словарь или BFS — что выбрать под задачу.",
+   "skills": [
+    "logic",
+    "knowledge"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "py-complexity",
+   "title": "Сложность в Python",
+   "emoji": "🐍",
+   "section": "algo",
+   "group": "quiz",
+   "desc": "append, pop(0), x in set, sorted… — сколько это стоит.",
+   "skills": [
+    "knowledge"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
    "id": "draw",
    "title": "Рисовалка",
    "emoji": "🎨",
@@ -1553,6 +1728,86 @@
    "skills": [
     "knowledge",
     "math"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "ege-paronyms",
+   "title": "Паронимы",
+   "emoji": "🔀",
+   "section": "ege",
+   "group": "erus",
+   "desc": "Надеть или одеть? Задание 5: выбери слово по смыслу.",
+   "skills": [
+    "language"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "ege-litterms",
+   "title": "Теория литературы",
+   "emoji": "🖋",
+   "section": "ege",
+   "group": "elit",
+   "desc": "Тропы, фигуры речи, размеры стиха, сюжет, направления.",
+   "skills": [
+    "language",
+    "knowledge"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "ege-rulers",
+   "title": "Правители и реформы",
+   "emoji": "👑",
+   "section": "ege",
+   "group": "ehist",
+   "desc": "При ком это было? От Олега до Ельцина.",
+   "skills": [
+    "knowledge"
+   ],
+   "par": 15,
+   "timed": true
+  },
+  {
+   "id": "ege-art",
+   "title": "Картины и художники",
+   "emoji": "🖼",
+   "section": "ege",
+   "group": "ehist",
+   "desc": "Культура для ЕГЭ: ~190 картин из открытой базы Wikidata.",
+   "skills": [
+    "knowledge"
+   ],
+   "par": 12,
+   "timed": true
+  },
+  {
+   "id": "ege-arch",
+   "title": "Архитектура",
+   "emoji": "🏛",
+   "section": "ege",
+   "group": "ehist",
+   "desc": "Кто построил? Постройки и архитекторы из Wikidata.",
+   "skills": [
+    "knowledge"
+   ],
+   "par": 12,
+   "timed": true
+  },
+  {
+   "id": "ege-social",
+   "title": "Понятия обществознания",
+   "emoji": "⚖️",
+   "section": "ege",
+   "group": "esoc",
+   "desc": "Экономика, политика, право, общество — термины и определения.",
+   "skills": [
+    "language",
+    "knowledge"
    ],
    "par": 15,
    "timed": true

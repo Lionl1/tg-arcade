@@ -112,7 +112,7 @@
         }
         card.a = String(card.a);
         label.textContent = (card.ask || (card.rev && cfg.askRev) || cfg.ask || '') + (hasD ? ` · ${DNAME[card.d || 1]}` : '');
-        q.className = 'learn-q' + (cfg.big && !card.rev ? ' big' : '');
+        q.className = 'learn-q' + (cfg.big && !card.rev ? ' big' : '') + (cfg.mono ? ' code' : ''); // mono — вопрос-код (трассировка)
         setQ(q, card.q, cfg.big && !card.rev);
         fb.textContent = '';
         ch.innerHTML = '';

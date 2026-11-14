@@ -3,6 +3,7 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const WEB = path.join(ROOT, 'web');
@@ -21,7 +22,7 @@ const sandbox = {
 sandbox.window = sandbox;
 sandbox.Arcade = { register: (def) => { registered[current] = def; }, fail: (msg) => bad(current, 'не загрузилась: ' + msg) };
 vm.createContext(sandbox);
-for (const f of ['sdk/countries.js', 'sdk/learn.js', 'sdk/algo.js', 'sdk/algo-paths.js']) vm.runInContext(fs.readFileSync(path.join(WEB, f), 'utf8'), sandbox);
+for (const f of ['sdk/countries.js', 'sdk/learn.js', 'sdk/algo-code.js', 'sdk/algo.js', 'sdk/algo-paths.js']) vm.runInContext(fs.readFileSync(path.join(WEB, f), 'utf8'), sandbox);
 for (const g of cat.games) {
   current = g.id;
   if (g.id === 'chess') continue; // проверяется отдельно ниже
@@ -91,6 +92,59 @@ for (const [id, fen, moves] of puzzles) {
   if (ok) chessOk++; else bad('chess', `задача ${id}: недопустимый ход в решении`);
 }
 
+// --- учебный код: всё реально исполняется в Python (и JS) ---
+// Python-раннер: получает JSON [{code, test?, expect?, mustFail?}], возвращает [{ok, out, err}]
+const RUNNER = `
+import json, sys, io, contextlib
+res = []
+for job in json.load(sys.stdin):
+    buf = io.StringIO()
+    try:
+        with contextlib.redirect_stdout(buf):
+            exec(job["code"] + "\\n" + job.get("test", ""), {})
+        res.append({"ok": True, "out": buf.getvalue().strip()})
+    except BaseException as e:
+        res.append({"ok": False, "out": buf.getvalue().strip(), "err": type(e).__name__ + ": " + str(e)[:120]})
+print(json.dumps(res))
+`;
+const runPy = (jobs) => JSON.parse(execFileSync('python3', ['-I', '-c', RUNNER], { input: JSON.stringify(jobs), encoding: 'utf8', maxBuffer: 64 << 20 }));
+let pyRuns = 0;
+
+// 1) настоящий код алгоритмов: Python и JavaScript с тестами
+const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+const algoIds = Object.keys(sandbox.ALGO_CODE || {});
+runPy(algoIds.map((id) => ({ code: sandbox.ALGO_CODE[id].py, test: sandbox.ALGO_CODE[id].pyTest }))).forEach((r, k) => {
+  pyRuns++;
+  if (!r.ok) bad(algoIds[k], 'Python-код не проходит тест: ' + r.err);
+});
+for (const id of algoIds) {
+  const c = sandbox.ALGO_CODE[id];
+  try { if (new Function('eq', c.js + '\nreturn (' + c.jsTest + ');')(eq) !== true) bad(id, 'JS-код не проходит тест'); } catch (e) { bad(id, 'JS-код падает: ' + e.message); }
+}
+for (const g of cat.games) if (g.section === 'algo' && g.app && !sandbox.ALGO_CODE[g.id]) bad(g.id, 'нет настоящего кода (ALGO_CODE)');
+
+// 2) «Собери код»: эталон каждой задачи проходит свой тест
+const parsons = (registered.parsons || {}).bank || [];
+runPy(parsons.map((t) => ({ code: t.code, test: t.test }))).forEach((r, k) => { pyRuns++; if (!r.ok) bad('parsons', `«${parsons[k].task}»: ${r.err}`); });
+
+// 3) «Найди ошибку»: с исправлением тест проходит, с багом — НЕ проходит (иначе это не баг)
+const bugs = (registered.findbug || {}).bank || [];
+const fixedJobs = bugs.map((b) => ({ code: b.code.map((l, i) => (i === b.bug ? b.fix : l)).join('\n'), test: b.test }));
+const buggyJobs = bugs.map((b) => ({ code: b.code.join('\n'), test: b.test }));
+runPy(fixedJobs).forEach((r, k) => { pyRuns++; if (!r.ok) bad('findbug', `«${bugs[k].task}»: исправленная версия не проходит тест — ${r.err}`); });
+runPy(buggyJobs).forEach((r, k) => { pyRuns++; if (r.ok) bad('findbug', `«${bugs[k].task}»: версия с багом проходит тест — это не баг`); });
+
+// 4) «Что выведет код?»: ответ генератора = реальный вывод Python
+const trace = registered.trace && registered.trace.cfg;
+if (trace) {
+  const cases = [...Array(400)].map((_, i) => trace.gen(api(i % 30, i % 12)));
+  runPy(cases.map((c) => ({ code: c.q }))).forEach((r, k) => {
+    pyRuns++;
+    if (!r.ok) bad('trace', `код падает: ${cases[k].q.split('\n')[0]}… — ${r.err}`);
+    else if (r.out !== String(cases[k].a)) bad('trace', `ответ «${cases[k].a}», а Python печатает «${r.out}» для: ${cases[k].q.replace(/\n/g, ' ⏎ ')}`);
+  });
+}
+
 // --- каталог ---
 const ids = new Set();
 for (const g of cat.games) {
@@ -100,6 +154,6 @@ for (const g of cat.games) {
   if (!g.app && !(g.par > 0)) bad(g.id, 'нет нормы par');
 }
 
-console.log(`Колод: ${decks}, генераторов: ${gens}, проверок вариантов: ${checks}, шахматных задач: ${chessOk}/${puzzles.length}, слов с ударением: ${stress.length}`);
+console.log(`Колод: ${decks}, генераторов: ${gens}, проверок вариантов: ${checks}, шахматных задач: ${chessOk}/${puzzles.length}, слов с ударением: ${stress.length}, запусков Python: ${pyRuns}`);
 if (problems.length) { console.log(`\n❌ Проблемы (${problems.length}):\n` + problems.slice(0, 60).join('\n')); process.exit(1); }
 console.log('✅ Проблем не найдено');

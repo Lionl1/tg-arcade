@@ -71,7 +71,7 @@ def test_parse_duration():
 
 def test_catalog_matches_game_files():
     cat = Catalog(ROOT / "web/games/catalog.json")
-    assert len(cat) >= 109
+    assert len(cat) >= 122
     for g in cat.games.values():
         assert re.fullmatch(r"[a-z0-9-]{1,32}", g.id)
         section = cat.section(g.section)

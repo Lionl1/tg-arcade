@@ -30,4 +30,5 @@ their own licenses (see docs/credits.md):
 - web/games/data/phrases.json — Tatoeba, CC BY 2.0 FR
 - web/games/data/trivia.json — Open Trivia Database, CC BY-SA 4.0
 - web/games/data/geo.json — mledoze/countries, ODbL 1.0
+- web/games/data/ege-art.json, ege-arch.json — Wikidata, CC0
 - flag images loaded at runtime — Twemoji, CC BY 4.0

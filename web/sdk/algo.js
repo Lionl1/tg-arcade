@@ -28,9 +28,30 @@
         cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%';
         const note = api.el('div', '', box);
         note.style.cssText = 'min-height:2.6em;font-size:14px;font-weight:600;text-align:center';
+        // вкладки: псевдокод (с подсветкой текущей строки) и настоящий код на Python / JavaScript (проверен автотестами)
+        const real = (window.ALGO_CODE || {})[api.gameId];
+        const tabs = api.el('div', 'seg', box);
+        tabs.style.margin = '0';
+        const TABS = [['pseudo', 'Псевдокод']].concat(real ? [['py', 'Python'], ['js', 'JavaScript']] : []);
         const code = api.el('pre', '', box);
-        code.style.cssText = 'margin:0;padding:8px 10px;border-radius:12px;background:color-mix(in srgb, var(--fg) 6%, transparent);font:12px/1.45 ui-monospace,Menlo,monospace;overflow-x:auto;max-height:24vh';
-        const lines = cfg.code.map((t) => { const d = document.createElement('div'); d.textContent = t; d.style.cssText = 'padding:0 4px;border-radius:4px;white-space:pre'; code.appendChild(d); return d; });
+        code.style.cssText = 'margin:0;padding:8px 10px;border-radius:12px;background:color-mix(in srgb, var(--fg) 6%, transparent);font:12px/1.45 ui-monospace,Menlo,monospace;overflow:auto;max-height:24vh;-webkit-user-select:text;user-select:text';
+        let lines = [];
+        function showTab(t) {
+          [...tabs.children].forEach((b) => b.classList.toggle('on', b.dataset.t === t));
+          code.innerHTML = '';
+          const src = t === 'pseudo' ? cfg.code : real[t].split('\n');
+          lines = src.map((txt) => { const d = document.createElement('div'); d.textContent = txt || ' '; d.style.cssText = 'padding:0 4px;border-radius:4px;white-space:pre'; code.appendChild(d); return d; });
+          if (t !== 'pseudo') lines = []; // подсветка шагов — только в псевдокоде
+          copyBtn.hidden = t === 'pseudo';
+          copyBtn.dataset.t = t;
+          render();
+        }
+        for (const [t, label] of TABS) { const b = api.el('button', '', tabs, label); b.dataset.t = t; api.on(b, 'click', () => showTab(t)); }
+        const copyBtn = api.el('button', '', tabs, '📋 Копировать');
+        copyBtn.hidden = true;
+        api.on(copyBtn, 'click', async () => {
+          try { await navigator.clipboard.writeText(real[copyBtn.dataset.t]); api.toast('Код скопирован'); } catch (e) { api.toast('Выдели код и скопируй вручную'); }
+        });
         const bar = api.el('div', 'toolbar', box);
         const bNew = api.el('button', 'btn ghost', bar, '🔀');
         const bBack = api.el('button', 'btn ghost', bar, '◀');
@@ -81,6 +102,7 @@
         api.on(window, 'resize', fit);
         api.onDispose(() => clearTimeout(timer));
         frames = cfg.run(cfg.make(api));
+        showTab('pseudo');
         requestAnimationFrame(fit);
       },
     };
