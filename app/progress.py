@@ -36,7 +36,8 @@ def clean_nickname(raw: str | None, lang: str = "ru") -> str | None:
     return nick
 
 
-LEVELS = 12  # уровней на «странице»; сами уровни бесконечные
+LEVELS = 10  # уровней в главе; сами уровни бесконечные: главы идут одна за другой
+BOSS_XP = 50  # бонус за первую победу над боссом главы
 MAX_LEVEL = 9999
 # навыки для «тренировки дня» (аркадную координацию и факты-знания не навязываем)
 COGNITIVE = ["speed", "attention", "memory", "flex", "logic", "spatial", "math", "language"]
@@ -63,8 +64,31 @@ def level_factor(game: Game, k: int) -> float:
     return f * time_factor(k) if game.timed else f
 
 
+# Главы по 10 уровней: 4-й и 8-й — испытания с модификатором, 10-й — босс главы. Те же правила — в web/sdk/arcade.js.
+MODS = ("fast", "rush", "sharp")  # ⚡ быстрее · ⏱ меньше времени · 💥 ошибки дороже
+
+
+def level_mod(k: int) -> str | None:
+    i, c = (k - 1) % LEVELS + 1, (k - 1) // LEVELS + 1
+    if i == LEVELS:
+        return "boss"
+    if i in (4, 8):
+        return MODS[(2 * c + (i == 8)) % len(MODS)]
+    return None
+
+
+def mod_goal_mult(game: Game, k: int) -> float:
+    m = level_mod(k)
+    if m == "boss":
+        return 0.9 if game.asc else 1.15  # босс: планка выше
+    if m == "rush" and game.timed and not game.asc:
+        return 0.85  # времени на 20 % меньше — цель чуть ниже, но испытание всё равно труднее
+    return 1.0
+
+
 def level_goal(game: Game, k: int) -> int:
-    return max(1, math.floor(game.par * level_factor(game, k) + 0.5))  # округление как Math.round в SDK
+    g = max(1, math.floor(game.par * level_factor(game, k) * mod_goal_mult(game, k) + 0.5))  # округление как Math.round в SDK
+    return max(g, math.floor(game.par * game.floor + 0.5)) if game.asc else g  # «на время»: даже босс не ниже предела floor·par
 
 
 def level_stars(game: Game, k: int, score: int) -> int:
@@ -138,6 +162,8 @@ ACHIEVEMENTS: list[Ach] = [
     Ach("perfect10", "💯", "Перфекционист", "10 уровней на 3 звезды", "three_star", 10, "Perfectionist", "10 levels with 3 stars"),
     Ach("level12", "🏔", "Покоритель", "Пройди 12-й уровень в любой игре", "max_level", 12, "Conqueror", "Clear level 12 in any game"),
     Ach("level30", "♾️", "Бесконечность", "Пройди 30-й уровень в любой игре", "max_level", 30, "Infinity", "Clear level 30 in any game"),
+    Ach("boss1", "👑", "Победитель босса", "Пройди босса главы в любой игре", "bosses", 1, "Boss slayer", "Beat a chapter boss in any game"),
+    Ach("boss10", "🐉", "Охотник на боссов", "Победи 10 боссов", "bosses", 10, "Boss hunter", "Beat 10 bosses"),
     Ach("tour_win", "🏆", "Чемпион", "Победи в турнире чата", "tour_win", 1, "Champion", "Win a chat tournament"),
     Ach("duel_win", "⚔️", "Дуэлянт", "Выиграй дуэль", "duel_win", 1, "Duelist", "Win a duel"),
     Ach("early", "🌅", "Ранняя пташка", "Потренируйся до 8 утра", "early", 1, "Early bird", "Train before 8 am"),
@@ -227,7 +253,7 @@ class Progress:
         return {
             "unlocked": unlocked,
             "levels": [
-                {"n": k, "goal": level_goal(game, k), "diff": level_difficulty(k),
+                {"n": k, "goal": level_goal(game, k), "diff": level_difficulty(k), "mod": level_mod(k),
                  "stars": rows.get(k, (0, None))[0], "best": rows.get(k, (0, None))[1]}
                 for k in range(1, last + 1)
             ],
@@ -312,8 +338,9 @@ class Progress:
             "SELECT COUNT(*), COALESCE(SUM(record), 0), COALESCE(MAX(hour < 8), 0), COALESCE(MAX(hour >= 23), 0) FROM plays WHERE user_id=?",
             (user_id,))
         per_game = await self._xp_per_game(user_id)
-        stars, three, max_level = await self.store._one(
-            "SELECT COALESCE(SUM(stars), 0), COALESCE(SUM(stars = 3), 0), COALESCE(MAX(CASE WHEN stars > 0 THEN level END), 0) FROM levels WHERE user_id=?",
+        stars, three, max_level, bosses = await self.store._one(
+            "SELECT COALESCE(SUM(stars), 0), COALESCE(SUM(stars = 3), 0), COALESCE(MAX(CASE WHEN stars > 0 THEN level END), 0),"
+            " COALESCE(SUM(level % 10 = 0 AND stars > 0), 0) FROM levels WHERE user_id=?",
             (user_id,))
         done_days = await self._done_days(user_id)
         days = [date.fromisoformat(d) for (d,) in await self.store._all(
@@ -326,7 +353,7 @@ class Progress:
             "plays": plays, "games": len(per_game), "sections": len(sections), "daily": len(done_days),
             "best_streak": (await self.streak(user_id, today, done_days))["best"], "level": level_from_xp(total, 25)[0],
             "max_skill": max(sk_lv.values(), default=1), "min_cog_skill": min(sk_lv.get(s, 1) for s in COGNITIVE),
-            "records": records, "stars": stars, "three_star": three, "max_level": max_level,
+            "records": records, "stars": stars, "three_star": three, "max_level": max_level, "bosses": bosses,
             "tour_win": int("tour_win" in have), "duel_win": int("duel_win" in have),
             "early": int(early > 0), "night": int(night > 0), "comeback": int(any((b - a).days >= 7 for a, b in zip(days, days[1:]))),
             "days": len(days), "_have": have, "_total_xp": total,
@@ -365,6 +392,7 @@ class Progress:
 
         stars = 0
         unlocked_new = None
+        chapter_clear = None
         if mode == "level" and level:
             stars = level_stars(game, level, score)
             old = await self.store._one("SELECT stars, best FROM levels WHERE user_id=? AND game=? AND level=?", (user_id, game.id, level))
@@ -377,6 +405,8 @@ class Progress:
                                        (max(stars, old[0]), score if better_score else old[1], user_id, game.id, level))
             if stars and (old is None or old[0] == 0) and level < MAX_LEVEL:
                 unlocked_new = level + 1
+                if level_mod(level) == "boss":
+                    chapter_clear = level // LEVELS
 
         record = 0
         if mode == "free":
@@ -390,7 +420,7 @@ class Progress:
         diff_mult = (1.0, 1.2, 1.5, 1.8)[level_difficulty(level)] if mode == "level" and level else 1.0
         xp = (10 + 5 * stars + 10 * record) * diff_mult * variety
         in_daily = any(i["id"] == game.id and not i["done"] for i in daily_before["games"])
-        xp = round(xp + (15 if in_daily else 0))
+        xp = round(xp + (15 if in_daily else 0) + (BOSS_XP if chapter_clear else 0))
 
         await self.store._exec(
             "INSERT INTO plays (user_id, game, score, mode, level, stars, record, xp, day, hour, ts) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -408,7 +438,7 @@ class Progress:
             "xp": after_xp - before_xp, "play_xp": xp, "variety": variety, "in_daily": in_daily,
             "level": lv, "title": title_for(lv, lang), "level_up": lv > lv_before, "xp_total": after_xp,
             "xp_start": start, "xp_next": nxt,
-            "stars": stars, "record": bool(record), "unlocked": unlocked_new,
+            "stars": stars, "record": bool(record), "unlocked": unlocked_new, "chapter_clear": chapter_clear,
             "daily": daily_after, "daily_completed": daily_after["done"] and not daily_before["done"],
             "achievements": new_ach,
         }

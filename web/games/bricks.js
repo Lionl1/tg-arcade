@@ -1,16 +1,24 @@
 Arcade.register({
   howto: L('Веди пальцем, чтобы двигать платформу. Тап — запустить мяч. 3 жизни.', 'Drag to move the paddle. Tap to launch the ball. 3 lives.'),
+  chapters: {
+    2: L('крепкие кирпичи — разбиваются со второго удара', 'tough bricks — break on the second hit'),
+    3: L('стальные кирпичи — не разбиваются, отскакивай', 'steel bricks — unbreakable, bounce off them'),
+    4: L('платформа короче', 'a shorter paddle'),
+  },
   start(api) {
+    const ch = api.chapter;
     const g = api.canvas(), x = g.ctx, C = api.colors, keys = api.keys();
-    const pw = Math.max(70, g.W * 0.22), ph = 12, br = 7;
+    const pw = Math.max(60, g.W * (ch >= 4 ? 0.17 : 0.22)), ph = 12, br = 7;
     const cols = 7, rows = 6, pad = 6, top = 50;
     let px = g.W / 2, lives = 3, level = 0, bricks = [], ball, held = true;
 
     function build() {
       const bw = (g.W - pad * (cols + 1)) / cols, bh = 18;
       bricks = [];
-      for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++)
-        bricks.push({ x: pad + c * (bw + pad), y: top + r * (bh + pad), w: bw, h: bh, c: C.palette[r % C.palette.length] });
+      for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+        const steel = ch >= 3 && r === 2 && c % 3 === 1, hp = !steel && ch >= 2 && r < 2 ? 2 : 1;
+        bricks.push({ x: pad + c * (bw + pad), y: top + r * (bh + pad), w: bw, h: bh, c: C.palette[r % C.palette.length], hp, steel });
+      }
     }
     const speed = () => Math.min(620, 330 + level * 40 + api.score * 2);
     function reset() { held = true; ball = { x: px, y: g.H - 60 - br, vx: 0, vy: 0 }; }
@@ -44,11 +52,13 @@ Arcade.register({
         if (dx * dx + dy * dy > br * br) continue;
         if (Math.abs(dx) > Math.abs(dy)) ball.vx = Math.sign(dx || -ball.vx) * Math.abs(ball.vx);
         else ball.vy = Math.sign(dy || -ball.vy) * Math.abs(ball.vy);
+        if (b.steel) { api.tone(220, 30); break; }
+        if (--b.hp > 0) { api.tone(380, 30); break; }
         bricks.splice(i, 1);
         api.addScore(1); api.tone(500 + (rows * 60 - (b.y - top) * 3), 40);
         break;
       }
-      if (!bricks.length) { level++; build(); reset(); api.haptic('success'); }
+      if (!bricks.some((b) => !b.steel)) { level++; build(); reset(); api.haptic('success'); }
       if (ball.y > g.H + br) {
         lives--; api.haptic('error');
         if (lives <= 0) return api.end();
@@ -64,7 +74,12 @@ Arcade.register({
       if (api.ended) return;
 
       x.fillStyle = C.bg; x.fillRect(0, 0, g.W, g.H);
-      for (const b of bricks) { x.fillStyle = b.c; api.rr(x, b.x, b.y, b.w, b.h, 4); x.fill(); }
+      for (const b of bricks) {
+        x.fillStyle = b.steel ? C.hint : b.c; x.globalAlpha = b.hp > 1 ? 1 : b.steel ? 0.8 : 0.75;
+        api.rr(x, b.x, b.y, b.w, b.h, 4); x.fill();
+        if (b.hp > 1) { x.strokeStyle = C.fg; x.lineWidth = 2; api.rr(x, b.x + 2, b.y + 2, b.w - 4, b.h - 4, 3); x.stroke(); }
+      }
+      x.globalAlpha = 1;
       x.fillStyle = C.accent; api.rr(x, px - pw / 2, g.H - 60, pw, ph, 6); x.fill();
       x.fillStyle = C.fg; x.beginPath(); x.arc(ball.x, ball.y, br, 0, 7); x.fill();
       x.font = '16px system-ui'; x.textAlign = 'left'; x.fillText('❤️'.repeat(lives), 10, 28);

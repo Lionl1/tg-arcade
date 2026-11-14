@@ -1,6 +1,10 @@
 // N-назад — классическая тренировка рабочей памяти
 Arcade.register({
   howto: L('Клетки загораются по одной. Жми «Совпало» (или пробел), если клетка та же, что N шагов назад. Каждые 15 шагов N растёт, очки за совпадение = N. Пропуск или ложное нажатие — минус жизнь, всего 3.', 'Cells light up one at a time. Tap “Match” (or space) if the cell is the same as N steps back. Every 15 steps N grows; a match is worth N points. A miss or a false tap costs a life, 3 in total.'),
+  chapters: {
+    2: L('начинаешь сразу с N = 2', 'you start right at N = 2'),
+    3: L('начинаешь с N = 3', 'you start at N = 3'),
+  },
   start(api) {
     const BLOCK = 15;
     const box = api.el('div', 'fill');
@@ -10,7 +14,7 @@ Arcade.register({
     const cells = [...Array(9)].map(() => api.el('div', 'tile', grid));
     const btn = api.el('button', 'btn', box, L('Совпало!', 'Match!'));
     btn.style.cssText = 'flex:none;width:min(80vw,320px);padding:18px;font-size:20px';
-    let n = 1, seq = [], step = 0, pressed = false, lives = 3, active = false;
+    let n = Math.min(3, api.chapter), seq = [], step = 0, pressed = false, lives = 3, active = false;
 
     const isMatch = () => seq.length > n && seq[seq.length - 1] === seq[seq.length - 1 - n];
     const draw = (msg) => { info.textContent = msg || L(`N = ${n} · шаг ${step}/${BLOCK} · ${'❤️'.repeat(lives)}`, `N = ${n} · step ${step}/${BLOCK} · ${'❤️'.repeat(lives)}`); };
@@ -47,7 +51,7 @@ Arcade.register({
     }
     api.on(btn, 'pointerdown', press);
     api.on(window, 'keydown', (e) => { if (e.code === 'Space') { e.preventDefault(); press(); } });
-    draw(L('Приготовься: сначала N = 1', 'Get ready: N = 1 first'));
+    draw(L(`Приготовься: сначала N = ${n}`, `Get ready: N = ${n} first`));
     api.after(1200, next);
   },
 });

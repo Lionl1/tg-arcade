@@ -66,9 +66,60 @@
     const all = cfg.cards ? normalize(cfg.cards, cfg.both) : null;
     const total = cfg.cards ? cfg.cards.length : 0;
 
+    // ---------- уроки: на уровнях колода проходится по порядку ----------
+    // 8 карточек на урок, от простых к сложным; 10-й уровень главы — экзамен по урокам этой главы.
+    const LESSON = 8;
+    const hash = (t) => { let h = 2166136261; for (let k = 0; k < t.length; k++) { h ^= t.charCodeAt(k); h = Math.imul(h, 16777619); } return h >>> 0; };
+    const lessons = all ? (() => {
+      const base = all.filter((c) => !c.rev).sort((x, y) => (x.d || 1) - (y.d || 1) || hash(keyOf(x)) - hash(keyOf(y)));
+      const out = [];
+      for (let k = 0; k < base.length; k += LESSON) out.push(base.slice(k, k + LESSON));
+      if (out.length > 1 && out[out.length - 1].length < 4) out[out.length - 2].push(...out.pop()); // хвост — в предыдущий урок
+      return out;
+    })() : [];
+    /** Урок для уровня k: {n, cards, exam, from, to}. Уроки идут по кругу, если колода короче. */
+    function lessonOf(k) {
+      if (!lessons.length) return null;
+      const c = Math.floor((k - 1) / 10), i = (k - 1) % 10;
+      const at = (j) => j % lessons.length;
+      if (i === 9) { // экзамен главы
+        const ids = [...new Set([...Array(9)].map((_, j) => at(c * 9 + j)))];
+        return { exam: true, n: c + 1, ids, cards: ids.flatMap((j) => lessons[j]) };
+      }
+      const j = at(c * 9 + i);
+      return { exam: false, n: j + 1, ids: [j], cards: lessons[j].concat(j > 0 ? api_pickPrev(lessons[j - 1]) : []) };
+    }
+    const api_pickPrev = (prev) => prev.slice(0, 3); // повторение: 3 карточки прошлого урока
+    const withRev = (cards) => (cfg.both ? cards.concat(all.filter((c) => c.rev && cards.some((x) => x.q === c.a && x.a === c.q))) : cards);
+
+    function lessonIntro(api, ls, go) {
+      const box = api.el('div', 'appbox');
+      box.style.gap = '10px';
+      const head = api.el('div', 'learn-q', box, ls.exam
+        ? L(`👑 Экзамен главы ${ls.n}`, `👑 Chapter ${ls.n} exam`)
+        : L(`📘 Урок ${ls.n} из ${lessons.length}`, `📘 Lesson ${ls.n} of ${lessons.length}`));
+      head.style.fontSize = '22px';
+      api.el('div', 'hint', box, ls.exam
+        ? L(`Вопросы по всем урокам главы (${ls.cards.length} карточек). Сначала вспомни их — потом проверка на время.`, `Questions from every lesson of the chapter (${ls.cards.length} cards). Recall them first — then a timed check.`)
+        : L('Прочитай и запомни — потом проверка на время. Последние карточки — повторение прошлого урока.', 'Read and remember — then a timed check. The last cards review the previous lesson.'));
+      const list = api.el('div', 'lesson-list', box);
+      ls.cards.slice(0, ls.exam ? 0 : ls.cards.length).forEach((c, k) => {
+        const r = api.el('div', 'lesson-row' + (k >= LESSON ? ' rev' : ''), list);
+        const qn = api.el('span', '', r); setQ(qn, c.q, false);
+        api.el('b', '', r, '→');
+        const an = api.el('span', '', r); setQ(an, c.a, false);
+      });
+      const b = api.el('button', 'btn', box, L('▶ Проверить себя', '▶ Test yourself'));
+      b.style.flex = 'none';
+      api.on(b, 'click', () => go());
+    }
+
     // ---------- тест на очки ----------
     function test(api) {
       api.stage.innerHTML = '';
+      const ls = api.mode === 'level' && all && !cfg.gen ? lessonOf(api.level) : null;
+      if (ls && !api._lessonShown) { api._lessonShown = true; return lessonIntro(api, ls, () => test(api)); }
+      const lessonPool = ls ? withRev(ls.cards) : null;
       const tm = api.timer(cfg.seconds || 60);
       const box = api.el('div', 'fill');
       const label = api.el('div', 'hint', box, cfg.ask || '');
@@ -84,6 +135,7 @@
         return [1, api.score < 6 ? 1 : api.score < 14 ? 2 : 3];
       };
       const poolNow = () => {
+        if (lessonPool) return lessonPool;
         if (!hasD) return all;
         const [lo, hi] = band();
         const p = all.filter((c) => (c.d || 1) >= lo && (c.d || 1) <= hi);

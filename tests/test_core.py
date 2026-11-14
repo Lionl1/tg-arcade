@@ -14,7 +14,7 @@ from app.catalog import Catalog
 from app.config import ROOT, Settings
 from app.db import Store
 from app.events import Events, parse_duration
-from app.progress import LEVELS, Progress, level_from_xp, level_goal, level_stars
+from app.progress import level_mod, LEVELS, Progress, level_from_xp, level_goal, level_stars
 from app.links import Links
 from app.security import Ctx, make_ctx, make_event_ctx, parse_ctx, validate_init_data
 from app.web import create_app
@@ -379,10 +379,13 @@ def test_infinite_levels(client):
     cat = client.catalog
     for gid in ("snake", "reaction", "schulte"):
         g = cat.get(gid)
-        goals = [level_goal(g, k) for k in range(1, 60)]
-        assert goals == (sorted(goals, reverse=True) if g.asc else sorted(goals))  # монотонно сложнее
+        plain = [level_goal(g, k) for k in range(1, 60) if level_mod(k) is None]
+        assert plain == (sorted(plain, reverse=True) if g.asc else sorted(plain))  # обычные уровни монотонно сложнее
+        for k in range(10, 60, 10):  # босс главы не легче соседних уровней
+            harder = (lambda a, b: a <= b) if g.asc else (lambda a, b: a >= b)
+            assert level_mod(k) == "boss" and harder(level_goal(g, k), level_goal(g, k - 1))
         if g.asc:
-            assert min(goals) >= g.par * 0.6  # «на время» не уходит в невозможное
+            assert min(level_goal(g, k) for k in range(1, 60)) >= g.par * g.floor - 1  # «на время» не уходит в невозможное
     assert len(client.catalog.list("apps")) == 6 and all(g.app for g in client.catalog.list("apps"))
 
 
@@ -536,3 +539,18 @@ def test_reminder_text_languages():
     info = {"daily": {"games": [1, 2, 3], "count": 1}, "streak": {"current": 4, "freezes": 1}, "lang": "en"}
     assert "daily workout" in reminder_text("Ann Lee", info) and "Streak" in reminder_text("Ann Lee", info)
     assert "тренировку дня" in reminder_text("Аня", {**info, "lang": "ru"})
+
+
+def test_chapters_and_boss_reward(client):
+    c = client
+    assert [level_mod(k) for k in range(1, 11)] == [None, None, None, "sharp", None, None, None, "fast", None, "boss"]
+    g = c.catalog.get("snake")
+    uid = 91
+    for k in range(1, 10):  # проходим главу до босса
+        r = c.post("/api/level", json={"initData": init_data(uid), "ctx": "snake", "level": k, "score": level_goal(g, k)})
+        assert r.status_code == 200, r.text
+        time.sleep(1.01)
+    r = c.post("/api/level", json={"initData": init_data(uid), "ctx": "snake", "level": 10, "score": level_goal(g, 10)}).json()
+    assert r["progress"]["chapter_clear"] == 1 and r["progress"]["play_xp"] >= 50
+    assert any(a["code"] == "boss1" for a in r["progress"]["achievements"])
+    assert r["levels"][9]["mod"] == "boss" and len(r["levels"]) % 10 == 0

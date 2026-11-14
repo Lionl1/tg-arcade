@@ -19,10 +19,66 @@
     return src;
   }
 
+  /** Уровни к анимации: «Что произойдёт на следующем шаге?» — по настоящим кадрам алгоритма */
+  function quiz(cfg, api) {
+    const C = api.colors;
+    const box = api.el('div', 'appbox');
+    box.style.gap = '8px';
+    const head = api.el('div', 'hint', box, L('Что произойдёт на следующем шаге?', 'What happens at the next step?'));
+    head.style.cssText = 'font-weight:800;text-align:center';
+    const wrap = api.el('div', '', box);
+    wrap.style.cssText = 'flex:1;min-height:150px;max-height:36vh;position:relative;border-radius:14px;background:var(--card);overflow:hidden';
+    const cv = api.el('canvas', '', wrap);
+    cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%';
+    const now = api.el('div', 'hint', box);
+    now.style.cssText = 'text-align:center;font-size:13px;min-height:2.4em';
+    const opts = api.el('div', 'choices learn', box);
+    const tm = api.timer(90);
+    let ctx, W = 0, H = 0, frames = [], j = 0, shown = 0, used = 0, lock = false;
+    function fit() {
+      const r = wrap.getBoundingClientRect(), d = window.devicePixelRatio || 1;
+      W = r.width; H = r.height; cv.width = Math.round(W * d); cv.height = Math.round(H * d);
+      ctx = cv.getContext('2d'); ctx.setTransform(d, 0, 0, d, 0, 0); paint(shown);
+    }
+    function paint(k) { shown = k; if (ctx && frames[k]) { ctx.clearRect(0, 0, W, H); cfg.draw(ctx, W, H, frames[k], C, api); } }
+    function next() {
+      if (!frames.length || ++used > 3) { frames = cfg.run(cfg.make(api)); used = 1; } // новый пример каждые 3 вопроса
+      const texts = [...new Set(frames.map((f) => f.t).filter(Boolean))];
+      const cand = frames.map((_, k) => k).filter((k) => k < frames.length - 1 && frames[k + 1].t && frames[k + 1].t !== frames[k].t);
+      if (texts.length < 3 || !cand.length) { frames = []; return next(); }
+      j = api.pick(cand);
+      const right = frames[j + 1].t;
+      const wrong = api.shuffle(texts.filter((t) => t !== right && t !== frames[j].t)).slice(0, 3);
+      paint(j);
+      now.textContent = `${L('Сейчас', 'Now')}: ${frames[j].t}`;
+      opts.innerHTML = '';
+      for (const t of api.shuffle([right, ...wrong])) { const b = api.el('button', 'btn ghost', opts, t); b.style.fontSize = '13px'; b.dataset.ok = t === right ? '1' : ''; }
+      lock = false;
+    }
+    api.on(opts, 'click', (e) => {
+      const b = e.target.closest('button');
+      if (!b || lock) return;
+      lock = true;
+      const ok = b.dataset.ok === '1';
+      for (const o of opts.children) if (o.dataset.ok) o.style.background = 'var(--good)';
+      if (ok) { api.addScore(1); api.haptic('light'); api.tone(820, 50); } else { b.style.background = 'var(--bad)'; tm.add(-5); api.haptic('error'); }
+      paint(j + 1); // показать, что на самом деле произошло
+      api.after(ok ? 700 : 1500, next);
+    });
+    api.on(window, 'resize', fit);
+    next();
+    requestAnimationFrame(fit);
+  }
+
   function viz(cfg) {
     return {
-      app: true,
+      viz: true, // уровни — «предскажи шаг», анимация открывается как приложение
+      howto: L('«Анимация» — смотри алгоритм по шагам с кодом. «Уровни» — предскажи следующий шаг алгоритма: 90 секунд, ошибка −5 с.',
+        '“Animation” — watch the algorithm step by step with code. “Levels” — predict the algorithm’s next step: 90 seconds, a mistake costs 5 s.'),
       start(api) {
+        if (api.mode !== 'app') return quiz(cfg, api);
+        const back = api.el('button', 'backlink', api.stage, L('← Меню', '← Menu')); // к уровням «предскажи шаг»
+        api.on(back, 'click', () => api.quit());
         const C = api.colors;
         const box = api.el('div', 'appbox');
         box.style.gap = '8px';

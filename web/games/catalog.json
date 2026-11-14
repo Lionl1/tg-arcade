@@ -1212,10 +1212,10 @@
    "group": "sort",
    "desc": "Соседи меняются местами, пока всё не встанет по порядку.",
    "skills": [],
-   "par": 1,
-   "app": true,
+   "par": 8,
    "title_en": "Bubble Sort",
-   "desc_en": "Neighbours swap until everything is in order."
+   "desc_en": "Neighbours swap until everything is in order.",
+   "timed": true
   },
   {
    "id": "algo-selection",
@@ -1225,10 +1225,10 @@
    "group": "sort",
    "desc": "Каждый раз ищем минимум и ставим в начало.",
    "skills": [],
-   "par": 1,
-   "app": true,
+   "par": 8,
    "title_en": "Selection Sort",
-   "desc_en": "Find the minimum each time and move it to the front."
+   "desc_en": "Find the minimum each time and move it to the front.",
+   "timed": true
   },
   {
    "id": "algo-insertion",
@@ -1238,10 +1238,10 @@
    "group": "sort",
    "desc": "Как карты в руке: вставляем каждый элемент на своё место.",
    "skills": [],
-   "par": 1,
-   "app": true,
+   "par": 8,
    "title_en": "Insertion Sort",
-   "desc_en": "Like cards in your hand: insert each element into place."
+   "desc_en": "Like cards in your hand: insert each element into place.",
+   "timed": true
   },
   {
    "id": "algo-merge",
@@ -1251,10 +1251,10 @@
    "group": "sort",
    "desc": "Делим пополам, сортируем и сливаем.",
    "skills": [],
-   "par": 1,
-   "app": true,
+   "par": 8,
    "title_en": "Merge Sort",
-   "desc_en": "Split in half, sort and merge."
+   "desc_en": "Split in half, sort and merge.",
+   "timed": true
   },
   {
    "id": "algo-quick",
@@ -1264,10 +1264,10 @@
    "group": "sort",
    "desc": "Опорный элемент и разбиение на меньшие и большие.",
    "skills": [],
-   "par": 1,
-   "app": true,
+   "par": 8,
    "title_en": "Quicksort",
-   "desc_en": "A pivot and partitioning into smaller and larger."
+   "desc_en": "A pivot and partitioning into smaller and larger.",
+   "timed": true
   },
   {
    "id": "algo-binsearch",
@@ -1277,10 +1277,10 @@
    "group": "search",
    "desc": "Каждый шаг вдвое сужает поиск.",
    "skills": [],
-   "par": 1,
-   "app": true,
+   "par": 8,
    "title_en": "Binary Search",
-   "desc_en": "Each step halves the search."
+   "desc_en": "Each step halves the search.",
+   "timed": true
   },
   {
    "id": "algo-bfs",
@@ -1290,10 +1290,10 @@
    "group": "search",
    "desc": "Волна от старта находит кратчайший путь.",
    "skills": [],
-   "par": 1,
-   "app": true,
+   "par": 8,
    "title_en": "Breadth-First Search (BFS)",
-   "desc_en": "A wave from the start finds the shortest path."
+   "desc_en": "A wave from the start finds the shortest path.",
+   "timed": true
   },
   {
    "id": "algo-dfs",
@@ -1303,10 +1303,10 @@
    "group": "search",
    "desc": "Идём до упора и возвращаемся из тупиков.",
    "skills": [],
-   "par": 1,
-   "app": true,
+   "par": 8,
    "title_en": "Depth-First Search (DFS)",
-   "desc_en": "Go as far as possible and back out of dead ends."
+   "desc_en": "Go as far as possible and back out of dead ends.",
+   "timed": true
   },
   {
    "id": "algo-astar",
@@ -1316,10 +1316,10 @@
    "group": "search",
    "desc": "Кратчайший путь с подсказкой «куда ближе к цели».",
    "skills": [],
-   "par": 1,
-   "app": true,
+   "par": 8,
    "title_en": "A* Search",
-   "desc_en": "Shortest path with a hint of “closer to the goal”."
+   "desc_en": "Shortest path with a hint of “closer to the goal”.",
+   "timed": true
   },
   {
    "id": "algo-stackqueue",
@@ -1329,10 +1329,10 @@
    "group": "ds",
    "desc": "LIFO против FIFO на одних и тех же операциях.",
    "skills": [],
-   "par": 1,
-   "app": true,
+   "par": 8,
    "title_en": "Stack and Queue",
-   "desc_en": "LIFO vs FIFO on the same operations."
+   "desc_en": "LIFO vs FIFO on the same operations.",
+   "timed": true
   },
   {
    "id": "algo-bst",
@@ -1342,10 +1342,10 @@
    "group": "ds",
    "desc": "Вставка и поиск в двоичном дереве поиска.",
    "skills": [],
-   "par": 1,
-   "app": true,
+   "par": 8,
    "title_en": "Binary Search Tree",
-   "desc_en": "Insert and search in a binary search tree."
+   "desc_en": "Insert and search in a binary search tree.",
+   "timed": true
   },
   {
    "id": "algo-heap",
@@ -1355,10 +1355,10 @@
    "group": "ds",
    "desc": "Максимум всегда в корне: всплытие и просеивание.",
    "skills": [],
-   "par": 1,
-   "app": true,
+   "par": 8,
    "title_en": "Heap",
-   "desc_en": "The max is always at the root: sift up and sift down."
+   "desc_en": "The max is always at the root: sift up and sift down.",
+   "timed": true
   },
   {
    "id": "algo-hash",
@@ -1368,10 +1368,10 @@
    "group": "ds",
    "desc": "Хеш-функция, корзины и коллизии.",
    "skills": [],
-   "par": 1,
-   "app": true,
+   "par": 8,
    "title_en": "Hash Table",
-   "desc_en": "Hash function, buckets and collisions."
+   "desc_en": "Hash function, buckets and collisions.",
+   "timed": true
   },
   {
    "id": "bigo",
@@ -1460,10 +1460,10 @@
    "group": "sort",
    "desc": "Куча и перенос максимума в конец.",
    "skills": [],
-   "par": 1,
-   "app": true,
+   "par": 8,
    "title_en": "Heapsort",
-   "desc_en": "A heap and moving the maximum to the end."
+   "desc_en": "A heap and moving the maximum to the end.",
+   "timed": true
   },
   {
    "id": "algo-counting",
@@ -1473,10 +1473,10 @@
    "group": "sort",
    "desc": "Сортировка без сравнений — считаем значения.",
    "skills": [],
-   "par": 1,
-   "app": true,
+   "par": 8,
    "title_en": "Counting Sort",
-   "desc_en": "Sorting without comparisons — count the values."
+   "desc_en": "Sorting without comparisons — count the values.",
+   "timed": true
   },
   {
    "id": "algo-dijkstra",
@@ -1486,10 +1486,10 @@
    "group": "search",
    "desc": "Кратчайшие пути по дорогам разной длины.",
    "skills": [],
-   "par": 1,
-   "app": true,
+   "par": 8,
    "title_en": "Dijkstra",
-   "desc_en": "Shortest paths over roads of different lengths."
+   "desc_en": "Shortest paths over roads of different lengths.",
+   "timed": true
   },
   {
    "id": "algo-traversal",
@@ -1499,10 +1499,10 @@
    "group": "ds",
    "desc": "Прямой, симметричный и обратный обход.",
    "skills": [],
-   "par": 1,
-   "app": true,
+   "par": 8,
    "title_en": "Tree Traversals",
-   "desc_en": "Pre-order, in-order and post-order."
+   "desc_en": "Pre-order, in-order and post-order.",
+   "timed": true
   },
   {
    "id": "algo-linkedlist",
@@ -1512,10 +1512,10 @@
    "group": "ds",
    "desc": "Разворот списка тремя указателями.",
    "skills": [],
-   "par": 1,
-   "app": true,
+   "par": 8,
    "title_en": "Linked List",
-   "desc_en": "Reversing a list with three pointers."
+   "desc_en": "Reversing a list with three pointers.",
+   "timed": true
   },
   {
    "id": "algo-coins",
@@ -1525,10 +1525,10 @@
    "group": "dp",
    "desc": "Динамическое программирование: таблица ответов для всех сумм.",
    "skills": [],
-   "par": 1,
-   "app": true,
+   "par": 8,
    "title_en": "Coin Change (DP)",
-   "desc_en": "Dynamic programming: a table of answers for every amount."
+   "desc_en": "Dynamic programming: a table of answers for every amount.",
+   "timed": true
   },
   {
    "id": "algo-ideas",

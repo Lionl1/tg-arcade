@@ -150,7 +150,7 @@ for (const id of algoIds) {
   const c = sandbox.ALGO_CODE[id];
   try { if (new Function('eq', c.js + '\nreturn (' + c.jsTest + ');')(eq) !== true) bad(id, 'JS-код не проходит тест'); } catch (e) { bad(id, 'JS-код падает: ' + e.message); }
 }
-for (const g of cat.games) if (g.section === 'algo' && g.app && !sandbox.ALGO_CODE[g.id]) bad(g.id, 'нет настоящего кода (ALGO_CODE)');
+for (const g of cat.games) if (g.section === 'algo' && (registered[g.id] || {}).viz && !sandbox.ALGO_CODE[g.id]) bad(g.id, 'нет настоящего кода (ALGO_CODE)');
 
 // 2) «Собери код»: эталон каждой задачи проходит свой тест
 for (const lang of ['ru', 'en']) {

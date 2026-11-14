@@ -3,6 +3,7 @@
  * Игра — один файл web/games/<id>.js:
  *   Arcade.register({
  *     howto: 'Как играть',
+ *     chapters: { 2: 'новая механика с главы 2', 3: '…' },  // показываются на карте и в начале главы; в игре — api.chapter
  *     start(api) { ... }   // вызывается на каждый раунд с пустой сценой; конец раунда — api.end(score)
  *   });
  * Всё, что создано через api (on/loop/after/every/timer), само убирается после api.end().
@@ -31,7 +32,7 @@
   const eventKey = evPart[0] === 'e' ? evPart : qs.get('seed') ? 'seed' + qs.get('seed') : '';
   let event = null; // {kind, title, single, played, note, closed} — приходит с сервера
 
-  const PAGE = 12; // уровней на странице; сами уровни бесконечные
+  const PAGE = 10; // уровней в главе; сами уровни бесконечные — главы идут одна за другой
   const DIFF_NAMES = L('Лёгкая|Обычная|Сложная|Экстрим', 'Easy|Normal|Hard|Extreme').split('|');
   const DIFF_COLORS = ['var(--good)', 'var(--accent)', 'var(--bad)', '#a371f7'];
   // сложность растёт плавно и без потолка: скорость игры и время таймера
@@ -119,13 +120,33 @@
     const ce = meta.ceil || 2.5, f = ce - (ce - 0.35) * Math.pow(0.88, k - 1);
     return meta.timed ? f * timeOf(k) : f;
   };
-  const goalOf = (k) => Math.max(1, Math.floor(meta.par * factorOf(k) + 0.5));
+  // главы (как в app/progress.py): 4-й и 8-й уровни — испытания с модификатором, 10-й — босс
+  const MODS = ['fast', 'rush', 'sharp'];
+  const modOf = (k) => { const i = (k - 1) % PAGE + 1, c = Math.floor((k - 1) / PAGE) + 1; return i === PAGE ? 'boss' : i === 4 || i === 8 ? MODS[(2 * c + (i === 8 ? 1 : 0)) % 3] : null; };
+  const modGoal = (k) => { const m = modOf(k); return m === 'boss' ? (asc() ? 0.9 : 1.15) : m === 'rush' && meta.timed && !asc() ? 0.85 : 1; };
+  const MOD_INFO = {
+    fast: ['⚡', L('Ускорение: всё на 15 % быстрее', 'Speed-up: everything is 15% faster')],
+    rush: ['⏱', L('Цейтнот: времени на 20 % меньше', 'Time crunch: 20% less time')],
+    sharp: ['💥', L('Дорогие ошибки: штраф за ошибку вдвое больше', 'Costly mistakes: penalties are doubled')],
+    boss: ['👑', L('Босс главы: цель выше и всё быстрее', 'Chapter boss: a higher goal and a faster pace')],
+  };
+  const CHAPTERS = L(['🌱 Разминка', '🔥 Разгон', '🎯 Точность', '⚡ Скорость', '🧗 Подъём', '🌪 Буря', '🏔 Вершина', '🌌 Космос'],
+    ['🌱 Warm-up', '🔥 Ramp-up', '🎯 Precision', '⚡ Speed', '🧗 Climb', '🌪 Storm', '🏔 Summit', '🌌 Cosmos']);
+  const chapterName = (c) => CHAPTERS[(c - 1) % CHAPTERS.length] + (c > CHAPTERS.length ? ' ' + ['', 'II', 'III', 'IV', 'V'][Math.min(4, Math.floor((c - 1) / CHAPTERS.length))] || '' : '');
+  const goalOf = (k) => {
+    const g = Math.max(1, Math.floor(meta.par * factorOf(k) * modGoal(k) + 0.5));
+    return asc() ? Math.max(g, Math.floor(meta.par * (meta.floor || 0.65) + 0.5)) : g; // «на время»: даже босс не ниже предела
+  };
   const starsOf = (k, s) => {
     const g = goalOf(k);
     return asc() ? [g, g * 0.85, g * 0.7].filter((t) => s <= t).length : [g, g * 1.25, g * 1.5].filter((t) => s >= t).length;
   };
   const diffOf = (k) => (k <= 3 ? 0 : k <= 8 ? 1 : k <= 20 ? 2 : 3);
-  const levelOpts = (k) => ({ mode: 'level', level: k, diff: diffOf(k), speed: speedOf(k), time: timeOf(k), seedKey: 'lvl' + k });
+  const levelOpts = (k) => {
+    const m = modOf(k);
+    return { mode: 'level', level: k, diff: diffOf(k), mod: m, seedKey: 'lvl' + k,
+      speed: speedOf(k) * (m === 'fast' || m === 'boss' ? 1.15 : 1), time: timeOf(k) * (m === 'rush' ? 0.8 : 1), penalty: m === 'sharp' || m === 'boss' ? 2 : 1 };
+  };
   const starStr = (n) => '★'.repeat(n) + '☆'.repeat(3 - n);
   const store = {
     get(k) { try { return JSON.parse(localStorage.getItem('arcade:' + k)); } catch (e) { return null; } },
@@ -154,7 +175,7 @@
     const last = Math.ceil(unlocked / PAGE) * PAGE;
     levels = {
       unlocked,
-      levels: [...Array(last)].map((_, i) => ({ n: i + 1, goal: goalOf(i + 1), diff: diffOf(i + 1), stars: (saved[i + 1] || {}).stars || 0, best: (saved[i + 1] || {}).best })),
+      levels: [...Array(last)].map((_, i) => ({ n: i + 1, goal: goalOf(i + 1), diff: diffOf(i + 1), mod: modOf(i + 1), stars: (saved[i + 1] || {}).stars || 0, best: (saved[i + 1] || {}).best })),
     };
     return levels;
   }
@@ -165,6 +186,13 @@
     store.set('lv:' + gameId, saved);
   }
   const totalStars = () => (levels ? levels.levels.reduce((s, l) => s + l.stars, 0) : 0);
+
+  function toastMsg(msg, ms = 2200) {
+    const t = document.createElement('div');
+    t.className = 'toast'; t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), ms);
+  }
 
   // ---------- оверлеи ----------
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -203,7 +231,7 @@
 
   function setHudTitle() {
     hud.title.textContent = opts.mode === 'level'
-      ? `${meta.emoji} ${L('Ур.', 'Lv.')} ${opts.level} · ${L('цель', 'goal')} ${fmt(goalOf(opts.level))}`
+      ? `${opts.mod ? MOD_INFO[opts.mod][0] : meta.emoji} ${L('Ур.', 'Lv.')} ${opts.level} · ${L('цель', 'goal')} ${fmt(goalOf(opts.level))}`
       : meta.emoji + ' ' + meta.title;
   }
 
@@ -211,13 +239,14 @@
   let firstMenu = true;
   function showMenu() {
     if (def.app || meta.app) return startRound({ mode: 'app' });
+    const freeAct = () => startRound({ mode: def.viz ? 'app' : 'free' }); // у анимаций алгоритмов «свободная игра» — сама анимация
     opts = { mode: 'free' };
     setHudTitle();
     if (eventKey) return showEventMenu();
     if (firstMenu) { // настройка «при открытии игры»
       firstMenu = false;
       if (pref('open_mode', 'menu') === 'levels') return showLevels();
-      if (pref('open_mode', 'menu') === 'free') return startRound({ mode: 'free' });
+      if (pref('open_mode', 'menu') === 'free') return freeAct();
     }
     const best = store.get('best:' + gameId);
     const card = show(`
@@ -226,11 +255,12 @@
       <p class="howto">${esc(def.howto || meta.desc)}</p>
       <div class="modes">
         <button class="btn" data-act="levels">${L('🎯 Уровни', '🎯 Levels')}<small class="lvinfo">${L('Бесконечные уровни: каждый новый сложнее, до 3 ★ за каждый', 'Endless levels: each one harder, up to 3 ★ each')}</small></button>
-        <button class="btn ghost" data-act="free">${L('♾ Свободная игра', '♾ Free play')}<small>${startParam && !qs.get('g') ? L('Рекорды этого чата', "This chat's records") : L('Личные рекорды', 'Personal records')}${best != null ? L(' · лучший: ', ' · best: ') + fmt(best) : ''}</small></button>
+        ${def.viz ? `<button class="btn ghost" data-act="free">${L('▶ Анимация', '▶ Animation')}<small>${L('Шаг за шагом, с псевдокодом и кодом на Python и JavaScript', 'Step by step, with pseudocode and Python and JavaScript code')}</small></button>`
+          : `<button class="btn ghost" data-act="free">${L('♾ Свободная игра', '♾ Free play')}<small>${startParam && !qs.get('g') ? L('Рекорды этого чата', "This chat's records") : L('Личные рекорды', 'Personal records')}${best != null ? L(' · лучший: ', ' · best: ') + fmt(best) : ''}</small></button>`}
       </div>
       ${hubLink()}
       <div class="board"></div>`);
-    bind(card, { levels: showLevels, free: () => startRound({ mode: 'free' }) });
+    bind(card, { levels: showLevels, free: freeAct });
     loadLevels().then(() => {
       const el = card.querySelector('.lvinfo');
       if (el) el.textContent = L(`Ты на уровне ${levels.unlocked} · ⭐ ${totalStars()} · уровни бесконечные`, `You're on level ${levels.unlocked} · ⭐ ${totalStars()} · levels never end`);
@@ -270,33 +300,45 @@
   }
 
   let lvPage = null;
+  /** Карта уровней по главам: извилистая тропа из 10 уровней, испытания с иконкой, босс в конце */
   async function showLevels() {
-    const card = show(`<div class="emoji">${meta.emoji}</div><h1>${L('Уровни', 'Levels')}</h1><p class="lvsum">${L('Загружаю…', 'Loading…')}</p>
+    const card = show(`<div class="emoji">${meta.emoji}</div><h1 class="chtitle">${L('Уровни', 'Levels')}</h1><p class="lvsum">${L('Загружаю…', 'Loading…')}</p>
       <div class="lvnav"><button class="btn ghost" data-act="prev">◀</button><b class="pg"></b><button class="btn ghost" data-act="next">▶</button></div>
-      <div class="levels"></div>
-      <p class="muted"><span style="color:${DIFF_COLORS[0]}">●</span> ${L('лёгкие', 'easy')} 1–3 · <span style="color:${DIFF_COLORS[1]}">●</span> ${L('обычные', 'normal')} 4–8 · <span style="color:${DIFF_COLORS[2]}">●</span> ${L('сложные', 'hard')} 9–20 · <span style="color:${DIFF_COLORS[3]}">●</span> ${L('экстрим', 'extreme')} 21+</p>
+      <p class="chnews"></p>
+      <div class="lvmap"></div>
+      <p class="muted lvlegend"></p>
       <div class="row"><button class="btn ghost" data-act="menu">${L('← Назад', '← Back')}</button></div>`);
     try { await loadLevels(); } catch (e) { card.querySelector('.lvsum').textContent = e.message; bind(card, { menu: showMenu }); return; }
     const pages = Math.ceil(levels.levels.length / PAGE);
     if (lvPage === null || lvPage >= pages) lvPage = Math.floor((levels.unlocked - 1) / PAGE);
+    const SHIFT = [0, 70, 110, 70, 0, -70, -110, -70, 0, 0]; // извилистая тропа, % ширины кружка
     const draw = () => {
-      card.querySelector('.lvsum').textContent = L(`⭐ ${totalStars()} · открыт уровень ${levels.unlocked}. Набери цель — откроется следующий.`, `⭐ ${totalStars()} · level ${levels.unlocked} unlocked. Reach the goal to unlock the next one.`);
+      const c = lvPage + 1, list = levels.levels.slice(lvPage * PAGE, (lvPage + 1) * PAGE);
+      const got = list.reduce((s2, l) => s2 + l.stars, 0), boss = list[PAGE - 1], cleared = boss && boss.stars > 0;
+      card.querySelector('.chtitle').textContent = `${L('Глава', 'Chapter')} ${c} · ${chapterName(c)}`;
+      card.querySelector('.lvsum').textContent = `⭐ ${got}/${PAGE * 3} ${L('в главе', 'in chapter')} · ${cleared ? L('👑 босс побеждён', '👑 boss defeated') : L('👑 победи босса: +50 XP', '👑 beat the boss: +50 XP')}`;
       card.querySelector('.pg').textContent = `${lvPage * PAGE + 1}–${(lvPage + 1) * PAGE}`;
+      const news = def.chapters && def.chapters[c];
+      card.querySelector('.chnews').textContent = news ? `🆕 ${L('Новое в главе', 'New in this chapter')}: ${news}` : '';
       card.querySelector('[data-act=prev]').disabled = lvPage === 0;
       card.querySelector('[data-act=next]').disabled = lvPage >= pages - 1;
-      const grid = card.querySelector('.levels');
-      grid.innerHTML = '';
-      for (const l of levels.levels.slice(lvPage * PAGE, (lvPage + 1) * PAGE)) {
-        const open = l.n <= levels.unlocked;
+      card.querySelector('.lvlegend').textContent = Object.values(MOD_INFO).map(([e, t]) => `${e} ${t.split(':')[0]}`).join(' · ');
+      const map = card.querySelector('.lvmap');
+      map.innerHTML = '';
+      list.forEach((l, i) => {
+        const open = l.n <= levels.unlocked, m = l.mod || modOf(l.n);
         const b = document.createElement('button');
-        b.className = 'lvl' + (open ? '' : ' locked') + (l.n === levels.unlocked ? ' cur' : '');
+        b.className = 'lvl node' + (open ? '' : ' locked') + (l.n === levels.unlocked ? ' cur' : '') + (m === 'boss' ? ' boss' : '');
         b.style.borderColor = DIFF_COLORS[l.diff];
+        b.style.transform = `translateX(${SHIFT[i]}%)`;
+        const icon = m ? `<i class="md">${MOD_INFO[m][0]}</i>` : '';
         b.innerHTML = open
-          ? `<b>${l.n}</b><span class="st">${starStr(l.stars)}</span><small>${fmt(l.goal)}</small>`
-          : `<b>🔒</b><small>${l.n}</small>`;
+          ? `${icon}<b>${m === 'boss' ? '👑' : l.n}</b><span class="st">${starStr(l.stars)}</span><small>${fmt(l.goal)}</small>`
+          : `${icon}<b>🔒</b><small>${l.n}</small>`;
         if (open) b.addEventListener('click', () => startRound(levelOpts(l.n)));
-        grid.appendChild(b);
-      }
+        else if (m) b.addEventListener('click', () => toastMsg(MOD_INFO[m][1]));
+        map.appendChild(b);
+      });
     };
     bind(card, {
       menu: showMenu,
@@ -304,6 +346,8 @@
       next: () => { lvPage = Math.min(pages - 1, lvPage + 1); draw(); },
     });
     draw();
+    const cur = card.querySelector('.cur');
+    if (cur) cur.scrollIntoView({ block: 'center' });
   }
 
   // ---------- конец раунда ----------
@@ -367,7 +411,7 @@
       <h1>${passed ? L(`Уровень ${k} пройден`, `Level ${k} cleared`) : L(`Уровень ${k} не пройден`, `Level ${k} failed`)}</h1>
       <div class="stars ${passed ? 'on' : ''}">${starStr(stars)}</div>
       <div class="big">${fmt(score)}</div>
-      <p class="muted">${L('Цель', 'Goal')}: ${fmt(goal)} · ${DIFF_NAMES[diffOf(k)]} · ${L('скорость', 'speed')} ×${speedOf(k).toFixed(2)}</p>
+      <p class="muted">${L('Цель', 'Goal')}: ${fmt(goal)} · ${DIFF_NAMES[diffOf(k)]} · ${L('скорость', 'speed')} ×${levelOpts(k).speed.toFixed(2)}${modOf(k) ? ' · ' + MOD_INFO[modOf(k)][0] : ''}</p>
       ${near}
       <div class="progress">${authed ? `<p class="muted">${L('Сохраняю…', 'Saving…')}</p>` : ''}</div>
       <div class="row"><button class="btn ghost" data-act="levels">${L('Уровни', 'Levels')}</button><button class="btn ${passed ? 'ghost' : ''}" data-act="again">${L('↻ Ещё раз', '↻ Again')}</button>
@@ -383,6 +427,7 @@
     api('level', { level: k, score }).then((d) => {
       levels = { unlocked: d.unlocked, levels: d.levels };
       card.querySelector('.progress').innerHTML =
+        (d.progress.chapter_clear ? `<div class="badge">👑 ${L(`Босс побеждён! Глава ${d.progress.chapter_clear} пройдена · +50 XP`, `Boss defeated! Chapter ${d.progress.chapter_clear} complete · +50 XP`)}</div>` : '') +
         (d.progress.unlocked ? `<div class="badge">🔓 ${L('Открыт уровень', 'Unlocked level')} ${d.progress.unlocked}</div>` : '') + progressHtml(d.progress);
       celebrate(d.progress);
     }).catch((e) => { card.querySelector('.progress').innerHTML = `<p class="muted">${L('Не сохранилось', 'Not saved')}: ${esc(e.message)}</p>`; });
@@ -403,9 +448,14 @@
     stage.innerHTML = '';
     hud.timer.hidden = true;
     hud.timer.classList.remove('low');
+    hud.score.hidden = opts.mode === 'app';
     setHudTitle();
     round = makeApi(opts);
     round.setScore(asc() ? null : 0);
+    // новая механика главы — в начале главы; модификатор испытания — на его уровне
+    const news = opts.mode === 'level' && def.chapters && (opts.level - 1) % PAGE === 0 ? def.chapters[round.chapter] : null;
+    if (news) round.toast('🆕 ' + news, 3500);
+    else if (opts.mode === 'level' && opts.mod) round.toast(MOD_INFO[opts.mod].join(' '));
     const cleanup = def.start(round);
     if (typeof cleanup === 'function') round.onDispose(cleanup);
   }
@@ -422,6 +472,8 @@
     const a = {
       stage, haptic, tone, fmt, gameId,
       mode: o.mode, level: o.level || 0, difficulty: diff,
+      /** Главы уровней: номер главы (1, 2…), модификатор испытания ('fast' | 'rush' | 'sharp' | 'boss' | null) — игры добавляют новые механики по главам */
+      chapter: o.level ? Math.floor((o.level - 1) / PAGE) + 1 : 1, mod: o.mod || null, boss: o.mod === 'boss',
       /** Ступень сложности 1–4 для одиночных головоломок: в личной свободной игре растёт с успехами, в чатах/турнирах/уровнях — стандартная 2 */
       tier: personalFree() ? tierGet() : 2,
       isEvent: o.mode === 'event',
@@ -480,12 +532,7 @@
         a.on(any, 'click', () => run(any, async () => a.share(image ? { kind: 'image', image: await jpeg(), send: 'any' } : { kind: 'text', text: text(), send: 'any' })));
         return bar;
       },
-      toast(msg, ms = 2200) {
-        const t = document.createElement('div');
-        t.className = 'toast'; t.textContent = msg;
-        document.body.appendChild(t);
-        setTimeout(() => t.remove(), ms);
-      },
+      toast: toastMsg,
       colors: colors(),
       get score() { return score; },
       get ended() { return ended; },
@@ -553,7 +600,7 @@
           if (left <= 0) { left = 0; done = true; draw(); (onDone || (() => a.end()))(); } else draw();
         });
         return {
-          add(s) { left = Math.max(0, left + s * 1000); draw(); },
+          add(s) { left = Math.max(0, left + (s < 0 ? s * (o.penalty || 1) : s) * 1000); draw(); }, // «дорогие ошибки» удваивают штраф
           get left() { return left / 1000; },
         };
       },

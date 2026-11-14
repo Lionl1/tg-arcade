@@ -1,6 +1,12 @@
 Arcade.register({
   howto: L('Свайпай (или стрелки): точка катится по коридору до развилки. Доберись до флажка. Каждый пройденный лабиринт +1 очко и +5 секунд.', 'Swipe (or use the arrows): the dot rolls along the corridor to the next fork. Reach the flag. Each maze solved gives +1 point and +5 seconds.'),
+  chapters: {
+    2: L('сначала возьми ключ 🔑 — без него флажок закрыт', 'grab the key 🔑 first — the flag is locked without it'),
+    3: L('туман: видно только рядом с собой', 'fog: you can only see around you'),
+  },
   start(api) {
+    const ch = api.chapter;
+    let key = -1, hasKey = true;
     const g = api.canvas(), x = g.ctx, C = api.colors;
     const DIRS = { up: [0, -1, 1], right: [1, 0, 2], down: [0, 1, 4], left: [-1, 0, 8] };
     const OPP = { 1: 4, 2: 8, 4: 1, 8: 2 };
@@ -24,6 +30,8 @@ Arcade.register({
         open[c] |= bit; open[n] |= OPP[bit]; seen[n] = true; stack.push(n);
       }
       pos = 0; path = []; draw = { x: 0, y: 0 };
+      hasKey = ch < 2;
+      if (!hasKey) { do key = api.randi(cols * rows); while (key === 0 || key === cols * rows - 1 || key % cols + Math.floor(key / cols) < 4); }
     }
     const exitCell = () => cols * rows - 1;
     const exits = (c) => [1, 2, 4, 8].filter((b) => open[c] & b);
@@ -35,7 +43,7 @@ Arcade.register({
       const step = (cc, b) => cc + (b === 1 ? -cols : b === 4 ? cols : b === 2 ? 1 : -1);
       for (let guard = 0; guard < cols * rows; guard++) {
         c = step(c, bit); path.push(c);
-        if (c === exitCell()) break;
+        if (c === exitCell() || c === key) break;
         const ex = exits(c).filter((b) => b !== OPP[bit]);
         if (ex.length !== 1) break;
         bit = ex[0];
@@ -52,7 +60,9 @@ Arcade.register({
         const dx = tx - draw.x, dy = ty - draw.y, d = Math.hypot(dx, dy);
         if (d <= sp) {
           draw = { x: tx, y: ty }; pos = path.shift();
-          if (pos === exitCell()) {
+          if (pos === key && !hasKey) { hasKey = true; api.haptic('success'); api.tone(880, 80); }
+          if (pos === exitCell() && !hasKey) { api.haptic('error'); api.toast(L('🔒 Сначала ключ!', '🔒 Get the key first!'), 1200); }
+          else if (pos === exitCell()) {
             api.addScore(1); tm.add(5); api.haptic('success'); api.tone(990, 120);
             level++; build();
           }
@@ -72,9 +82,17 @@ Arcade.register({
       }
       x.stroke();
       x.font = `${cell * 0.7}px system-ui`; x.textAlign = 'center'; x.textBaseline = 'middle';
-      x.fillText('🚩', ox + (cols - 0.5) * cell, oy + (rows - 0.5) * cell);
+      x.fillText(hasKey ? '🚩' : '🔒', ox + (cols - 0.5) * cell, oy + (rows - 0.5) * cell);
+      if (!hasKey) x.fillText('🔑', ox + (key % cols + 0.5) * cell, oy + (Math.floor(key / cols) + 0.5) * cell);
       x.fillStyle = C.accent;
       x.beginPath(); x.arc(ox + (draw.x + 0.5) * cell, oy + (draw.y + 0.5) * cell, cell * 0.32, 0, 7); x.fill();
+      if (ch >= 3) { // туман: видно только вокруг точки
+        const cx = ox + (draw.x + 0.5) * cell, cy = oy + (draw.y + 0.5) * cell, r = cell * 2.6;
+        const grd = x.createRadialGradient(cx, cy, r * 0.5, cx, cy, r);
+        grd.addColorStop(0, 'rgba(0,0,0,0)'); grd.addColorStop(1, C.bg);
+        x.fillStyle = grd; x.beginPath(); x.arc(cx, cy, r, 0, 7); x.fill();
+        x.fillStyle = C.bg; x.beginPath(); x.rect(0, 0, g.W, g.H); x.arc(cx, cy, r, 0, 7, true); x.fill('evenodd');
+      }
     });
   },
 });

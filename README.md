@@ -36,7 +36,8 @@ The design follows research findings — summary and sources in [docs/research.m
 - **Hub** (`/profile`): Today, Games, Profile, Science, Settings tabs.
 - **Daily workout** — 3 (or 5) games for different skills, ≈5 minutes, fixed for the day.
 - **Streak** — days with a finished workout; every 7 days give a “freeze” (up to 2) that covers one missed day.
-- **Endless levels in every game** with 1–3 ★; speed and timer change smoothly with the level.
+- **Endless levels in every game** with 1–3 ★, grouped into **chapters of 10** on a winding map: levels 4 and 8 are challenges with a modifier (⚡ speed-up, ⏱ time crunch, 💥 costly mistakes), level 10 is the **chapter boss** (higher goal, faster pace, +50 XP and achievements). Many games add **new mechanics by chapter** (snake: rocks and golden berries; maze: keys and fog; bricks: tough and steel bricks; test tubes: hidden colours; sequence: backwards; digits: backward span…), declared as `chapters: {2: '…'}` in the game file.
+- **Study decks on levels are lessons**: 8 cards per lesson from easy to hard — read them, then a timed check; the boss is the chapter exam. **Algorithm animations** get levels too: “predict the next step” from the real frames of the algorithm.
 - **XP**, profile levels and titles, **10 skills**, **28 achievements**, optional **daily reminder** in private messages.
 - **Flashcards** with spaced repetition (1 → 3 → 7 → 14 → 30 days).
 

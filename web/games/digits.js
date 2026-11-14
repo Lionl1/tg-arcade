@@ -1,6 +1,11 @@
 Arcade.register({
   howto: L('Запомни число, пока оно на экране, и набери его. Каждый раунд на цифру длиннее. Одна ошибка — конец.', 'Memorise the number while it is on screen, then type it. Each round is one digit longer. One mistake ends the game.'),
+  chapters: {
+    2: L('набирай число задом наперёд', 'type the number backwards'),
+    3: L('число показывается по одной цифре', 'the number is shown one digit at a time'),
+  },
   start(api) {
+    const ch = api.chapter, back = ch === 2 || (ch >= 4 && api.rand() < 0.5);
     const box = api.el('div', 'fill');
     const info = api.el('div', 'hint', box, L('Запоминай', 'Memorise'));
     const shown = api.el('div', '', box);
@@ -18,10 +23,13 @@ Arcade.register({
       input = false; typed = '';
       target = String(api.randi(9) + 1);
       while (target.length < len) target += api.randi(10);
-      info.textContent = L('Запоминай', 'Memorise'); shown.textContent = target;
-      api.after(800 + len * 350, () => {
-        input = true; info.textContent = L('Набери число', 'Type the number'); shown.textContent = '·'.repeat(len);
-      });
+      info.textContent = L('Запоминай', 'Memorise');
+      const ask = () => { input = true; info.textContent = back ? L('Набери задом наперёд', 'Type it backwards') : L('Набери число', 'Type the number'); shown.textContent = '·'.repeat(len); };
+      if (ch >= 3) { // по одной цифре
+        shown.textContent = '';
+        [...target].forEach((d, i) => api.after(i * 650, () => { shown.textContent = d; }));
+        api.after(len * 650, ask);
+      } else { shown.textContent = target; api.after(800 + len * 350, ask); }
     }
     function draw() { shown.textContent = typed + '·'.repeat(len - typed.length); }
 
@@ -34,7 +42,7 @@ Arcade.register({
       draw();
       if (typed.length < len) return;
       input = false;
-      if (typed === target) {
+      if (typed === (back ? [...target].reverse().join('') : target)) {
         api.setScore(len); api.haptic('success'); info.textContent = L('Верно!', 'Correct!');
         len++; api.after(600, round);
       } else {

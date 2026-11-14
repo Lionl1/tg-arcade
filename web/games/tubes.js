@@ -1,7 +1,13 @@
 // Пробирки: рассортируй цвета так, чтобы в каждой пробирке был один цвет. Генератор строит головоломку из решённого состояния.
 Arcade.register({
   howto: L('Тапни пробирку, потом другую — верхний цвет перельётся (только на такой же цвет или в пустую). Собери каждую пробирку одного цвета. Каждая решённая головоломка добавляет цвет. 3 минуты.', 'Tap a tube, then another — the top colour pours over (only onto the same colour or into an empty tube). Make every tube a single colour. Each solved puzzle adds a colour. 3 minutes.'),
+  chapters: {
+    2: L('скрытые цвета: под верхним слоем — «?», открываются по ходу', 'hidden colours: layers below the top show “?” until uncovered'),
+    3: L('всего одна пустая пробирка', 'only one empty tube'),
+  },
   start(api) {
+    const ch = api.chapter, EMPTY = ch >= 3 ? 1 : 2;
+    let seen = null; // для скрытых цветов: какие слои уже открыты
     const CAP = 4;
     const COLORS = ['#e5534b', '#4a90e2', '#3fb950', '#e3b341', '#a371f7', '#f0883e', '#39c5cf', '#db61a2', '#8b949e', '#7ee787', '#ffa198', '#1f6feb'];
     const box = api.el('div', 'fill');
@@ -17,7 +23,7 @@ Arcade.register({
 
     // обратные ходы из решённого состояния гарантируют, что решение существует
     function generate(colors) {
-      const t = [...Array(colors)].map((_, i) => Array(CAP).fill(i)).concat([[], []]);
+      const t = [...Array(colors)].map((_, i) => Array(CAP).fill(i)).concat([...Array(EMPTY)].map(() => []));
       for (let step = 0; step < colors * 40; step++) {
         const a = api.randi(t.length), b = api.randi(t.length);
         if (a === b || !t[a].length || t[b].length >= CAP) continue;
@@ -29,7 +35,9 @@ Arcade.register({
     }
     function fresh() {
       do tubes = generate(n); while (isSolved(tubes));
-      start = JSON.stringify(tubes); history = []; sel = null; draw();
+      start = JSON.stringify(tubes); history = []; sel = null;
+      seen = tubes.map((tb) => tb.map((_, k) => ch < 2 || k === tb.length - 1));
+      draw();
     }
     const isSolved = (t) => t.every((tb) => !tb.length || (tb.length === CAP && tb.every((c) => c === tb[0])));
     function pour(a, b) {
@@ -44,6 +52,11 @@ Arcade.register({
     function draw() {
       info.textContent = L(`Цветов: ${n} · решено: ${solved}`, `Colours: ${n} · solved: ${solved}`);
       field.innerHTML = '';
+      if (seen) tubes.forEach((tb, i) => { // верхний слой всегда открыт; что открылось — остаётся открытым
+        seen[i] = (seen[i] || []).slice(0, tb.length);
+        while (seen[i].length < tb.length) seen[i].push(true); // налитое сверху видно
+        if (tb.length) seen[i][tb.length - 1] = true;
+      });
       tubes.forEach((tb, i) => {
         const el = api.el('button', '', field);
         el.dataset.i = i;
@@ -51,7 +64,9 @@ Arcade.register({
           border-top:0;background:transparent;display:flex;flex-direction:column-reverse;padding:4px;gap:2px;transform:translateY(${sel === i ? -10 : 0}px);transition:transform .12s`;
         tb.forEach((c, k) => {
           const d = document.createElement('div');
-          d.style.cssText = `height:32px;background:${COLORS[c]};border-radius:${k === 0 ? '0 0 16px 16px' : '3px'}`;
+          const hidden = seen && !seen[i][k];
+          d.style.cssText = `height:32px;background:${hidden ? 'color-mix(in srgb, var(--fg) 25%, transparent)' : COLORS[c]};border-radius:${k === 0 ? '0 0 16px 16px' : '3px'};display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--fg)`;
+          if (hidden) d.textContent = '?';
           el.appendChild(d);
         });
       });
@@ -74,7 +89,7 @@ Arcade.register({
       }
     });
     api.on(undoBtn, 'click', () => { if (history.length) { tubes = JSON.parse(history.pop()); sel = null; draw(); } });
-    api.on(resetBtn, 'click', () => { tubes = JSON.parse(start); history = []; sel = null; draw(); });
+    api.on(resetBtn, 'click', () => { tubes = JSON.parse(start); history = []; sel = null; draw(); }); // открытые слои остаются открытыми
     fresh();
   },
 });
