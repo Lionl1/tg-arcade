@@ -5,10 +5,10 @@
   const WORDS = ['python', 'kotlin', 'banana', 'stack', 'queue', 'matrix', 'level', 'rotor', 'sorting', 'binary'];
 
   Arcade.register(Learn.deck({
-    ask: 'Что выведет код?',
+    ask: L('Что выведет код?', 'What does the code print?'),
     mono: true,
     seconds: 120,
-    howto: 'Прочитай программу на Python и выбери, что она напечатает. Тренирует умение «исполнять код в голове» — главный навык программиста. С ростом счёта программы сложнее. 2 минуты, ошибка −3 с.',
+    howto: L('Прочитай программу на Python и выбери, что она напечатает. Тренирует умение «исполнять код в голове» — главный навык программиста. С ростом счёта программы сложнее. 2 минуты, ошибка −3 с.', 'Read the Python program and choose what it prints. Trains “running code in your head” — the core programming skill. Programs get harder as your score grows. 2 minutes, a mistake costs 3 s.'),
     gen(api) {
       const R = (lo, hi) => lo + api.randi(hi - lo + 1);
       const lvl = Math.max(api.score, (api.level || 0) * 2);

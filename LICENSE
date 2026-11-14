@@ -26,9 +26,11 @@ The MIT license covers the code of this project. Third-party data and code keep
 their own licenses (see docs/credits.md):
 
 - web/vendor/chess.js — BSD-2-Clause, (c) Jeff Hlywa
+- web/vendor/pieces/*.svg — Cburnett chess pieces, (c) Colin M.L. Burnett, GPLv2+/BSD/GFDL (used under BSD)
 - web/games/data/chess.json — Lichess puzzle database, CC0
 - web/games/data/phrases.json — Tatoeba, CC BY 2.0 FR
 - web/games/data/trivia.json — Open Trivia Database, CC BY-SA 4.0
 - web/games/data/geo.json — mledoze/countries, ODbL 1.0
-- web/games/data/ege-art.json, ege-arch.json — Wikidata, CC0
+- web/games/data/ege-art.json, ege-arch.json, en-art.json — Wikidata, CC0
+- English country names in web/sdk/countries.js — mledoze/countries, ODbL 1.0
 - flag images loaded at runtime — Twemoji, CC BY 4.0

@@ -16,11 +16,12 @@ from .catalog import Catalog, Game
 from .config import Settings
 from .db import Event, Row, Store
 from .events import EventError, Events
+from .i18n import LANGS, from_code, tr
 from .progress import MAX_LEVEL, Progress
 from .security import parse_ctx, validate_init_data
 from .share import Sharer, ShareError
 
-OnRecord = Callable[[int, Game, str, int], Awaitable[None]]
+OnRecord = Callable[..., Awaitable[None]]  # (chat_id, game, name, score, lang)
 
 MAX_SCORE = 10**9
 
@@ -28,6 +29,7 @@ MAX_SCORE = 10**9
 class AuthIn(BaseModel):
     initData: str
     tz: int | None = None  # Date.getTimezoneOffset()
+    lang: str | None = None  # язык интерфейса Mini App (ru | en)
 
 
 class TopIn(AuthIn):
@@ -83,6 +85,12 @@ class Req:
     chat_id: int  # чат для таблиц; без чата — личная таблица (chat_id = user_id)
     is_group: bool
     event: Event | None
+    lang: str = "ru"
+
+
+def lang_of(body: "AuthIn", user: dict) -> str:
+    """Язык ответа: что прислал Mini App (он учитывает настройку), иначе — язык Telegram."""
+    return body.lang if body.lang in LANGS else from_code(user.get("language_code"))
 
 
 def display_name(user: dict) -> str:
@@ -104,7 +112,8 @@ def create_app(settings: Settings, store: Store, catalog: Catalog,
             return {"user": {"id": 1, "first_name": "Dev"}, "start_param": None}
         a = validate_init_data(body.initData, settings.bot_token)
         if not a:
-            raise HTTPException(401, "Сессия Telegram устарела — закрой и заново открой игру")
+            raise HTTPException(401, tr(body.lang or "ru", "Сессия Telegram устарела — закрой и заново открой игру",
+                                        "Your Telegram session expired — close and reopen the game"))
         return a
 
     async def resolve(body: TopIn) -> Req:
@@ -118,17 +127,18 @@ def create_app(settings: Settings, store: Store, catalog: Catalog,
         if not game:
             raise HTTPException(404, "unknown game")
         user = a["user"]
+        lang = lang_of(body, user)
         event = None
         chat_id = ctx.chat_id
         if ctx.event_id is not None:
             event = await store.get_event(ctx.event_id)
             if not event or event.game != game.id:
-                raise HTTPException(404, "Событие не найдено")
+                raise HTTPException(404, tr(lang, "Событие не найдено", "Event not found"))
             chat_id = event.chat_id
         if chat_id is None:
             chat_id = user["id"]
         name = await progress.table_name(user["id"], display_name(user))
-        return Req(user, name, game, chat_id, chat_id < 0, event)
+        return Req(user, name, game, chat_id, chat_id < 0, event, lang)
 
     def throttle(uid: int, game_id: str) -> None:
         now = time.monotonic()
@@ -152,7 +162,7 @@ def create_app(settings: Settings, store: Store, catalog: Catalog,
         rows = await events.top(ev, uid)
         rank = next((i + 1 for i, r in enumerate(rows) if r.user_id == uid), None)
         return {"group": req.is_group, "top": board(rows, uid), "rank": rank if ev.kind == "tour" else None,
-                "event": await events.info(ev, uid)}
+                "event": await events.info(ev, uid, req.lang)}
 
     @app.post("/api/top")
     async def api_top(body: TopIn):
@@ -168,7 +178,7 @@ def create_app(settings: Settings, store: Store, catalog: Catalog,
         req = await resolve(body)
         if req.event:
             try:
-                await events.start(req.event, req.user["id"], req.name)
+                await events.start(req.event, req.user["id"], req.name, req.lang)
             except EventError as e:
                 raise HTTPException(e.status, e.message)
         return {"ok": True}
@@ -182,19 +192,19 @@ def create_app(settings: Settings, store: Store, catalog: Catalog,
 
         if req.event:
             try:
-                await events.submit(req.event, uid, req.name, body.score)
+                await events.submit(req.event, uid, req.name, body.score, req.lang)
             except EventError as e:
                 raise HTTPException(e.status, e.message)
             # результат идёт и в обычную таблицу чата, но без объявлений о рекорде — итоги объявит событие
             await store.submit(req.chat_id, game.id, uid, req.name, body.score, game.asc)
             payload = await event_payload(req)
-            payload["progress"] = await progress.record_play(uid, display_name(req.user), body.tz, game, body.score, "event")
+            payload["progress"] = await progress.record_play(uid, display_name(req.user), body.tz, game, body.score, "event", lang=req.lang)
             return payload
 
         res = await store.submit(req.chat_id, game.id, uid, req.name, body.score, game.asc)
         if req.is_group and res.chat_record and on_record:
             try:
-                await on_record(req.chat_id, game, req.name, body.score)
+                await on_record(req.chat_id, game, req.name, body.score, req.lang)
             except Exception:  # уведомление не должно ломать сохранение очков
                 pass
         rows = await store.top(req.chat_id, game.id, game.asc, 10)
@@ -206,7 +216,7 @@ def create_app(settings: Settings, store: Store, catalog: Catalog,
             "group": req.is_group,
             "top": board(rows, uid),
             "event": None,
-            "progress": await progress.record_play(uid, display_name(req.user), body.tz, game, body.score, "free"),
+            "progress": await progress.record_play(uid, display_name(req.user), body.tz, game, body.score, "free", lang=req.lang),
         }
 
     # ---------- уровни внутри игры ----------
@@ -225,9 +235,9 @@ def create_app(settings: Settings, store: Store, catalog: Catalog,
             raise HTTPException(400, "bad level")
         state = await progress.game_levels(uid, game)
         if body.level > state["unlocked"]:
-            raise HTTPException(403, "Этот уровень ещё закрыт")
+            raise HTTPException(403, tr(req.lang, "Этот уровень ещё закрыт", "This level is still locked"))
         throttle(uid, game.id)
-        result = await progress.record_play(uid, display_name(req.user), body.tz, game, body.score, "level", body.level)
+        result = await progress.record_play(uid, display_name(req.user), body.tz, game, body.score, "level", body.level, req.lang)
         return {"progress": result, **(await progress.game_levels(uid, game))}
 
     # ---------- профиль и напоминания ----------
@@ -235,14 +245,15 @@ def create_app(settings: Settings, store: Store, catalog: Catalog,
     @app.post("/api/profile")
     async def api_profile(body: AuthIn):
         a = auth(body)
-        return await progress.profile(a["user"]["id"], display_name(a["user"]), body.tz)
+        return await progress.profile(a["user"]["id"], display_name(a["user"]), body.tz, lang_of(body, a["user"]))
 
     @app.post("/api/me")
     async def api_me(body: MeIn):
         """Свой ник и эмодзи-аватар (видны в таблицах и сообщениях бота)."""
         a = auth(body)
         try:
-            return await progress.set_identity(a["user"]["id"], display_name(a["user"]), body.tz, body.nickname, body.avatar)
+            return await progress.set_identity(a["user"]["id"], display_name(a["user"]), body.tz, body.nickname, body.avatar,
+                                               lang_of(body, a["user"]))
         except ValueError as e:
             raise HTTPException(400, str(e))
 
@@ -250,8 +261,11 @@ def create_app(settings: Settings, store: Store, catalog: Catalog,
     async def api_settings(body: SettingsIn):
         a = auth(body)
         uid = a["user"]["id"]
-        await progress.touch_user(uid, display_name(a["user"]), body.tz)
-        return {"prefs": await progress.prefs.set_user(uid, body.changes)}
+        prefs = await progress.prefs.set_user(uid, body.changes)
+        # язык для напоминаний: явная настройка, иначе — что прислал Mini App
+        lang = prefs["lang"] if prefs["lang"] in LANGS else lang_of(body, a["user"])
+        await progress.touch_user(uid, display_name(a["user"]), body.tz, lang)
+        return {"prefs": prefs}
 
     @app.post("/api/reminder")
     async def api_reminder(body: ReminderIn):
@@ -259,7 +273,7 @@ def create_app(settings: Settings, store: Store, catalog: Catalog,
         if not re.fullmatch(r"\d{1,2}:\d{2}", body.time):
             raise HTTPException(400, "bad time")
         try:
-            await progress.set_reminder(a["user"]["id"], display_name(a["user"]), body.tz, body.on, body.time)
+            await progress.set_reminder(a["user"]["id"], display_name(a["user"]), body.tz, body.on, body.time, lang_of(body, a["user"]))
         except ValueError:
             raise HTTPException(400, "bad time")
         return {"ok": True}
@@ -269,19 +283,19 @@ def create_app(settings: Settings, store: Store, catalog: Catalog,
     @app.post("/api/share")
     async def api_share(body: ShareIn):
         req = await resolve(body)
-        uid = req.user["id"]
+        uid, L = req.user["id"], req.lang
         throttle(uid, "share")
         try:
             if body.kind == "image":
-                name, raw = sharer.save_image(body.image, uid)
-                sent = await sharer.send_photo(req.chat_id, raw, f"🎨 {escape(req.name)} · {escape(req.game.name)}", uid) if body.send == "chat" else False
+                name, raw = sharer.save_image(body.image, uid, L)
+                sent = await sharer.send_photo(req.chat_id, raw, f"🎨 {escape(req.name)} · {escape(req.game.label(L))}", uid, L) if body.send == "chat" else False
                 prepared = await sharer.prepare(uid, photo_name=name, raw=raw) if body.send == "any" else None
                 return {"url": sharer.url(name), "sent": sent, "prepared": prepared, "group": req.is_group}
             text = body.text.strip()[:3500]
             if not text:
-                raise ShareError(400, "Пустой текст")
-            html = f"{escape(text)}\n\n<i>— {escape(req.name)} · {escape(req.game.name)}</i>"
-            sent = await sharer.send_text(req.chat_id, html, uid) if body.send == "chat" else False
+                raise ShareError(400, tr(L, "Пустой текст", "Empty text"))
+            html = f"{escape(text)}\n\n<i>— {escape(req.name)} · {escape(req.game.label(L))}</i>"
+            sent = await sharer.send_text(req.chat_id, html, uid, L) if body.send == "chat" else False
             prepared = await sharer.prepare(uid, text=f"{text}\n\n— {req.name}") if body.send == "any" else None
             return {"sent": sent, "prepared": prepared, "group": req.is_group}
         except ShareError as e:
@@ -293,8 +307,10 @@ def create_app(settings: Settings, store: Store, catalog: Catalog,
         req = await resolve(body)
         throttle(req.user["id"], "roll")
         try:
-            res = Sharer.roll(body.kind, n=body.n, sides=body.sides, lo=body.lo, hi=body.hi, items=body.items, teams=body.teams)
-            res["sent"] = await sharer.send_text(req.chat_id, f"{res['text']}\n<i>— бросок по запросу {escape(req.name)}</i>", req.user["id"]) if body.post else False
+            L = req.lang
+            res = Sharer.roll(body.kind, n=body.n, sides=body.sides, lo=body.lo, hi=body.hi, items=body.items, teams=body.teams, lang=L)
+            by = tr(L, "бросок по запросу", "rolled for")
+            res["sent"] = await sharer.send_text(req.chat_id, f"{res['text']}\n<i>— {by} {escape(req.name)}</i>", req.user["id"], L) if body.post else False
         except ShareError as e:
             raise HTTPException(e.status, e.message)
         res["group"] = req.is_group

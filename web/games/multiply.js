@@ -1,7 +1,7 @@
 // Умножение: от таблицы до двузначных чисел. Сложность растёт с уровнем и счётом.
 Arcade.register(Learn.deck({
-  ask: 'Сколько будет?',
-  howto: 'Сначала таблица умножения, потом двузначное на однозначное, квадраты и двузначное на двузначное. 60 секунд, ошибка −3 с.',
+  ask: L('Сколько будет?', 'What is it?'),
+  howto: L('Сначала таблица умножения, потом двузначное на однозначное, квадраты и двузначное на двузначное. 60 секунд, ошибка −3 с.', 'First the times tables, then two-digit by one-digit numbers, squares and two-digit by two-digit. 60 seconds, a mistake costs 3 s.'),
   gen(api) {
     const R = (lo, hi) => lo + api.randi(hi - lo + 1);
     const tier = Math.max(api.mode === 'level' ? Math.floor((api.level - 1) / 4) : 0, api.score < 8 ? 0 : api.score < 16 ? 1 : 2);

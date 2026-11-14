@@ -1,6 +1,6 @@
 // Гравитация: бежишь по полу или потолку, тап переворачивает притяжение
 Arcade.register({
-  howto: 'Тап (или пробел) переворачивает гравитацию: бежишь то по полу, то по потолку. Шипы растут и снизу, и сверху — успевай переключаться.',
+  howto: L('Тап (или пробел) переворачивает гравитацию: бежишь то по полу, то по потолку. Шипы растут и снизу, и сверху — успевай переключаться.', 'Tap (or space) flips gravity: you run on the floor, then on the ceiling. Spikes grow from both sides — switch in time.'),
   start(api) {
     const g = api.canvas(), x = g.ctx, C = api.colors;
     const s = 22;

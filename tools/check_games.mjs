@@ -11,23 +11,30 @@ const cat = JSON.parse(fs.readFileSync(path.join(WEB, 'games/catalog.json'), 'ut
 const problems = [];
 const bad = (id, msg) => problems.push(`${id}: ${msg}`);
 
-// --- песочница браузера: window, Arcade.register, fetch с диска ---
-const registered = {};
-let current = null;
-const sandbox = {
-  console, setTimeout, Promise, Math, JSON, String, Number, Array, Object, Set, Map, RegExp, Intl,
-  document: { createElement: () => ({ style: {}, appendChild() {} }), head: { appendChild() {} }, body: { appendChild() {} } },
-  fetch: async (url) => ({ ok: true, json: async () => JSON.parse(fs.readFileSync(path.join(WEB, url), 'utf8')) }),
-};
-sandbox.window = sandbox;
-sandbox.Arcade = { register: (def) => { registered[current] = def; }, fail: (msg) => bad(current, 'не загрузилась: ' + msg) };
-vm.createContext(sandbox);
-for (const f of ['sdk/countries.js', 'sdk/learn.js', 'sdk/algo-code.js', 'sdk/algo.js', 'sdk/algo-paths.js']) vm.runInContext(fs.readFileSync(path.join(WEB, f), 'utf8'), sandbox);
-for (const g of cat.games) {
-  current = g.id;
-  if (g.id === 'chess') continue; // проверяется отдельно ниже
-  try { vm.runInContext(fs.readFileSync(path.join(WEB, 'games', g.id + '.js'), 'utf8'), sandbox); } catch (e) { bad(g.id, 'ошибка загрузки: ' + e.message); }
-  await new Promise((r) => setTimeout(r, 5)); // асинхронные колоды (Learn.load) регистрируются после загрузки данных
+// --- песочница браузера: window, Arcade.register, fetch с диска; язык интерфейса — ru или en ---
+const CYR = /[А-Яа-яЁё]/;
+const RU_CONTENT = new Set(['english', 'english-b', 'phrases']); // учим русский: русские слова в карточках — это и есть контент
+async function loadAll(lang) {
+  const registered = {};
+  let current = null;
+  const sandbox = {
+    console, setTimeout, Promise, Math, JSON, String, Number, Array, Object, Set, Map, RegExp, Intl,
+    document: { createElement: () => ({ style: {}, appendChild() {} }), head: { appendChild() {} }, body: { appendChild() {} } },
+    fetch: async (url) => ({ ok: true, json: async () => JSON.parse(fs.readFileSync(path.join(WEB, url), 'utf8')) }),
+    LANG: lang,
+  };
+  sandbox.window = sandbox;
+  sandbox.L = (ru, en) => (lang === 'en' && en != null ? en : ru);
+  sandbox.Arcade = { register: (def) => { registered[current] = def; }, fail: (msg) => bad(current, `[${lang}] не загрузилась: ` + msg) };
+  vm.createContext(sandbox);
+  for (const f of ['sdk/countries.js', 'sdk/learn.js', 'sdk/algo-code.js', 'sdk/algo.js', 'sdk/algo-paths.js']) vm.runInContext(fs.readFileSync(path.join(WEB, f), 'utf8'), sandbox);
+  for (const g of cat.games) {
+    current = g.id;
+    if (g.id === 'chess' || (g.lang && g.lang !== lang)) continue; // шахматы — отдельно; игры на другом языке не показываются
+    try { vm.runInContext(fs.readFileSync(path.join(WEB, 'games', g.id + '.js'), 'utf8'), sandbox); } catch (e) { bad(g.id, `[${lang}] ошибка загрузки: ` + e.message); }
+    await new Promise((r) => setTimeout(r, 5)); // асинхронные колоды (Learn.load) регистрируются после загрузки данных
+  }
+  return { registered, sandbox };
 }
 
 const api = (score = 0, level = 0) => ({
@@ -38,40 +45,62 @@ const api = (score = 0, level = 0) => ({
 });
 
 let decks = 0, gens = 0, checks = 0;
-for (const g of cat.games) {
-  const def = registered[g.id];
-  if (!def) { if (g.id !== 'chess') bad(g.id, 'не вызвал Arcade.register'); continue; }
-  if (!def.cfg) continue;
-  const cfg = def.cfg;
-  if (cfg.gen) { // генератор: 4000 заданий на разных уровнях счёта
-    gens++;
-    for (let i = 0; i < 4000; i++) {
-      const c = cfg.gen(api(i % 40, i % 25));
-      checks++;
-      const a = String(c.a), wrong = [...new Set((c.wrong || []).map(String))].filter((w) => w !== a);
-      if (!c.q || a === '' || /NaN|undefined|Infinity|null/.test(a + c.q)) { bad(g.id, `битое задание: ${JSON.stringify(c)}`); break; }
-      if (!wrong.length) { bad(g.id, `нет неверных вариантов: ${c.q} → ${a}`); break; }
-      if (wrong.some((w) => /NaN|undefined|Infinity/.test(w))) { bad(g.id, `битый вариант: ${JSON.stringify(c)}`); break; }
+const LOADED = {};
+for (const lang of ['ru', 'en']) {
+  const { registered, sandbox } = await loadAll(lang);
+  LOADED[lang] = { registered, sandbox };
+  const id = (g) => `${g.id} [${lang}]`;
+  // в английском интерфейсе не должно остаться русского текста (кроме колод, где русский — предмет изучения)
+  const leak = (g, where, text) => { if (lang === 'en' && !RU_CONTENT.has(g.id) && CYR.test(String(text))) { bad(id(g), `русский текст в английском интерфейсе (${where}): ${String(text).slice(0, 80)}`); return true; } return false; };
+  for (const g of cat.games) {
+    if (g.lang && g.lang !== lang) continue;
+    if (lang === 'en' && (!g.title_en || !g.desc_en) && !g.lang) bad(id(g), 'нет title_en / desc_en в каталоге');
+    const def = registered[g.id];
+    if (!def) { if (g.id !== 'chess') bad(id(g), 'не вызвал Arcade.register'); continue; }
+    if (def.howto && leak(g, 'howto', def.howto)) continue;
+    if (!def.cfg) continue;
+    const cfg = def.cfg;
+    if (['ask', 'askRev', 'rule'].some((k) => cfg[k] && leak(g, k, cfg[k]))) continue;
+    if (cfg.gen) { // генератор: 4000 заданий на разных уровнях счёта
+      gens++;
+      for (let i = 0; i < 4000; i++) {
+        const c = cfg.gen(api(i % 40, i % 25));
+        checks++;
+        const a = String(c.a), wrong = [...new Set((c.wrong || []).map(String))].filter((w) => w !== a);
+        if (!c.q || a === '' || /NaN|undefined|Infinity|null/.test(a + c.q)) { bad(id(g), `битое задание: ${JSON.stringify(c)}`); break; }
+        if (!wrong.length) { bad(id(g), `нет неверных вариантов: ${c.q} → ${a}`); break; }
+        if (wrong.some((w) => /NaN|undefined|Infinity/.test(w))) { bad(id(g), `битый вариант: ${JSON.stringify(c)}`); break; }
+        if (leak(g, 'задание', c.q + ' ' + a + ' ' + wrong.join(' ') + ' ' + (c.ask || ''))) break;
+      }
+      continue;
     }
-    continue;
+    decks++;
+    const all = sandbox.Learn._normalize(cfg.cards, cfg.both);
+    const byQ = new Map();
+    let leaked = false;
+    for (const c of all) {
+      if (!c.q || !c.a) bad(id(g), `пустая карточка ${JSON.stringify(c)}`);
+      if (!c.pool && byQ.has(c.q) && byQ.get(c.q) !== c.a) bad(id(g), `неоднозначно: «${c.q}» → «${byQ.get(c.q)}» и «${c.a}»`);
+      byQ.set(c.q, c.a);
+      if (!leaked) leaked = leak(g, 'карточка', `${c.q} ${c.a} ${(c.wrong || []).join(' ')}`);
+    }
+    for (let i = 0; i < 3000; i++) { // варианты ответа: правильный есть, все разные, хотя бы 2
+      const c = all[i % all.length];
+      const o = sandbox.Learn._options(c, all, api());
+      checks++;
+      if (!o.includes(c.a) || new Set(o).size !== o.length || o.length < 2) { bad(id(g), `плохие варианты для «${c.q}»: ${o.join(' | ')}`); break; }
+      // в вариантах не должно быть второго верного ответа (для колод с одинаковым вопросом)
+      const alt = all.filter((x) => x.q === c.q && x.a !== c.a && !c.pool).map((x) => x.a);
+      if (o.some((v) => alt.includes(v))) { bad(id(g), `два верных варианта для «${c.q}»`); break; }
+    }
   }
-  decks++;
-  const all = sandbox.Learn._normalize(cfg.cards, cfg.both);
-  const byQ = new Map();
-  for (const c of all) {
-    if (!c.q || !c.a) bad(g.id, `пустая карточка ${JSON.stringify(c)}`);
-    if (!c.pool && byQ.has(c.q) && byQ.get(c.q) !== c.a) bad(g.id, `неоднозначно: «${c.q}» → «${byQ.get(c.q)}» и «${c.a}»`);
-    byQ.set(c.q, c.a);
-  }
-  for (let i = 0; i < 3000; i++) { // варианты ответа: правильный есть, все разные, хотя бы 2
-    const c = all[i % all.length];
-    const o = sandbox.Learn._options(c, all, api());
-    checks++;
-    if (!o.includes(c.a) || new Set(o).size !== o.length || o.length < 2) { bad(g.id, `плохие варианты для «${c.q}»: ${o.join(' | ')}`); break; }
-    // в вариантах не должно быть второго верного ответа (для колод с одинаковым вопросом)
-    const alt = all.filter((x) => x.q === c.q && x.a !== c.a && !c.pool).map((x) => x.a);
-    if (o.some((v) => alt.includes(v))) { bad(g.id, `два верных варианта для «${c.q}»`); break; }
-  }
+}
+const { registered, sandbox } = LOADED.ru;
+
+// --- L() — функция перевода: локальная переменная с именем L ломает строки игры в обоих языках ---
+for (const g of cat.games) {
+  const src = fs.readFileSync(path.join(WEB, 'games', g.id + '.js'), 'utf8');
+  if (/(?:const|let|var)\s*(?:\[\s*)?L\b|function\s*\w*\s*\(\s*L\b/.test(src)) bad(g.id, 'локальная переменная L перекрывает функцию перевода L()');
 }
 
 // --- ударения: в каждом слове ровно одна заглавная гласная ---
@@ -124,15 +153,19 @@ for (const id of algoIds) {
 for (const g of cat.games) if (g.section === 'algo' && g.app && !sandbox.ALGO_CODE[g.id]) bad(g.id, 'нет настоящего кода (ALGO_CODE)');
 
 // 2) «Собери код»: эталон каждой задачи проходит свой тест
-const parsons = (registered.parsons || {}).bank || [];
-runPy(parsons.map((t) => ({ code: t.code, test: t.test }))).forEach((r, k) => { pyRuns++; if (!r.ok) bad('parsons', `«${parsons[k].task}»: ${r.err}`); });
+for (const lang of ['ru', 'en']) {
+  const parsons = (LOADED[lang].registered.parsons || {}).bank || [];
+  runPy(parsons.map((t) => ({ code: t.code, test: t.test }))).forEach((r, k) => { pyRuns++; if (!r.ok) bad(`parsons [${lang}]`, `«${parsons[k].task}»: ${r.err}`); });
+}
 
 // 3) «Найди ошибку»: с исправлением тест проходит, с багом — НЕ проходит (иначе это не баг)
-const bugs = (registered.findbug || {}).bank || [];
-const fixedJobs = bugs.map((b) => ({ code: b.code.map((l, i) => (i === b.bug ? b.fix : l)).join('\n'), test: b.test }));
-const buggyJobs = bugs.map((b) => ({ code: b.code.join('\n'), test: b.test }));
-runPy(fixedJobs).forEach((r, k) => { pyRuns++; if (!r.ok) bad('findbug', `«${bugs[k].task}»: исправленная версия не проходит тест — ${r.err}`); });
-runPy(buggyJobs).forEach((r, k) => { pyRuns++; if (r.ok) bad('findbug', `«${bugs[k].task}»: версия с багом проходит тест — это не баг`); });
+for (const lang of ['ru', 'en']) {
+  const bugs = (LOADED[lang].registered.findbug || {}).bank || [];
+  const fixedJobs = bugs.map((b) => ({ code: b.code.map((l, i) => (i === b.bug ? b.fix : l)).join('\n'), test: b.test }));
+  const buggyJobs = bugs.map((b) => ({ code: b.code.join('\n'), test: b.test }));
+  runPy(fixedJobs).forEach((r, k) => { pyRuns++; if (!r.ok) bad(`findbug [${lang}]`, `«${bugs[k].task}»: исправленная версия не проходит тест — ${r.err}`); });
+  runPy(buggyJobs).forEach((r, k) => { pyRuns++; if (r.ok) bad(`findbug [${lang}]`, `«${bugs[k].task}»: версия с багом проходит тест — это не баг`); });
+}
 
 // 4) «Что выведет код?»: ответ генератора = реальный вывод Python
 const trace = registered.trace && registered.trace.cfg;

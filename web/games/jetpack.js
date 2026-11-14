@@ -1,6 +1,6 @@
 // Ранец: держи палец — летишь вверх, отпустил — падаешь. Облетай лазеры.
 Arcade.register({
-  howto: 'Держи палец на экране (или пробел) — ранец тянет вверх, отпусти — падаешь. Облетай красные лазеры, собирай монеты (+5).',
+  howto: L('Держи палец на экране (или пробел) — ранец тянет вверх, отпусти — падаешь. Облетай красные лазеры, собирай монеты (+5).', 'Hold your finger on the screen (or space) and the jetpack lifts you; let go and you fall. Dodge the red lasers, collect coins (+5).'),
   start(api) {
     const g = api.canvas(), x = g.ctx, C = api.colors;
     const r = 13;

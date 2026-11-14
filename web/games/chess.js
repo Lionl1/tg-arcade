@@ -1,10 +1,14 @@
 // Шахматные задачи из открытой базы Lichess (CC0). Правила ходов — chess.js (BSD-2).
 // Рейтинг задач подстраивается: решил — следующая сложнее, ошибся — проще.
 (() => {
-  const THEMES = { mateIn1: 'Мат в 1 ход', mateIn2: 'Мат в 2 хода', mateIn3: 'Мат в 3 хода', mateIn4: 'Мат в 4 хода', fork: 'вилка', pin: 'связка',
+  const THEMES = LANG === 'en' ? { mateIn1: 'Mate in 1', mateIn2: 'Mate in 2', mateIn3: 'Mate in 3', mateIn4: 'Mate in 4', fork: 'fork', pin: 'pin',
+    skewer: 'skewer', hangingPiece: 'hanging piece', discoveredAttack: 'discovered attack', sacrifice: 'sacrifice', promotion: 'promotion',
+    endgame: 'endgame', middlegame: 'middlegame', opening: 'opening', backRankMate: 'back-rank mate', deflection: 'deflection', trappedPiece: 'trapped piece' } : { mateIn1: 'Мат в 1 ход', mateIn2: 'Мат в 2 хода', mateIn3: 'Мат в 3 хода', mateIn4: 'Мат в 4 хода', fork: 'вилка', pin: 'связка',
     skewer: 'сквозной удар', hangingPiece: 'незащищённая фигура', discoveredAttack: 'вскрытое нападение', sacrifice: 'жертва', promotion: 'превращение пешки',
     endgame: 'эндшпиль', middlegame: 'миттельшпиль', opening: 'дебют', backRankMate: 'мат по последней горизонтали', deflection: 'отвлечение', trappedPiece: 'ловля фигуры' };
-  const GLYPH = { k: '♚', q: '♛', r: '♜', b: '♝', n: '♞', p: '♟' };
+  // Фигуры — классический набор Cburnett (Colin M.L. Burnett, BSD/GPL/GFDL), как на Lichess и в Википедии
+  const PIECE = (p) => `vendor/pieces/${p.color}${p.type.toUpperCase()}.svg`;
+  for (const c of 'wb') for (const t of 'kqrbnp') new Image().src = PIECE({ color: c, type: t }); // заранее, чтобы доска не мигала
 
   function start(api, DATA) {
     const box = api.el('div', 'fill');
@@ -17,7 +21,17 @@
     const sq = [];
     for (let i = 0; i < 64; i++) {
       const b = api.el('button', '', board);
-      b.style.cssText = `width:${S}px;height:${S}px;border:0;padding:0;font-size:${S * 0.78}px;line-height:1;display:flex;align-items:center;justify-content:center;position:relative`;
+      b.style.cssText = `width:${S}px;height:${S}px;border:0;padding:0;display:flex;align-items:center;justify-content:center;position:relative`;
+      const img = api.el('img', '', b);
+      img.draggable = false;
+      img.style.cssText = 'width:92%;height:92%;pointer-events:none;-webkit-user-drag:none';
+      const dot = api.el('span', '', b); // куда можно пойти выбранной фигурой
+      dot.style.cssText = 'position:absolute;inset:0;margin:auto;pointer-events:none;border-radius:50%';
+      const file = api.el('span', '', b), rank = api.el('span', '', b); // координаты a–h, 1–8
+      const lab = `position:absolute;font:700 ${Math.max(9, S * 0.2)}px system-ui;pointer-events:none;opacity:.85`;
+      file.style.cssText = lab + ';right:2px;bottom:0';
+      rank.style.cssText = lab + ';left:2px;top:1px';
+      b._p = { img, dot, file, rank };
       sq.push(b);
     }
     const note = api.el('div', 'hint', box);
@@ -45,14 +59,21 @@
     }
     function draw(hl = []) {
       const b = game.board();
+      const targets = sel ? game.moves({ square: sel, verbose: true }) : [];
       for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
         const s = name(r, c), el = sq[idx(s)], p = b[r][c];
         const light = (r + c) % 2 === 0;
         el.style.background = hl.includes(s) ? (light ? '#f6f669' : '#baca2b') : light ? '#f0d9b5' : '#b58863';
         if (sel === s) el.style.background = '#7fc97f';
-        el.textContent = p ? GLYPH[p.type] : '';
-        el.style.color = p ? (p.color === 'w' ? '#fff' : '#111') : '';
-        el.style.textShadow = p && p.color === 'w' ? '0 0 2px #000, 0 0 2px #000' : 'none';
+        const { img, dot, file, rank } = el._p;
+        if (p) { const src = PIECE(p); if (img.getAttribute('src') !== src) img.src = src; img.hidden = false; } else img.hidden = true;
+        const t = targets.find((m) => m.to === s);
+        dot.style.width = dot.style.height = t ? (p ? '86%' : '30%') : '0';
+        dot.style.background = t && !p ? 'rgba(20,85,30,.45)' : 'transparent';
+        dot.style.boxShadow = t && p ? 'inset 0 0 0 4px rgba(20,85,30,.55)' : 'none';
+        const k = idx(s), labColor = light ? '#b58863' : '#f0d9b5';
+        file.textContent = k >= 56 ? s[0] : ''; rank.textContent = k % 8 === 0 ? s[1] : '';
+        file.style.color = rank.style.color = labColor;
         el.dataset.s = s;
       }
     }
@@ -69,8 +90,8 @@
       white = game.turn() === 'b'; // первый ход в задаче делает соперник, решаем за другую сторону
       ply = 0; sel = null; busy = true;
       const themes = cur[4].split(' ').map((t) => THEMES[t]).filter(Boolean);
-      info.textContent = `Рейтинг задачи ${cur[3]} · играешь ${white ? 'белыми' : 'чёрными'}`;
-      note.textContent = themes.length ? 'Подсказка: ' + themes.slice(0, 2).join(', ') : 'Найди лучший ход';
+      info.textContent = L(`Рейтинг задачи ${cur[3]} · играешь ${white ? 'белыми' : 'чёрными'}`, `Puzzle rating ${cur[3]} · you play ${white ? 'White' : 'Black'}`);
+      note.textContent = themes.length ? L('Подсказка: ', 'Hint: ') + themes.slice(0, 2).join(', ') : L('Найди лучший ход', 'Find the best move');
       draw();
       api.after(600, () => { play(line[ply++]); busy = false; });
     }
@@ -78,7 +99,7 @@
       busy = true;
       if (ok) {
         api.addScore(1); api.haptic('success');
-        info.textContent = `✅ Решено! (${cur[3]})`;
+        info.textContent = L(`✅ Решено! (${cur[3]})`, `✅ Solved! (${cur[3]})`);
         rating = Math.min(2900, rating + 100);
       } else {
         api.haptic('error');
@@ -107,17 +128,17 @@
         api.after(450, () => { play(line[ply++]); busy = false; if (ply >= line.length) done(true); });
       } else {
         api.shake(board);
-        info.textContent = `❌ Лучше было ${want.slice(0, 2)}→${want.slice(2, 4)}`;
+        info.textContent = L(`❌ Лучше было ${want.slice(0, 2)}→${want.slice(2, 4)}`, `❌ Better was ${want.slice(0, 2)}→${want.slice(2, 4)}`);
         done(false);
       }
     });
     load();
   }
 
-  const def = { howto: 'Шахматные задачи из открытой базы Lichess. Тапни фигуру, потом клетку. Найди лучший ход (часто — серию ходов). Решил — следующая сложнее, ошибся — проще. 5 минут, очки — решённые задачи.', start: null };
+  const def = { howto: L('Шахматные задачи из открытой базы Lichess. Тапни фигуру, потом клетку. Найди лучший ход (часто — серию ходов). Решил — следующая сложнее, ошибся — проще. 5 минут, очки — решённые задачи.', 'Chess puzzles from the open Lichess database. Tap a piece, then a square. Find the best move (often a series of moves). Solve one and the next is harder; miss and it gets easier. 5 minutes, points = puzzles solved.'), start: null };
   Promise.all([
     new Promise((ok, fail) => { if (window.Chess) return ok(); const s = document.createElement('script'); s.src = 'vendor/chess.js'; s.onload = ok; s.onerror = fail; document.head.appendChild(s); }),
     fetch('games/data/chess.json').then((r) => r.json()),
   ]).then(([, data]) => { def.start = (api) => start(api, data); Arcade.register(def); })
-    .catch(() => Arcade.fail('Не удалось загрузить шахматные задачи. Проверь связь и открой игру заново.'));
+    .catch(() => Arcade.fail(L('Не удалось загрузить шахматные задачи. Проверь связь и открой игру заново.', "Couldn't load the chess puzzles. Check your connection and reopen the game.")));
 })();

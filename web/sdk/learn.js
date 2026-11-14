@@ -77,7 +77,7 @@
       fb.style.minHeight = '1.4em';
       const ch = api.el('div', 'choices learn', box);
       // сложность карточек (d: 1 базовая, 2 средняя, 3 продвинутая): уровни и рост счёта открывают более трудные
-      const DNAME = ['', 'базовые', 'средние', 'продвинутые'];
+      const DNAME = ['', ...L('базовые|средние|продвинутые', 'basic|intermediate|advanced').split('|')];
       const hasD = all && all.some((c) => (c.d || 1) > 1);
       const band = () => {
         if (api.mode === 'level') { const k = api.level; return [k >= 12 ? 2 : 1, k <= 3 ? 1 : k <= 8 ? 2 : 3]; }
@@ -97,7 +97,7 @@
         if (lock) return;
         lock = true; tm.add(-3); api.haptic('error');
         for (const o of ch.children) if (o.dataset.v === card.a) o.style.background = 'var(--good)';
-        fb.textContent = '⏱ Время! ' + (cfg.reveal ? cfg.reveal(card) : `${card.q} → ${card.a}`);
+        fb.textContent = L('⏱ Время! ', '⏱ Time! ') + (cfg.reveal ? cfg.reveal(card) : `${card.q} → ${card.a}`);
         api.after(1100, next);
       }
 
@@ -152,7 +152,7 @@
       api.setScore(null);
       const boxes = loadBoxes(api.gameId);
       const now = Date.now();
-      const back = api.el('button', 'backlink', api.stage, '← Меню');
+      const back = api.el('button', 'backlink', api.stage, L('← Меню', '← Menu'));
       api.on(back, 'click', () => api.quit());
       const box = api.el('div', 'fill');
       const progress = api.el('div', 'hint', box);
@@ -160,8 +160,8 @@
       const card = api.el('div', 'flash', box);
       const row = api.el('div', 'row', box);
       row.style.cssText = 'width:100%;max-width:380px;visibility:hidden';
-      const again = api.el('button', 'btn ghost', row, '😕 Ещё раз');
-      const know = api.el('button', 'btn', row, '😎 Знаю');
+      const again = api.el('button', 'btn ghost', row, L('😕 Ещё раз', '😕 Again'));
+      const know = api.el('button', 'btn', row, L('😎 Знаю', '😎 I know it'));
 
       // сначала то, что пора повторить (самые «старые» долги первыми), потом новые карточки
       const due = all.filter((c) => boxes[keyOf(c)] && boxes[keyOf(c)].due <= now)
@@ -178,16 +178,17 @@
       };
       function draw() {
         const sure = all.filter((c) => boxes[keyOf(c)] && boxes[keyOf(c)].box >= 2).length;
-        progress.textContent = `Партия: ${learned}/${size}${reviews ? ` (повторений ${reviews})` : ''} · уверенно знаешь ${sure} из ${all.length}`;
+        progress.textContent = L(`Партия: ${learned}/${size}${reviews ? ` (повторений ${reviews})` : ''} · уверенно знаешь ${sure} из ${all.length}`,
+          `Session: ${learned}/${size}${reviews ? ` (${reviews} reviews)` : ''} · you know ${sure} of ${all.length} well`);
         if (!queue.length) return finish();
         const c = queue[0];
         flipped = false;
         row.style.visibility = 'hidden';
         card.innerHTML = '';
         const b = boxes[keyOf(c)];
-        api.el('div', 'hint', card, (b ? '🔁 повторение · ' : '🆕 ') + (c.rev ? (cfg.askRev || cfg.ask || '') : (cfg.ask || '')));
+        api.el('div', 'hint', card, (b ? L('🔁 повторение · ', '🔁 review · ') : '🆕 ') + (c.rev ? (cfg.askRev || cfg.ask || '') : (cfg.ask || '')));
         setQ(api.el('div', 'learn-q' + (cfg.big && !c.rev ? ' big' : ''), card), c.q, cfg.big && !c.rev);
-        api.el('div', 'hint', card, 'вспомни ответ и нажми, чтобы проверить');
+        api.el('div', 'hint', card, L('вспомни ответ и нажми, чтобы проверить', 'recall the answer, then tap to check'));
       }
       function flip() {
         if (flipped || !queue.length) return;
@@ -204,11 +205,13 @@
         const done = api.el('div', '', box);
         const nd = nextDue();
         done.innerHTML = size
-          ? `<div class="learn-q">🎉 Партия пройдена!</div><p class="hint">Карточек: ${size}. ${nd ? `Следующее повторение — через ${nd} дн. Интервальные повторения запоминаются надёжнее зубрёжки.` : ''}</p>`
-          : `<div class="learn-q">🏅 На сегодня всё повторено</div><p class="hint">${nd ? `Следующие карточки вернутся через ${nd} дн.` : ''} Можно проверить себя на очки.</p>`;
+          ? L(`<div class="learn-q">🎉 Партия пройдена!</div><p class="hint">Карточек: ${size}. ${nd ? `Следующее повторение — через ${nd} дн. Интервальные повторения запоминаются надёжнее зубрёжки.` : ''}</p>`,
+            `<div class="learn-q">🎉 Session complete!</div><p class="hint">Cards: ${size}. ${nd ? `Next review in ${nd} days. Spaced repetition sticks better than cramming.` : ''}</p>`)
+          : L(`<div class="learn-q">🏅 На сегодня всё повторено</div><p class="hint">${nd ? `Следующие карточки вернутся через ${nd} дн.` : ''} Можно проверить себя на очки.</p>`,
+            `<div class="learn-q">🏅 All reviewed for today</div><p class="hint">${nd ? `The next cards come back in ${nd} days.` : ''} You can test yourself for points.</p>`);
         const btns = api.el('div', 'modes', box);
-        const more = api.el('button', 'btn ghost', btns, size ? '📖 Ещё карточки' : '🔄 Начать колоду заново');
-        const check = api.el('button', 'btn', btns, '🎯 Проверить себя на очки');
+        const more = api.el('button', 'btn ghost', btns, size ? L('📖 Ещё карточки', '📖 More cards') : L('🔄 Начать колоду заново', '🔄 Restart the deck'));
+        const check = api.el('button', 'btn', btns, L('🎯 Проверить себя на очки', '🎯 Test yourself for points'));
         api.on(more, 'click', () => { if (!size) saveBoxes(api.gameId, {}); study(api); });
         api.on(check, 'click', () => test(api));
       }
@@ -233,17 +236,18 @@
     return {
       cfg, // для автопроверки колод (tools/check_games.mjs)
       howto: cfg.howto || (all
-        ? `${total} карточек. «Учить» — карточки с интервальными повторениями (выученное вернётся через 1, 3, 7… дней). «Тест» — ${cfg.seconds || 60} секунд на очки, ошибка −3 с.`
-        : `Тест на ${cfg.seconds || 60} секунд: выбирай правильный ответ, ошибка −3 с.`),
+        ? L(`${total} карточек. «Учить» — карточки с интервальными повторениями (выученное вернётся через 1, 3, 7… дней). «Тест» — ${cfg.seconds || 60} секунд на очки, ошибка −3 с.`,
+          `${total} cards. “Learn” — flashcards with spaced repetition (learned cards return after 1, 3, 7… days). “Test” — ${cfg.seconds || 60} seconds for points, a mistake costs 3 s.`)
+        : L(`Тест на ${cfg.seconds || 60} секунд: выбирай правильный ответ, ошибка −3 с.`, `A ${cfg.seconds || 60}-second test: pick the right answer, a mistake costs 3 s.`)),
       start(api) {
         if (!all || api.mode !== 'free') return test(api); // уровни, турниры, дуэли — только тест на очки
         const box = api.el('div', 'fill');
-        api.el('div', 'learn-q', box, 'Как будем?');
+        api.el('div', 'learn-q', box, L('Как будем?', 'How shall we go?'));
         const modes = api.el('div', 'modes', box);
         const s = api.el('button', 'btn ghost', modes);
-        s.innerHTML = '📖 Учить карточки<small>Без очков, в своём темпе. Запомню, что ты уже знаешь.</small>';
+        s.innerHTML = L('📖 Учить карточки<small>Без очков, в своём темпе. Запомню, что ты уже знаешь.</small>', "📖 Learn the cards<small>No points, at your own pace. I'll remember what you already know.</small>");
         const t = api.el('button', 'btn', modes);
-        t.innerHTML = `🎯 Тест на очки<small>${cfg.seconds || 60} секунд, результат идёт в таблицу чата.</small>`;
+        t.innerHTML = L(`🎯 Тест на очки<small>${cfg.seconds || 60} секунд, результат идёт в таблицу чата.</small>`, `🎯 Test for points<small>${cfg.seconds || 60} seconds, the result goes to the chat leaderboard.</small>`);
         api.on(s, 'click', () => study(api));
         api.on(t, 'click', () => test(api));
       },
@@ -266,7 +270,7 @@
     fetch(url)
       .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then((data) => Arcade.register(deck(build(data))))
-      .catch(() => Arcade.fail('Не удалось загрузить карточки. Проверь связь и открой игру заново.'));
+      .catch(() => Arcade.fail(L('Не удалось загрузить карточки. Проверь связь и открой игру заново.', "Couldn't load the cards. Check your connection and reopen the game.")));
   }
 
   window.Learn = { deck, load, nearNumbers, _options: options, _normalize: normalize };

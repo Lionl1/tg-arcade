@@ -1,7 +1,8 @@
 // Химические элементы: символ ↔ название. Сложность — по порядковому номеру (1–20 базовые, 21–36 средние, дальше продвинутые).
+const ELEMENTS_EN = {"H": "Hydrogen", "He": "Helium", "Li": "Lithium", "Be": "Beryllium", "B": "Boron", "C": "Carbon", "N": "Nitrogen", "O": "Oxygen", "F": "Fluorine", "Ne": "Neon", "Na": "Sodium", "Mg": "Magnesium", "Al": "Aluminium", "Si": "Silicon", "P": "Phosphorus", "S": "Sulfur", "Cl": "Chlorine", "Ar": "Argon", "K": "Potassium", "Ca": "Calcium", "Sc": "Scandium", "Ti": "Titanium", "V": "Vanadium", "Cr": "Chromium", "Mn": "Manganese", "Fe": "Iron", "Co": "Cobalt", "Ni": "Nickel", "Cu": "Copper", "Zn": "Zinc", "Ga": "Gallium", "Ge": "Germanium", "As": "Arsenic", "Se": "Selenium", "Br": "Bromine", "Kr": "Krypton", "Rb": "Rubidium", "Sr": "Strontium", "Zr": "Zirconium", "Mo": "Molybdenum", "Pd": "Palladium", "Ag": "Silver", "Cd": "Cadmium", "Sn": "Tin", "Sb": "Antimony", "I": "Iodine", "Xe": "Xenon", "Cs": "Caesium", "Ba": "Barium", "W": "Tungsten", "Os": "Osmium", "Ir": "Iridium", "Pt": "Platinum", "Au": "Gold", "Hg": "Mercury", "Pb": "Lead", "Bi": "Bismuth", "Rn": "Radon", "Ra": "Radium", "U": "Uranium", "Pu": "Plutonium"};
 Arcade.register(Learn.deck({
-  ask: 'Какой это элемент?',
-  askRev: 'Химический символ элемента',
+  ask: L('Какой это элемент?', 'Which element is this?'),
+  askRev: L('Химический символ элемента', 'Chemical symbol of the element'),
   both: true,
   big: true,
   cards: [
@@ -13,5 +14,5 @@ Arcade.register(Learn.deck({
     ['Pd', 'Палладий', 46], ['Ag', 'Серебро', 47], ['Cd', 'Кадмий', 48], ['Sn', 'Олово', 50], ['Sb', 'Сурьма', 51], ['I', 'Йод', 53], ['Xe', 'Ксенон', 54], ['Cs', 'Цезий', 55],
     ['Ba', 'Барий', 56], ['W', 'Вольфрам', 74], ['Os', 'Осмий', 76], ['Ir', 'Иридий', 77], ['Pt', 'Платина', 78], ['Au', 'Золото', 79], ['Hg', 'Ртуть', 80], ['Pb', 'Свинец', 82],
     ['Bi', 'Висмут', 83], ['Rn', 'Радон', 86], ['Ra', 'Радий', 88], ['U', 'Уран', 92], ['Pu', 'Плутоний', 94],
-  ].map(([q, a, z]) => ({ q, a, d: z <= 20 ? 1 : z <= 36 ? 2 : 3 })),
+  ].map(([q, a, z]) => ({ q, a: L(a, ELEMENTS_EN[q]), d: z <= 20 ? 1 : z <= 36 ? 2 : 3 })),
 }));

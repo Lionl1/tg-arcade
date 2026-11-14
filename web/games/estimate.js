@@ -1,7 +1,7 @@
 // Прикинь: быстрая оценка порядка величины без точного счёта
 Arcade.register(Learn.deck({
-  ask: 'Примерно сколько? Выбери ближайшее',
-  howto: 'Не считай точно — прикинь! Выбери вариант, ближайший к ответу. Чем выше счёт, тем ближе друг к другу варианты. 45 секунд, ошибка −3 с.',
+  ask: L('Примерно сколько? Выбери ближайшее', 'Roughly how much? Pick the closest'),
+  howto: L('Не считай точно — прикинь! Выбери вариант, ближайший к ответу. Чем выше счёт, тем ближе друг к другу варианты. 45 секунд, ошибка −3 с.', 'Do not calculate exactly — estimate! Pick the option closest to the answer. The higher your score, the closer the options. 45 seconds, a mistake costs 3 s.'),
   seconds: 45,
   gen(api) {
     const R = (lo, hi) => lo + api.randi(hi - lo + 1);
@@ -10,7 +10,7 @@ Arcade.register(Learn.deck({
     if (t === 0) { const a = R(12, 99), b = R(12, 99); q = `${a} × ${b}`; v = a * b; }
     else if (t === 1) { const a = R(120, 990), b = R(120, 990), c = R(120, 990); q = `${a} + ${b} + ${c}`; v = a + b + c; }
     else if (t === 2) { const a = R(1000, 9999), b = R(7, 49); q = `${a} ÷ ${b}`; v = a / b; }
-    else if (t === 3) { const p = api.pick([12, 15, 18, 23, 27, 35, 42, 65, 78]), n = R(150, 2400); q = `${p}% от ${n}`; v = (p * n) / 100; }
+    else if (t === 3) { const p = api.pick([12, 15, 18, 23, 27, 35, 42, 65, 78]), n = R(150, 2400); q = L(`${p}% от ${n}`, `${p}% of ${n}`); v = (p * n) / 100; }
     else { const a = R(11, 40); q = `${a}²`; v = a * a; }
     const spread = Math.max(0.12, 0.6 - api.score * 0.02); // варианты сближаются по мере роста счёта
     const round = (x) => { const m = 10 ** Math.max(0, Math.floor(Math.log10(Math.abs(x))) - 1); return Math.round(x / m) * m; };

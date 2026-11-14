@@ -1,7 +1,7 @@
 // ЕГЭ математика: степени и логарифмы
 Arcade.register(Learn.deck({
-  ask: 'Найдите значение выражения',
-  howto: 'Свойства логарифмов и степеней. 90 секунд, ошибка −3 с.',
+  ask: L('Найдите значение выражения', 'Evaluate the expression'),
+  howto: L('Свойства логарифмов и степеней. 90 секунд, ошибка −3 с.', 'Properties of logarithms and powers. 90 seconds, a mistake costs 3 s.'),
   seconds: 90,
   gen(api) {
     const R = (lo, hi) => lo + api.randi(hi - lo + 1);

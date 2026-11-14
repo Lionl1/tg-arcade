@@ -15,31 +15,60 @@ class Opt:
     labels: tuple = ()  # подписи к значениям (для UI)
     hint: str = ""
     group: str = ""
+    en: tuple = ()  # (название, подписи, подсказка, группа) по-английски
+
+    def view(self, lang: str) -> dict:
+        title_en, labels_en, hint_en, group_en = (self.en + ("", (), "", ""))[:4] if self.en else ("", (), "", "")
+        e = lang == "en"
+        return {"key": self.key, "default": self.default, "choices": list(self.choices),
+                "title": (title_en or self.title) if e else self.title,
+                "labels": list((labels_en or self.labels) if e else self.labels) or None,
+                "hint": (hint_en or self.hint) if e else self.hint,
+                "group": (group_en or self.group) if e else self.group}
+
+    def t(self, lang: str) -> str:
+        return self.view(lang)["title"]
+
+    def label(self, lang: str, v) -> str:
+        labels = self.view(lang)["labels"]
+        return labels[self.choices.index(v)] if labels and v in self.choices else str(v)
 
 
 # ---------- личные: применяются в Mini App и на сервере, синхронизируются между устройствами ----------
 USER: list[Opt] = [
-    Opt("sound", "Звук", True, (True, False), group="🎧 Звук и отклик"),
-    Opt("haptics", "Вибрация", True, (True, False), group="🎧 Звук и отклик"),
-    Opt("theme", "Тема", "tg", ("tg", "dark", "light"), ("Как в Telegram", "Тёмная", "Светлая"), group="🎨 Вид"),
-    Opt("text", "Размер текста", "normal", ("normal", "large"), ("Обычный", "Крупный"), group="🎨 Вид"),
-    Opt("motion", "Анимации", True, (True, False), hint="Выключи, если от тряски и вспышек некомфортно", group="🎨 Вид"),
-    Opt("open_mode", "При открытии игры", "menu", ("menu", "levels", "free"), ("Показывать меню", "Сразу уровни", "Сразу свободная игра"), group="🎮 Игры"),
-    Opt("tips", "Подсказки «как играть»", True, (True, False), group="🎮 Игры"),
-    Opt("daily_size", "Игр в тренировке дня", 3, (3, 5), ("3 (≈5 минут)", "5 (≈8 минут)"), hint="Меняется со следующего дня", group="🧠 Тренировка"),
-    Opt("learn_batch", "Карточек за подход", 20, (10, 20, 30), ("10", "20", "30"), group="📚 Учёба"),
-    Opt("algo_speed", "Скорость анимации алгоритмов", 1, (0, 1, 2, 3), ("×0.5", "×1", "×2", "×5"), group="💻 Алгоритмы"),
-    Opt("hide_name", "Скрывать имя в таблицах", False, (False, True), ("Нет", "Да — «Игрок №…»"), hint="Для новых результатов", group="🔒 Приватность"),
+    Opt("lang", "Язык", "auto", ("auto", "ru", "en"), ("Как в Telegram", "Русский", "English"), group="🌐 Язык",
+        en=("Language", ("Same as Telegram", "Русский", "English"), "", "🌐 Language")),
+    Opt("sound", "Звук", True, (True, False), group="🎧 Звук и отклик", en=("Sound", (), "", "🎧 Sound & feedback")),
+    Opt("haptics", "Вибрация", True, (True, False), group="🎧 Звук и отклик", en=("Vibration", (), "", "🎧 Sound & feedback")),
+    Opt("theme", "Тема", "tg", ("tg", "dark", "light"), ("Как в Telegram", "Тёмная", "Светлая"), group="🎨 Вид",
+        en=("Theme", ("Same as Telegram", "Dark", "Light"), "", "🎨 Look")),
+    Opt("text", "Размер текста", "normal", ("normal", "large"), ("Обычный", "Крупный"), group="🎨 Вид",
+        en=("Text size", ("Normal", "Large"), "", "🎨 Look")),
+    Opt("motion", "Анимации", True, (True, False), hint="Выключи, если от тряски и вспышек некомфортно", group="🎨 Вид",
+        en=("Animations", (), "Turn off if shaking and flashes are uncomfortable", "🎨 Look")),
+    Opt("open_mode", "При открытии игры", "menu", ("menu", "levels", "free"), ("Показывать меню", "Сразу уровни", "Сразу свободная игра"), group="🎮 Игры",
+        en=("When a game opens", ("Show the menu", "Go to levels", "Start free play"), "", "🎮 Games")),
+    Opt("tips", "Подсказки «как играть»", True, (True, False), group="🎮 Игры", en=("“How to play” tips", (), "", "🎮 Games")),
+    Opt("daily_size", "Игр в тренировке дня", 3, (3, 5), ("3 (≈5 минут)", "5 (≈8 минут)"), hint="Меняется со следующего дня", group="🧠 Тренировка",
+        en=("Games in the daily workout", ("3 (≈5 minutes)", "5 (≈8 minutes)"), "Takes effect tomorrow", "🧠 Workout")),
+    Opt("learn_batch", "Карточек за подход", 20, (10, 20, 30), ("10", "20", "30"), group="📚 Учёба", en=("Cards per session", (), "", "📚 Study")),
+    Opt("algo_speed", "Скорость анимации алгоритмов", 1, (0, 1, 2, 3), ("×0.5", "×1", "×2", "×5"), group="💻 Алгоритмы",
+        en=("Algorithm animation speed", (), "", "💻 Algorithms")),
+    Opt("hide_name", "Скрывать имя в таблицах", False, (False, True), ("Нет", "Да — «Игрок №…»"), hint="Для новых результатов", group="🔒 Приватность",
+        en=("Hide my name in leaderboards", ("No", "Yes — “Player #…”"), "For new results", "🔒 Privacy")),
 ]
 
 # ---------- групповые: меняют админы чата командой /settings ----------
 CHAT: list[Opt] = [
-    Opt("record_alerts", "Объявлять новые рекорды чата", True, (True, False)),
-    Opt("tours", "Турниры", True, (True, False)),
-    Opt("tour_minutes", "Длительность турнира по умолчанию", 60, (15, 30, 60, 180, 1440), ("15 мин", "30 мин", "1 ч", "3 ч", "1 день")),
-    Opt("pin", "Закреплять карточку турнира", True, (True, False)),
-    Opt("duels", "Дуэли", True, (True, False)),
-    Opt("duel_hours", "Время на дуэль", 24, (6, 12, 24, 48), ("6 ч", "12 ч", "24 ч", "48 ч")),
+    Opt("lang", "Язык бота в чате", "auto", ("auto", "ru", "en"), ("По языку участника", "Русский", "English"),
+        en=("Bot language in this chat", ("Each member's language", "Русский", "English"))),
+    Opt("record_alerts", "Объявлять новые рекорды чата", True, (True, False), en=("Announce new chat records",)),
+    Opt("tours", "Турниры", True, (True, False), en=("Tournaments",)),
+    Opt("tour_minutes", "Длительность турнира по умолчанию", 60, (15, 30, 60, 180, 1440), ("15 мин", "30 мин", "1 ч", "3 ч", "1 день"),
+        en=("Default tournament length", ("15 min", "30 min", "1 h", "3 h", "1 day"))),
+    Opt("pin", "Закреплять карточку турнира", True, (True, False), en=("Pin the tournament card",)),
+    Opt("duels", "Дуэли", True, (True, False), en=("Duels",)),
+    Opt("duel_hours", "Время на дуэль", 24, (6, 12, 24, 48), ("6 ч", "12 ч", "24 ч", "48 ч"), en=("Time for a duel", ("6 h", "12 h", "24 h", "48 h"))),
 ]
 
 USER_BY_KEY = {o.key: o for o in USER}
@@ -60,9 +89,8 @@ def clean(opts_by_key: dict[str, Opt], raw: dict) -> dict:
     return out
 
 
-def schema(opts: list[Opt]) -> list[dict]:
-    return [{"key": o.key, "title": o.title, "default": o.default, "choices": list(o.choices),
-             "labels": list(o.labels) or None, "hint": o.hint, "group": o.group} for o in opts]
+def schema(opts: list[Opt], lang: str = "ru") -> list[dict]:
+    return [o.view(lang) for o in opts]
 
 
 class Prefs:

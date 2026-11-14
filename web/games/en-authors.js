@@ -1,0 +1,25 @@
+// Who wrote it? Classic works of English-language and world literature (school and college reading lists).
+Arcade.register(Learn.deck({
+  ask: 'Who wrote it?',
+  cards: [
+    ['Romeo and Juliet', 'William Shakespeare', 1], ['Hamlet', 'William Shakespeare', 1], ['Macbeth', 'William Shakespeare', 1], ['Othello', 'William Shakespeare', 2],
+    ['King Lear', 'William Shakespeare', 2], ['A Midsummer Night’s Dream', 'William Shakespeare', 2], ['Pride and Prejudice', 'Jane Austen', 1], ['Emma', 'Jane Austen', 2],
+    ['Sense and Sensibility', 'Jane Austen', 2], ['Jane Eyre', 'Charlotte Brontë', 1], ['Wuthering Heights', 'Emily Brontë', 1], ['Great Expectations', 'Charles Dickens', 1],
+    ['Oliver Twist', 'Charles Dickens', 1], ['A Christmas Carol', 'Charles Dickens', 1], ['A Tale of Two Cities', 'Charles Dickens', 2], ['David Copperfield', 'Charles Dickens', 2],
+    ['Frankenstein', 'Mary Shelley', 1], ['Dracula', 'Bram Stoker', 1], ['The Strange Case of Dr Jekyll and Mr Hyde', 'Robert Louis Stevenson', 1], ['Treasure Island', 'Robert Louis Stevenson', 2],
+    ['The Picture of Dorian Gray', 'Oscar Wilde', 1], ['The Importance of Being Earnest', 'Oscar Wilde', 2], ['Middlemarch', 'George Eliot', 3], ['Silas Marner', 'George Eliot', 3],
+    ['Tess of the d’Urbervilles', 'Thomas Hardy', 2], ['Far from the Madding Crowd', 'Thomas Hardy', 3], ['Nineteen Eighty-Four', 'George Orwell', 1], ['Animal Farm', 'George Orwell', 1],
+    ['Brave New World', 'Aldous Huxley', 2], ['Lord of the Flies', 'William Golding', 1], ['The Lord of the Rings', 'J. R. R. Tolkien', 1], ['The Hobbit', 'J. R. R. Tolkien', 1],
+    ['Mrs Dalloway', 'Virginia Woolf', 2], ['To the Lighthouse', 'Virginia Woolf', 3], ['Ulysses', 'James Joyce', 2], ['Heart of Darkness', 'Joseph Conrad', 2],
+    ['Robinson Crusoe', 'Daniel Defoe', 2], ['Gulliver’s Travels', 'Jonathan Swift', 2], ['An Inspector Calls', 'J. B. Priestley', 2], ['Never Let Me Go', 'Kazuo Ishiguro', 3],
+    ['The Great Gatsby', 'F. Scott Fitzgerald', 1], ['To Kill a Mockingbird', 'Harper Lee', 1], ['The Catcher in the Rye', 'J. D. Salinger', 1], ['Of Mice and Men', 'John Steinbeck', 1],
+    ['The Grapes of Wrath', 'John Steinbeck', 2], ['Moby-Dick', 'Herman Melville', 1], ['The Adventures of Huckleberry Finn', 'Mark Twain', 1], ['The Adventures of Tom Sawyer', 'Mark Twain', 2],
+    ['The Scarlet Letter', 'Nathaniel Hawthorne', 2], ['The Old Man and the Sea', 'Ernest Hemingway', 1], ['A Farewell to Arms', 'Ernest Hemingway', 2], ['Fahrenheit 451', 'Ray Bradbury', 1],
+    ['Beloved', 'Toni Morrison', 2], ['The Color Purple', 'Alice Walker', 2], ['Death of a Salesman', 'Arthur Miller', 2], ['The Crucible', 'Arthur Miller', 2],
+    ['A Streetcar Named Desire', 'Tennessee Williams', 2], ['Little Women', 'Louisa May Alcott', 1], ['The Raven', 'Edgar Allan Poe', 1],
+    ['Leaves of Grass', 'Walt Whitman', 2], ['The Road', 'Cormac McCarthy', 3], ['The Handmaid’s Tale', 'Margaret Atwood', 2], ['Things Fall Apart', 'Chinua Achebe', 2],
+    ['One Hundred Years of Solitude', 'Gabriel García Márquez', 2], ['Don Quixote', 'Miguel de Cervantes', 1], ['Les Misérables', 'Victor Hugo', 1], ['The Count of Monte Cristo', 'Alexandre Dumas', 2],
+    ['Madame Bovary', 'Gustave Flaubert', 3], ['War and Peace', 'Leo Tolstoy', 1], ['Anna Karenina', 'Leo Tolstoy', 2], ['Crime and Punishment', 'Fyodor Dostoevsky', 1],
+    ['The Brothers Karamazov', 'Fyodor Dostoevsky', 2], ['The Metamorphosis', 'Franz Kafka', 2], ['The Divine Comedy', 'Dante Alighieri', 2], ['The Odyssey', 'Homer', 1],
+  ].map(([q, a, d]) => ({ q: `“${q}”`, a, d })),
+}));

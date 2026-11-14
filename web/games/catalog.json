@@ -7,37 +7,47 @@
    "groups": [
     {
      "id": "reaction",
-     "title": "⚡ Реакция"
+     "title": "⚡ Реакция",
+     "title_en": "⚡ Reaction"
     },
     {
      "id": "count",
-     "title": "🧮 Счёт"
+     "title": "🧮 Счёт",
+     "title_en": "🧮 Numbers"
     },
     {
      "id": "memory",
-     "title": "💭 Память"
+     "title": "💭 Память",
+     "title_en": "💭 Memory"
     },
     {
      "id": "attention",
-     "title": "👁 Внимание"
+     "title": "👁 Внимание",
+     "title_en": "👁 Attention"
     },
     {
      "id": "logic",
-     "title": "🧩 Логика"
+     "title": "🧩 Логика",
+     "title_en": "🧩 Logic"
     },
     {
      "id": "iq",
-     "title": "🎓 Интеллект"
+     "title": "🎓 Интеллект",
+     "title_en": "🎓 Reasoning"
     },
     {
      "id": "critical",
-     "title": "🛡 Критическое мышление"
+     "title": "🛡 Критическое мышление",
+     "title_en": "🛡 Critical thinking"
     },
     {
      "id": "words",
-     "title": "🔤 Слова"
+     "title": "🔤 Слова",
+     "title_en": "🔤 Words"
     }
-   ]
+   ],
+   "title_en": "🧠 Brain training",
+   "desc_en": "Memory, attention, speed, logic and critical thinking. Difficulty grows with you."
   },
   {
    "id": "ege",
@@ -46,37 +56,47 @@
    "groups": [
     {
      "id": "emath",
-     "title": "📐 Математика"
+     "title": "📐 Математика",
+     "title_en": "📐 Math"
     },
     {
      "id": "erus",
-     "title": "✍️ Русский язык"
+     "title": "✍️ Русский язык",
+     "title_en": "✍️ Language"
     },
     {
      "id": "elit",
-     "title": "📖 Литература"
+     "title": "📖 Литература",
+     "title_en": "📖 Literature"
     },
     {
      "id": "ehist",
-     "title": "🏛 История"
+     "title": "🏛 История",
+     "title_en": "🏛 History"
     },
     {
      "id": "esoc",
-     "title": "⚖️ Обществознание"
+     "title": "⚖️ Обществознание",
+     "title_en": "⚖️ Civics & economics"
     },
     {
      "id": "einf",
-     "title": "💻 Информатика"
+     "title": "💻 Информатика",
+     "title_en": "💻 Computer science"
     },
     {
      "id": "ephys",
-     "title": "⚛️ Физика"
+     "title": "⚛️ Физика",
+     "title_en": "⚛️ Physics"
     },
     {
      "id": "echem",
-     "title": "🧪 Химия"
+     "title": "🧪 Химия",
+     "title_en": "🧪 Chemistry"
     }
-   ]
+   ],
+   "title_en": "🎓 Exams & school",
+   "desc_en": "Subject courses: exam-style tasks with generators, flashcards with spaced repetition, endless levels."
   },
   {
    "id": "learn",
@@ -85,25 +105,32 @@
    "groups": [
     {
      "id": "geo",
-     "title": "🌍 География"
+     "title": "🌍 География",
+     "title_en": "🌍 Geography"
     },
     {
      "id": "lang",
-     "title": "🗣 Языки"
+     "title": "🗣 Языки",
+     "title_en": "🗣 Languages"
     },
     {
      "id": "math",
-     "title": "🔢 Математика"
+     "title": "🔢 Математика",
+     "title_en": "🔢 Math"
     },
     {
      "id": "science",
-     "title": "🧪 Наука"
+     "title": "🧪 Наука",
+     "title_en": "🧪 Science"
     },
     {
      "id": "erudition",
-     "title": "🎓 Эрудиция"
+     "title": "🎓 Эрудиция",
+     "title_en": "🎓 General knowledge"
     }
-   ]
+   ],
+   "title_en": "📚 Study & languages",
+   "desc_en": "Flashcards with spaced repetition and a points test. Levels: 1–3 basic cards, 4–8 intermediate, from 9 advanced (high-school level)."
   },
   {
    "id": "algo",
@@ -112,29 +139,37 @@
    "groups": [
     {
      "id": "practice",
-     "title": "🛠 Практика: пишем сами"
+     "title": "🛠 Практика: пишем сами",
+     "title_en": "🛠 Practice: write it yourself"
     },
     {
      "id": "sort",
-     "title": "📊 Сортировки"
+     "title": "📊 Сортировки",
+     "title_en": "📊 Sorting"
     },
     {
      "id": "search",
-     "title": "🔎 Поиск и графы"
+     "title": "🔎 Поиск и графы",
+     "title_en": "🔎 Search and graphs"
     },
     {
      "id": "ds",
-     "title": "🧱 Структуры данных"
+     "title": "🧱 Структуры данных",
+     "title_en": "🧱 Data structures"
     },
     {
      "id": "dp",
-     "title": "🧮 Динамика"
+     "title": "🧮 Динамика",
+     "title_en": "🧮 Dynamic programming"
     },
     {
      "id": "quiz",
-     "title": "🎯 Запомнить"
+     "title": "🎯 Запомнить",
+     "title_en": "🎯 Remember"
     }
-   ]
+   ],
+   "title_en": "💻 Algorithms",
+   "desc_en": "Understand → remember → write it yourself. Animations with pseudocode and real Python and JavaScript, practice (build the code, be the sort, trace, find the bug) and flashcards."
   },
   {
    "id": "arcade",
@@ -143,19 +178,25 @@
    "groups": [
     {
      "id": "run",
-     "title": "🏃 Бегалки"
+     "title": "🏃 Бегалки",
+     "title_en": "🏃 Runners"
     },
     {
      "id": "skill",
-     "title": "🎯 Ловкость"
+     "title": "🎯 Ловкость",
+     "title_en": "🎯 Skill"
     }
-   ]
+   ],
+   "title_en": "🕹 Chill: arcade",
+   "desc_en": "When your brain is warmed up: runners and skill games."
   },
   {
    "id": "apps",
    "title": "🛠 Для чата",
    "desc": "Не игры, а штуки для группы: рисовалка, мемы, честный жребий, команды, раздел счёта — результат сразу в чат.",
-   "groups": []
+   "groups": [],
+   "title_en": "🛠 For chats",
+   "desc_en": "Not games but tools for a group: drawing, memes, fair draws, teams, bill splitting — results go straight to the chat."
   }
  ],
  "games": [
@@ -170,7 +211,9 @@
     "spatial"
    ],
    "par": 15,
-   "group": "skill"
+   "group": "skill",
+   "title_en": "Snake",
+   "desc_en": "Eat berries, grow and don’t crash."
   },
   {
    "id": "balloon",
@@ -182,7 +225,9 @@
     "coordination"
    ],
    "par": 10,
-   "group": "run"
+   "group": "run",
+   "title_en": "Balloon",
+   "desc_en": "Tap to keep the balloon up and fly between the columns."
   },
   {
    "id": "dodge",
@@ -195,7 +240,9 @@
     "attention"
    ],
    "par": 40,
-   "group": "skill"
+   "group": "skill",
+   "title_en": "Dodge",
+   "desc_en": "Move the platform and dodge falling boulders."
   },
   {
    "id": "tower",
@@ -208,7 +255,9 @@
     "spatial"
    ],
    "par": 15,
-   "group": "skill"
+   "group": "skill",
+   "title_en": "Tower",
+   "desc_en": "Stack blocks exactly — the overhang is cut off."
   },
   {
    "id": "bricks",
@@ -220,7 +269,9 @@
     "coordination"
    ],
    "par": 25,
-   "group": "skill"
+   "group": "skill",
+   "title_en": "Bricks",
+   "desc_en": "Bounce the ball with the paddle and break the wall."
   },
   {
    "id": "jump",
@@ -232,7 +283,9 @@
     "coordination"
    ],
    "par": 120,
-   "group": "run"
+   "group": "run",
+   "title_en": "Jump Up",
+   "desc_en": "Jump higher and higher on platforms. Some break or move."
   },
   {
    "id": "runner",
@@ -245,7 +298,9 @@
     "speed"
    ],
    "par": 60,
-   "group": "run"
+   "group": "run",
+   "title_en": "Runner",
+   "desc_en": "Jump over obstacles on the run. Double jump included."
   },
   {
    "id": "catch",
@@ -258,7 +313,9 @@
     "attention"
    ],
    "par": 30,
-   "group": "skill"
+   "group": "skill",
+   "title_en": "Catcher",
+   "desc_en": "Catch fruit in the basket, avoid bombs."
   },
   {
    "id": "orbit",
@@ -271,7 +328,9 @@
     "flex"
    ],
    "par": 15,
-   "group": "skill"
+   "group": "skill",
+   "title_en": "Orbit",
+   "desc_en": "Reverse around the circle: collect stars, avoid spikes."
   },
   {
    "id": "pong",
@@ -284,7 +343,9 @@
    ],
    "par": 3,
    "group": "skill",
-   "ceil": 2.0
+   "ceil": 2.0,
+   "title_en": "Pong",
+   "desc_en": "Score against the computer. Miss three balls and it’s over."
   },
   {
    "id": "lanes",
@@ -297,7 +358,9 @@
     "coordination",
     "speed"
    ],
-   "par": 150
+   "par": 150,
+   "title_en": "Three Lanes",
+   "desc_en": "Swipe to change lanes, jump barriers, collect coins."
   },
   {
    "id": "jetpack",
@@ -309,7 +372,9 @@
    "skills": [
     "coordination"
    ],
-   "par": 120
+   "par": 120,
+   "title_en": "Jetpack",
+   "desc_en": "Hold to fly up, let go to fall. Dodge the lasers."
   },
   {
    "id": "gravity",
@@ -322,7 +387,9 @@
     "coordination",
     "flex"
    ],
-   "par": 100
+   "par": 100,
+   "title_en": "Gravity",
+   "desc_en": "Tap to flip gravity: run on the floor, then the ceiling."
   },
   {
    "id": "slalom",
@@ -335,7 +402,9 @@
     "coordination",
     "attention"
    ],
-   "par": 20
+   "par": 20,
+   "title_en": "Slalom",
+   "desc_en": "Pass the gates and avoid the trees on an ever-steeper slope."
   },
   {
    "id": "traffic",
@@ -348,7 +417,9 @@
     "coordination",
     "speed"
    ],
-   "par": 120
+   "par": 120,
+   "title_en": "Traffic",
+   "desc_en": "Change lanes and overtake. Close passes give a bonus."
   },
   {
    "id": "ninja",
@@ -360,7 +431,9 @@
    "skills": [
     "coordination"
    ],
-   "par": 100
+   "par": 100,
+   "title_en": "Ninja",
+   "desc_en": "Jump between walls, flying over spikes."
   },
   {
    "id": "reaction",
@@ -375,7 +448,9 @@
     "speed"
    ],
    "par": 320,
-   "floor": 0.65
+   "floor": 0.65,
+   "title_en": "Reaction",
+   "desc_en": "Tap as soon as the screen turns green. 5 tries, average counts."
   },
   {
    "id": "tapper",
@@ -390,7 +465,10 @@
    ],
    "par": 65,
    "timed": true,
-   "ceil": 1.3
+   "ceil": 1.3,
+   "title_en": "Tapper",
+   "desc_en": "How many taps can you do in 10 seconds?",
+   "unit_en": "taps"
   },
   {
    "id": "moles",
@@ -404,7 +482,9 @@
     "attention"
    ],
    "par": 25,
-   "timed": true
+   "timed": true,
+   "title_en": "Whack-a-Hamster",
+   "desc_en": "Whack the hamsters, leave the bombs. 30 seconds."
   },
   {
    "id": "aim",
@@ -418,7 +498,9 @@
     "coordination"
    ],
    "par": 25,
-   "timed": true
+   "timed": true,
+   "title_en": "Aim",
+   "desc_en": "Hit targets before they vanish. 30 seconds."
   },
   {
    "id": "nogo",
@@ -431,7 +513,9 @@
     "attention",
     "speed"
    ],
-   "par": 30
+   "par": 30,
+   "title_en": "Don’t Tap Red",
+   "desc_en": "Tap green circles, never the red ones."
   },
   {
    "id": "rhythm",
@@ -444,7 +528,9 @@
     "speed"
    ],
    "par": 30,
-   "ceil": 2.2
+   "ceil": 2.2,
+   "title_en": "Rhythm",
+   "desc_en": "Tap when the circle meets the ring."
   },
   {
    "id": "sort",
@@ -458,7 +544,9 @@
     "flex"
    ],
    "par": 25,
-   "timed": true
+   "timed": true,
+   "title_en": "Sorting",
+   "desc_en": "Swipe pictures left and right by category. 30 seconds."
   },
   {
    "id": "math",
@@ -471,7 +559,9 @@
     "math"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "title_en": "Mental Math",
+   "desc_en": "Solve sums against the clock. A mistake costs 3 seconds."
   },
   {
    "id": "compare",
@@ -485,7 +575,9 @@
     "speed"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "title_en": "More or Less",
+   "desc_en": "Which expression is bigger? 30 seconds."
   },
   {
    "id": "count",
@@ -499,7 +591,9 @@
     "math"
    ],
    "par": 10,
-   "ceil": 2.0
+   "ceil": 2.0,
+   "title_en": "Count the Dots",
+   "desc_en": "Dots flash for a moment — how many were there?"
   },
   {
    "id": "sequence",
@@ -512,7 +606,9 @@
     "memory"
    ],
    "par": 7,
-   "ceil": 1.6
+   "ceil": 1.6,
+   "title_en": "Repeat",
+   "desc_en": "Remember the order the buttons light up and repeat it."
   },
   {
    "id": "memory",
@@ -528,7 +624,10 @@
     "spatial"
    ],
    "par": 18,
-   "floor": 0.72
+   "floor": 0.72,
+   "title_en": "Pairs",
+   "desc_en": "Find all pairs of cards in as few moves as possible.",
+   "unit_en": "moves"
   },
   {
    "id": "digits",
@@ -542,7 +641,10 @@
     "memory"
    ],
    "par": 7,
-   "ceil": 1.4
+   "ceil": 1.4,
+   "title_en": "Number Memory",
+   "desc_en": "Remember the number and type it. One digit longer each time.",
+   "unit_en": "digits"
   },
   {
    "id": "stroop",
@@ -556,7 +658,9 @@
     "flex"
    ],
    "par": 20,
-   "timed": true
+   "timed": true,
+   "title_en": "Colour or Word",
+   "desc_en": "Pick the colour the word is written in, not the word itself."
   },
   {
    "id": "oddone",
@@ -569,7 +673,9 @@
     "attention"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "title_en": "Odd One Out",
+   "desc_en": "Find the picture that differs from the rest. 30 seconds."
   },
   {
    "id": "shade",
@@ -582,7 +688,9 @@
     "attention"
    ],
    "par": 12,
-   "timed": true
+   "timed": true,
+   "title_en": "Shade",
+   "desc_en": "Find the square of a slightly different colour. Harder every level."
   },
   {
    "id": "schulte",
@@ -598,7 +706,9 @@
     "speed"
    ],
    "par": 25000,
-   "floor": 0.6
+   "floor": 0.6,
+   "title_en": "Number Hunt",
+   "desc_en": "Tap numbers 1 to 25 as fast as you can."
   },
   {
    "id": "blocks",
@@ -611,7 +721,9 @@
     "spatial",
     "logic"
    ],
-   "par": 150
+   "par": 150,
+   "title_en": "Block Fit",
+   "desc_en": "Place pieces on an 8×8 board. Full rows or columns clear. Think where the next one fits."
   },
   {
    "id": "merge",
@@ -624,7 +736,9 @@
     "logic",
     "spatial"
    ],
-   "par": 600
+   "par": 600,
+   "title_en": "Evolution",
+   "desc_en": "Slide the board: two identical pieces merge into the next stage. Grow an egg into a dragon."
   },
   {
    "id": "tubes",
@@ -638,7 +752,9 @@
     "spatial"
    ],
    "par": 12,
-   "timed": true
+   "timed": true,
+   "title_en": "Test Tubes",
+   "desc_en": "Pour colours until each tube holds one colour. A generator makes every puzzle new."
   },
   {
    "id": "nonogram",
@@ -651,7 +767,9 @@
     "logic"
    ],
    "par": 60,
-   "timed": true
+   "timed": true,
+   "title_en": "Nonogram",
+   "desc_en": "Restore the picture from the numbers by rows and columns. The grid grows."
   },
   {
    "id": "switches",
@@ -664,7 +782,9 @@
     "logic"
    ],
    "par": 4,
-   "timed": true
+   "timed": true,
+   "title_en": "Lights Out",
+   "desc_en": "Turn off all lamps: a tap toggles a lamp and its neighbours. 90 seconds."
   },
   {
    "id": "fifteen",
@@ -680,7 +800,9 @@
     "spatial"
    ],
    "par": 120000,
-   "floor": 0.55
+   "floor": 0.55,
+   "title_en": "Fifteen Puzzle",
+   "desc_en": "Put the tiles from 1 to 15 in order."
   },
   {
    "id": "maze",
@@ -694,7 +816,9 @@
     "logic"
    ],
    "par": 5,
-   "timed": true
+   "timed": true,
+   "title_en": "Maze",
+   "desc_en": "Swipe the dot to the exit. How many mazes can you solve?"
   },
   {
    "id": "anagram",
@@ -707,7 +831,9 @@
     "language"
    ],
    "par": 10,
-   "timed": true
+   "timed": true,
+   "title_en": "Anagrams",
+   "desc_en": "Make a word from shuffled letters. 60 seconds."
   },
   {
    "id": "nback",
@@ -720,7 +846,9 @@
     "memory"
    ],
    "par": 15,
-   "ceil": 2.0
+   "ceil": 2.0,
+   "title_en": "N-Back",
+   "desc_en": "The classic working-memory trainer: does the cell match the one N steps back?"
   },
   {
    "id": "matrix",
@@ -735,7 +863,10 @@
     "spatial"
    ],
    "par": 7,
-   "ceil": 1.8
+   "ceil": 1.8,
+   "title_en": "Memory Matrix",
+   "desc_en": "Remember which cells flashed and find them all. The grid grows.",
+   "unit_en": "cells"
   },
   {
    "id": "pasat",
@@ -749,7 +880,9 @@
     "math"
    ],
    "par": 15,
-   "ceil": 2.0
+   "ceil": 2.0,
+   "title_en": "Running Sum",
+   "desc_en": "Add the last two numbers while the pace speeds up."
   },
   {
    "id": "flanker",
@@ -762,7 +895,9 @@
     "attention"
    ],
    "par": 25,
-   "timed": true
+   "timed": true,
+   "title_en": "Arrows",
+   "desc_en": "Which way does the middle arrow point? Don’t let the neighbours fool you."
   },
   {
    "id": "switch",
@@ -775,7 +910,9 @@
     "flex"
    ],
    "par": 25,
-   "timed": true
+   "timed": true,
+   "title_en": "Task Switch",
+   "desc_en": "The rule depends on position: top “even?”, bottom “greater than 5?”."
   },
   {
    "id": "sudoku",
@@ -790,7 +927,9 @@
     "logic"
    ],
    "par": 180000,
-   "floor": 0.5
+   "floor": 0.5,
+   "title_en": "Mini Sudoku",
+   "desc_en": "6×6 sudoku with a unique solution. Against the clock."
   },
   {
    "id": "hanoi",
@@ -803,7 +942,9 @@
     "logic"
    ],
    "par": 12,
-   "timed": true
+   "timed": true,
+   "title_en": "Tower of Hanoi",
+   "desc_en": "Move the tower in the fewest moves. One more disc each time."
   },
   {
    "id": "bulls",
@@ -818,7 +959,10 @@
     "logic"
    ],
    "par": 7,
-   "floor": 0.85
+   "floor": 0.85,
+   "title_en": "Bulls and Cows",
+   "desc_en": "Crack a 4-digit code from hints in as few tries as possible.",
+   "unit_en": "tries"
   },
   {
    "id": "sumtarget",
@@ -832,7 +976,9 @@
     "logic"
    ],
    "par": 25,
-   "timed": true
+   "timed": true,
+   "title_en": "Make the Sum",
+   "desc_en": "Select numbers that add up to the target. 60 seconds."
   },
   {
    "id": "series",
@@ -845,7 +991,9 @@
     "logic"
    ],
    "par": 10,
-   "timed": true
+   "timed": true,
+   "title_en": "Number Series",
+   "desc_en": "Find the pattern in the series. The series get trickier."
   },
   {
    "id": "scales",
@@ -859,7 +1007,9 @@
     "math"
    ],
    "par": 10,
-   "timed": true
+   "timed": true,
+   "title_en": "Fruit Equations",
+   "desc_en": "Each fruit is a number. Solve the picture equations."
   },
   {
    "id": "raven",
@@ -872,7 +1022,9 @@
     "logic"
    ],
    "par": 10,
-   "timed": true
+   "timed": true,
+   "title_en": "Matrices",
+   "desc_en": "Find the pattern in a 3×3 grid: what belongs in place of “?”."
   },
   {
    "id": "rotation",
@@ -885,7 +1037,9 @@
     "spatial"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "title_en": "Rotation",
+   "desc_en": "Is it the same shape rotated, or its mirror image? Mental rotation."
   },
   {
    "id": "capitals",
@@ -898,7 +1052,9 @@
     "knowledge"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "title_en": "World Capitals",
+   "desc_en": "All 194 countries: country → capital and back. Options from the same continent."
   },
   {
    "id": "flags",
@@ -911,7 +1067,9 @@
     "knowledge"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "title_en": "Flags",
+   "desc_en": "Flags of all 194 countries."
   },
   {
    "id": "continents",
@@ -924,7 +1082,9 @@
     "knowledge"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "title_en": "Continents",
+   "desc_en": "Which continent is the country in? All 194 countries."
   },
   {
    "id": "english",
@@ -937,7 +1097,9 @@
     "language"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "title_en": "Russian: Basic Words",
+   "desc_en": "Learn Russian: basic words in both directions."
   },
   {
    "id": "english-b",
@@ -950,7 +1112,9 @@
     "language"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "title_en": "Russian: Advanced Words",
+   "desc_en": "110 words of upper-intermediate level in both directions."
   },
   {
    "id": "ruswords",
@@ -963,7 +1127,8 @@
     "language"
    ],
    "par": 20,
-   "timed": true
+   "timed": true,
+   "lang": "ru"
   },
   {
    "id": "tsya",
@@ -976,7 +1141,8 @@
     "language"
    ],
    "par": 20,
-   "timed": true
+   "timed": true,
+   "lang": "ru"
   },
   {
    "id": "multiply",
@@ -989,7 +1155,9 @@
     "math"
    ],
    "par": 20,
-   "timed": true
+   "timed": true,
+   "title_en": "Multiplication",
+   "desc_en": "From times tables to two-digit by two-digit and squares."
   },
   {
    "id": "roman",
@@ -1002,7 +1170,9 @@
     "math"
    ],
    "par": 12,
-   "timed": true
+   "timed": true,
+   "title_en": "Roman Numerals",
+   "desc_en": "Convert Roman numerals to ordinary numbers and back."
   },
   {
    "id": "elements",
@@ -1015,7 +1185,9 @@
     "knowledge"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "title_en": "Chemical Elements",
+   "desc_en": "63 elements: symbol ↔ name. Difficulty grows with the atomic number."
   },
   {
    "id": "ege-chem",
@@ -1028,7 +1200,9 @@
     "knowledge"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "title_en": "Substances & Formulas",
+   "desc_en": "H₂SO₄, NaHCO₃, C₆H₁₂O₆… — formulas and names of substances both ways."
   },
   {
    "id": "algo-bubble",
@@ -1039,7 +1213,9 @@
    "desc": "Соседи меняются местами, пока всё не встанет по порядку.",
    "skills": [],
    "par": 1,
-   "app": true
+   "app": true,
+   "title_en": "Bubble Sort",
+   "desc_en": "Neighbours swap until everything is in order."
   },
   {
    "id": "algo-selection",
@@ -1050,7 +1226,9 @@
    "desc": "Каждый раз ищем минимум и ставим в начало.",
    "skills": [],
    "par": 1,
-   "app": true
+   "app": true,
+   "title_en": "Selection Sort",
+   "desc_en": "Find the minimum each time and move it to the front."
   },
   {
    "id": "algo-insertion",
@@ -1061,7 +1239,9 @@
    "desc": "Как карты в руке: вставляем каждый элемент на своё место.",
    "skills": [],
    "par": 1,
-   "app": true
+   "app": true,
+   "title_en": "Insertion Sort",
+   "desc_en": "Like cards in your hand: insert each element into place."
   },
   {
    "id": "algo-merge",
@@ -1072,7 +1252,9 @@
    "desc": "Делим пополам, сортируем и сливаем.",
    "skills": [],
    "par": 1,
-   "app": true
+   "app": true,
+   "title_en": "Merge Sort",
+   "desc_en": "Split in half, sort and merge."
   },
   {
    "id": "algo-quick",
@@ -1083,7 +1265,9 @@
    "desc": "Опорный элемент и разбиение на меньшие и большие.",
    "skills": [],
    "par": 1,
-   "app": true
+   "app": true,
+   "title_en": "Quicksort",
+   "desc_en": "A pivot and partitioning into smaller and larger."
   },
   {
    "id": "algo-binsearch",
@@ -1094,7 +1278,9 @@
    "desc": "Каждый шаг вдвое сужает поиск.",
    "skills": [],
    "par": 1,
-   "app": true
+   "app": true,
+   "title_en": "Binary Search",
+   "desc_en": "Each step halves the search."
   },
   {
    "id": "algo-bfs",
@@ -1105,7 +1291,9 @@
    "desc": "Волна от старта находит кратчайший путь.",
    "skills": [],
    "par": 1,
-   "app": true
+   "app": true,
+   "title_en": "Breadth-First Search (BFS)",
+   "desc_en": "A wave from the start finds the shortest path."
   },
   {
    "id": "algo-dfs",
@@ -1116,7 +1304,9 @@
    "desc": "Идём до упора и возвращаемся из тупиков.",
    "skills": [],
    "par": 1,
-   "app": true
+   "app": true,
+   "title_en": "Depth-First Search (DFS)",
+   "desc_en": "Go as far as possible and back out of dead ends."
   },
   {
    "id": "algo-astar",
@@ -1127,7 +1317,9 @@
    "desc": "Кратчайший путь с подсказкой «куда ближе к цели».",
    "skills": [],
    "par": 1,
-   "app": true
+   "app": true,
+   "title_en": "A* Search",
+   "desc_en": "Shortest path with a hint of “closer to the goal”."
   },
   {
    "id": "algo-stackqueue",
@@ -1138,7 +1330,9 @@
    "desc": "LIFO против FIFO на одних и тех же операциях.",
    "skills": [],
    "par": 1,
-   "app": true
+   "app": true,
+   "title_en": "Stack and Queue",
+   "desc_en": "LIFO vs FIFO on the same operations."
   },
   {
    "id": "algo-bst",
@@ -1149,7 +1343,9 @@
    "desc": "Вставка и поиск в двоичном дереве поиска.",
    "skills": [],
    "par": 1,
-   "app": true
+   "app": true,
+   "title_en": "Binary Search Tree",
+   "desc_en": "Insert and search in a binary search tree."
   },
   {
    "id": "algo-heap",
@@ -1160,7 +1356,9 @@
    "desc": "Максимум всегда в корне: всплытие и просеивание.",
    "skills": [],
    "par": 1,
-   "app": true
+   "app": true,
+   "title_en": "Heap",
+   "desc_en": "The max is always at the root: sift up and sift down."
   },
   {
    "id": "algo-hash",
@@ -1171,7 +1369,9 @@
    "desc": "Хеш-функция, корзины и коллизии.",
    "skills": [],
    "par": 1,
-   "app": true
+   "app": true,
+   "title_en": "Hash Table",
+   "desc_en": "Hash function, buckets and collisions."
   },
   {
    "id": "bigo",
@@ -1184,7 +1384,9 @@
     "logic"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "title_en": "Algorithm Complexity",
+   "desc_en": "O(1), O(log n), O(n²)… Flashcards and a points test."
   },
   {
    "id": "parsons",
@@ -1198,7 +1400,9 @@
     "language"
    ],
    "par": 5,
-   "timed": true
+   "timed": true,
+   "title_en": "Build the Code",
+   "desc_en": "The lines of a working function are shuffled — put them in order. The best way to learn to write code."
   },
   {
    "id": "sortplay",
@@ -1212,7 +1416,9 @@
     "attention"
    ],
    "par": 25,
-   "timed": true
+   "timed": true,
+   "title_en": "Be the Sort",
+   "desc_en": "Make the swaps that bubble, selection or insertion sort would make."
   },
   {
    "id": "trace",
@@ -1226,7 +1432,9 @@
     "memory"
    ],
    "par": 12,
-   "timed": true
+   "timed": true,
+   "title_en": "What Does It Print?",
+   "desc_en": "Run a Python program in your head and choose the output."
   },
   {
    "id": "findbug",
@@ -1240,7 +1448,9 @@
     "attention"
    ],
    "par": 8,
-   "timed": true
+   "timed": true,
+   "title_en": "Find the Bug",
+   "desc_en": "One line of the function has a bug — find it and learn how to fix it."
   },
   {
    "id": "algo-heapsort",
@@ -1251,7 +1461,9 @@
    "desc": "Куча и перенос максимума в конец.",
    "skills": [],
    "par": 1,
-   "app": true
+   "app": true,
+   "title_en": "Heapsort",
+   "desc_en": "A heap and moving the maximum to the end."
   },
   {
    "id": "algo-counting",
@@ -1262,7 +1474,9 @@
    "desc": "Сортировка без сравнений — считаем значения.",
    "skills": [],
    "par": 1,
-   "app": true
+   "app": true,
+   "title_en": "Counting Sort",
+   "desc_en": "Sorting without comparisons — count the values."
   },
   {
    "id": "algo-dijkstra",
@@ -1273,7 +1487,9 @@
    "desc": "Кратчайшие пути по дорогам разной длины.",
    "skills": [],
    "par": 1,
-   "app": true
+   "app": true,
+   "title_en": "Dijkstra",
+   "desc_en": "Shortest paths over roads of different lengths."
   },
   {
    "id": "algo-traversal",
@@ -1284,7 +1500,9 @@
    "desc": "Прямой, симметричный и обратный обход.",
    "skills": [],
    "par": 1,
-   "app": true
+   "app": true,
+   "title_en": "Tree Traversals",
+   "desc_en": "Pre-order, in-order and post-order."
   },
   {
    "id": "algo-linkedlist",
@@ -1295,7 +1513,9 @@
    "desc": "Разворот списка тремя указателями.",
    "skills": [],
    "par": 1,
-   "app": true
+   "app": true,
+   "title_en": "Linked List",
+   "desc_en": "Reversing a list with three pointers."
   },
   {
    "id": "algo-coins",
@@ -1306,7 +1526,9 @@
    "desc": "Динамическое программирование: таблица ответов для всех сумм.",
    "skills": [],
    "par": 1,
-   "app": true
+   "app": true,
+   "title_en": "Coin Change (DP)",
+   "desc_en": "Dynamic programming: a table of answers for every amount."
   },
   {
    "id": "algo-ideas",
@@ -1320,7 +1542,9 @@
     "knowledge"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "title_en": "Algorithm Ideas",
+   "desc_en": "Recognise the algorithm from its idea — and the other way round."
   },
   {
    "id": "ds-choice",
@@ -1334,7 +1558,9 @@
     "knowledge"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "title_en": "What to Use?",
+   "desc_en": "Stack, queue, heap, dictionary or BFS — what fits the task."
   },
   {
    "id": "py-complexity",
@@ -1347,7 +1573,9 @@
     "knowledge"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "title_en": "Python Complexity",
+   "desc_en": "append, pop(0), x in set, sorted… — what each costs."
   },
   {
    "id": "draw",
@@ -1357,7 +1585,9 @@
    "desc": "Нарисуй и отправь в чат или сохрани файлом.",
    "skills": [],
    "par": 1,
-   "app": true
+   "app": true,
+   "title_en": "Drawing",
+   "desc_en": "Draw and send it to the chat or save it as a file."
   },
   {
    "id": "meme",
@@ -1367,7 +1597,9 @@
    "desc": "Фото или шаблон + подпись сверху и снизу.",
    "skills": [],
    "par": 1,
-   "app": true
+   "app": true,
+   "title_en": "Memes",
+   "desc_en": "A photo or template + top and bottom captions."
   },
   {
    "id": "wheel",
@@ -1377,7 +1609,9 @@
    "desc": "Куда идём? Кто моет посуду? Честно выбирает сервер, бот объявляет в чате.",
    "skills": [],
    "par": 1,
-   "app": true
+   "app": true,
+   "title_en": "Wheel of Choice",
+   "desc_en": "Where are we going? Who does the dishes? The server picks fairly, the bot announces it in the chat."
   },
   {
    "id": "dice",
@@ -1387,7 +1621,9 @@
    "desc": "Честный бросок: результат публикует бот, подделать нельзя.",
    "skills": [],
    "par": 1,
-   "app": true
+   "app": true,
+   "title_en": "Dice & Coin",
+   "desc_en": "A fair roll: the bot posts the result, it can’t be faked."
   },
   {
    "id": "teams",
@@ -1397,7 +1633,9 @@
    "desc": "Честно делим участников на команды.",
    "skills": [],
    "par": 1,
-   "app": true
+   "app": true,
+   "title_en": "Teams",
+   "desc_en": "Split players into teams fairly."
   },
   {
    "id": "split",
@@ -1407,7 +1645,9 @@
    "desc": "Кто сколько заплатил → кто кому сколько переводит.",
    "skills": [],
    "par": 1,
-   "app": true
+   "app": true,
+   "title_en": "Split the Bill",
+   "desc_en": "Who paid what → who pays whom."
   },
   {
    "id": "syllogism",
@@ -1420,7 +1660,9 @@
     "logic"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "title_en": "Logical Conclusions",
+   "desc_en": "Does the conclusion follow from the premises? Made-up words — only logic works."
   },
   {
    "id": "biases",
@@ -1434,7 +1676,9 @@
     "knowledge"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "title_en": "Cognitive Biases",
+   "desc_en": "Thinking traps: anchoring, survivorship bias, confirmation bias…"
   },
   {
    "id": "fallacies",
@@ -1448,7 +1692,9 @@
     "language"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "title_en": "Logical Fallacies",
+   "desc_en": "Straw man, false dilemma, ad hominem — spot the trick from an example."
   },
   {
    "id": "estimate",
@@ -1462,7 +1708,9 @@
     "speed"
    ],
    "par": 12,
-   "timed": true
+   "timed": true,
+   "title_en": "Estimate",
+   "desc_en": "Estimate the result without exact calculation: number sense."
   },
   {
    "id": "nback2",
@@ -1476,7 +1724,9 @@
     "attention"
    ],
    "par": 15,
-   "timed": false
+   "timed": false,
+   "title_en": "Dual N-Back",
+   "desc_en": "Remember both the place and the letter N steps back. The working-memory classic."
   },
   {
    "id": "chess",
@@ -1490,7 +1740,9 @@
     "spatial"
    ],
    "par": 5,
-   "timed": true
+   "timed": true,
+   "title_en": "Chess Puzzles",
+   "desc_en": "1500 puzzles from the open Lichess database. Difficulty adapts to you."
   },
   {
    "id": "phrases",
@@ -1503,7 +1755,9 @@
     "language"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "title_en": "Russian Phrases",
+   "desc_en": "800 everyday phrases from Tatoeba, both directions."
   },
   {
    "id": "trivia",
@@ -1517,7 +1771,9 @@
     "language"
    ],
    "par": 12,
-   "timed": true
+   "timed": true,
+   "title_en": "Trivia",
+   "desc_en": "600 general-knowledge questions — Open Trivia Database."
   },
   {
    "id": "neighbors",
@@ -1530,7 +1786,9 @@
     "knowledge"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "title_en": "Neighbouring Countries",
+   "desc_en": "Which countries share a border? All countries of the world."
   },
   {
    "id": "area",
@@ -1543,7 +1801,9 @@
     "knowledge"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "title_en": "Which Is Bigger?",
+   "desc_en": "Which country has the larger area? Pairs get closer in size."
   },
   {
    "id": "biology",
@@ -1556,7 +1816,9 @@
     "knowledge"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "title_en": "Biology: Cells & Organisms",
+   "desc_en": "Organelles, cell division, genetics, blood, ecology — high-school terms."
   },
   {
    "id": "ege-calc",
@@ -1569,7 +1831,9 @@
     "math"
    ],
    "par": 12,
-   "timed": true
+   "timed": true,
+   "title_en": "Arithmetic",
+   "desc_en": "Fractions, decimals, powers, roots — exam style."
   },
   {
    "id": "ege-eq",
@@ -1583,7 +1847,9 @@
     "logic"
    ],
    "par": 12,
-   "timed": true
+   "timed": true,
+   "title_en": "Equations",
+   "desc_en": "Linear, quadratic, exponential, logarithmic."
   },
   {
    "id": "ege-log",
@@ -1596,7 +1862,9 @@
     "math"
    ],
    "par": 12,
-   "timed": true
+   "timed": true,
+   "title_en": "Powers & Logarithms",
+   "desc_en": "Properties of logarithms and powers."
   },
   {
    "id": "ege-pct",
@@ -1609,7 +1877,9 @@
     "math"
    ],
    "par": 12,
-   "timed": true
+   "timed": true,
+   "title_en": "Percent & Probability",
+   "desc_en": "Percentages, price changes, classical probability."
   },
   {
    "id": "ege-deriv",
@@ -1622,7 +1892,9 @@
     "math"
    ],
    "par": 12,
-   "timed": true
+   "timed": true,
+   "title_en": "Derivatives & Sequences",
+   "desc_en": "Derivative of a polynomial at a point, arithmetic and geometric sequences."
   },
   {
    "id": "ege-trig",
@@ -1635,7 +1907,9 @@
     "math"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "title_en": "Trig Values",
+   "desc_en": "sin, cos, tan of the key angles."
   },
   {
    "id": "ege-stress",
@@ -1648,7 +1922,8 @@
     "language"
    ],
    "par": 20,
-   "timed": true
+   "timed": true,
+   "lang": "ru"
   },
   {
    "id": "ege-authors",
@@ -1662,7 +1937,8 @@
     "knowledge"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "lang": "ru"
   },
   {
    "id": "ege-heroes",
@@ -1676,7 +1952,8 @@
     "knowledge"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "lang": "ru"
   },
   {
    "id": "ege-dates",
@@ -1689,7 +1966,8 @@
     "knowledge"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "lang": "ru"
   },
   {
    "id": "ege-bases",
@@ -1703,7 +1981,9 @@
     "logic"
    ],
    "par": 12,
-   "timed": true
+   "timed": true,
+   "title_en": "Number Systems",
+   "desc_en": "Binary, octal, hexadecimal, decimal."
   },
   {
    "id": "ege-bool",
@@ -1716,7 +1996,9 @@
     "logic"
    ],
    "par": 8,
-   "timed": true
+   "timed": true,
+   "title_en": "Boolean Expressions",
+   "desc_en": "For how many inputs is the expression true?"
   },
   {
    "id": "ege-phys",
@@ -1730,7 +2012,9 @@
     "math"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "title_en": "Formulas & Units",
+   "desc_en": "Key formulas of mechanics, electricity, optics and SI units."
   },
   {
    "id": "ege-paronyms",
@@ -1743,7 +2027,8 @@
     "language"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "lang": "ru"
   },
   {
    "id": "ege-litterms",
@@ -1757,7 +2042,8 @@
     "knowledge"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "lang": "ru"
   },
   {
    "id": "ege-rulers",
@@ -1770,7 +2056,8 @@
     "knowledge"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "lang": "ru"
   },
   {
    "id": "ege-art",
@@ -1783,7 +2070,8 @@
     "knowledge"
    ],
    "par": 12,
-   "timed": true
+   "timed": true,
+   "lang": "ru"
   },
   {
    "id": "ege-arch",
@@ -1796,7 +2084,8 @@
     "knowledge"
    ],
    "par": 12,
-   "timed": true
+   "timed": true,
+   "lang": "ru"
   },
   {
    "id": "ege-social",
@@ -1810,59 +2099,245 @@
     "knowledge"
    ],
    "par": 15,
-   "timed": true
+   "timed": true,
+   "title_en": "Civics & Economics Terms",
+   "desc_en": "Economy, politics, law, society — terms and definitions."
+  },
+  {
+   "id": "en-confused",
+   "title": "Похожие английские слова",
+   "emoji": "🔀",
+   "section": "ege",
+   "group": "erus",
+   "desc": "Affect or effect? Their or there? Pick the word that fits.",
+   "skills": [
+    "language"
+   ],
+   "par": 15,
+   "timed": true,
+   "title_en": "Commonly Confused Words",
+   "desc_en": "Affect or effect? Their or there? Pick the word that fits.",
+   "lang": "en"
+  },
+  {
+   "id": "en-spelling",
+   "title": "Орфография английского",
+   "emoji": "✍️",
+   "section": "ege",
+   "group": "erus",
+   "desc": "The most commonly misspelled English words.",
+   "skills": [
+    "language"
+   ],
+   "par": 15,
+   "timed": true,
+   "title_en": "Spelling",
+   "desc_en": "The most commonly misspelled English words.",
+   "lang": "en"
+  },
+  {
+   "id": "en-grammar",
+   "title": "Грамматика английского",
+   "emoji": "📝",
+   "section": "ege",
+   "group": "erus",
+   "desc": "Agreement, tenses, who/whom, lie/lay, fewer/less.",
+   "skills": [
+    "language"
+   ],
+   "par": 15,
+   "timed": true,
+   "title_en": "Grammar & Usage",
+   "desc_en": "Agreement, tenses, who/whom, lie/lay, fewer/less.",
+   "lang": "en"
+  },
+  {
+   "id": "en-vocab",
+   "title": "Академическая лексика",
+   "emoji": "📚",
+   "section": "ege",
+   "group": "erus",
+   "desc": "SAT and A-level words: word ↔ definition.",
+   "skills": [
+    "language",
+    "knowledge"
+   ],
+   "par": 15,
+   "timed": true,
+   "title_en": "Advanced Vocabulary",
+   "desc_en": "SAT and A-level words: word ↔ definition.",
+   "lang": "en"
+  },
+  {
+   "id": "en-litterms",
+   "title": "Литературные термины (англ.)",
+   "emoji": "🖋",
+   "section": "ege",
+   "group": "elit",
+   "desc": "Devices, structure, verse, genre and movements.",
+   "skills": [
+    "language",
+    "knowledge"
+   ],
+   "par": 15,
+   "timed": true,
+   "title_en": "Literary Terms",
+   "desc_en": "Devices, structure, verse, genre and movements.",
+   "lang": "en"
+  },
+  {
+   "id": "en-authors",
+   "title": "Авторы мировой литературы",
+   "emoji": "✒️",
+   "section": "ege",
+   "group": "elit",
+   "desc": "Classics of English-language and world literature.",
+   "skills": [
+    "language",
+    "knowledge"
+   ],
+   "par": 15,
+   "timed": true,
+   "title_en": "Who Wrote It?",
+   "desc_en": "Classics of English-language and world literature.",
+   "lang": "en"
+  },
+  {
+   "id": "en-heroes",
+   "title": "Герои мировой литературы",
+   "emoji": "🎭",
+   "section": "ege",
+   "group": "elit",
+   "desc": "Which book is the character from?",
+   "skills": [
+    "language",
+    "knowledge"
+   ],
+   "par": 15,
+   "timed": true,
+   "title_en": "Famous Characters",
+   "desc_en": "Which book is the character from?",
+   "lang": "en"
+  },
+  {
+   "id": "en-dates",
+   "title": "Даты мировой истории",
+   "emoji": "📜",
+   "section": "ege",
+   "group": "ehist",
+   "desc": "Key dates of world, British and US history — both ways.",
+   "skills": [
+    "knowledge"
+   ],
+   "par": 15,
+   "timed": true,
+   "title_en": "History Dates",
+   "desc_en": "Key dates of world, British and US history — both ways.",
+   "lang": "en"
+  },
+  {
+   "id": "en-presidents",
+   "title": "Президенты США",
+   "emoji": "🇺🇸",
+   "section": "ege",
+   "group": "ehist",
+   "desc": "Under which president? Events, laws and documents.",
+   "skills": [
+    "knowledge"
+   ],
+   "par": 15,
+   "timed": true,
+   "title_en": "US Presidents",
+   "desc_en": "Under which president? Events, laws and documents.",
+   "lang": "en"
+  },
+  {
+   "id": "en-art",
+   "title": "Шедевры живописи",
+   "emoji": "🖼",
+   "section": "ege",
+   "group": "ehist",
+   "desc": "Who painted it? ~320 paintings from the open Wikidata database.",
+   "skills": [
+    "knowledge"
+   ],
+   "par": 12,
+   "timed": true,
+   "title_en": "Famous Paintings",
+   "desc_en": "Who painted it? ~320 paintings from the open Wikidata database.",
+   "lang": "en"
   }
  ],
  "skills": [
   {
    "id": "speed",
    "title": "⚡ Скорость",
-   "desc": "Как быстро ты замечаешь и реагируешь"
+   "desc": "Как быстро ты замечаешь и реагируешь",
+   "title_en": "⚡ Speed",
+   "desc_en": "How fast you notice and react"
   },
   {
    "id": "attention",
    "title": "🎯 Внимание",
-   "desc": "Фокус и умение не отвлекаться"
+   "desc": "Фокус и умение не отвлекаться",
+   "title_en": "🎯 Attention",
+   "desc_en": "Focus and resisting distraction"
   },
   {
    "id": "memory",
    "title": "💭 Память",
-   "desc": "Рабочая и зрительная память"
+   "desc": "Рабочая и зрительная память",
+   "title_en": "💭 Memory",
+   "desc_en": "Working and visual memory"
   },
   {
    "id": "flex",
    "title": "🔀 Гибкость",
-   "desc": "Переключение между правилами"
+   "desc": "Переключение между правилами",
+   "title_en": "🔀 Flexibility",
+   "desc_en": "Switching between rules"
   },
   {
    "id": "logic",
    "title": "🧩 Логика",
-   "desc": "Рассуждение и планирование"
+   "desc": "Рассуждение и планирование",
+   "title_en": "🧩 Logic",
+   "desc_en": "Reasoning and planning"
   },
   {
    "id": "spatial",
    "title": "📐 Пространство",
-   "desc": "Мысленное вращение и ориентация"
+   "desc": "Мысленное вращение и ориентация",
+   "title_en": "📐 Spatial",
+   "desc_en": "Mental rotation and orientation"
   },
   {
    "id": "math",
    "title": "🧮 Счёт",
-   "desc": "Устный счёт и числа"
+   "desc": "Устный счёт и числа",
+   "title_en": "🧮 Numbers",
+   "desc_en": "Mental arithmetic and numbers"
   },
   {
    "id": "language",
    "title": "🗣 Язык",
-   "desc": "Слова, правила, иностранный"
+   "desc": "Слова, правила, иностранный",
+   "title_en": "🗣 Language",
+   "desc_en": "Words, rules, foreign languages"
   },
   {
    "id": "knowledge",
    "title": "📚 Знания",
-   "desc": "География, наука, факты"
+   "desc": "География, наука, факты",
+   "title_en": "📚 Knowledge",
+   "desc_en": "Geography, science, facts"
   },
   {
    "id": "coordination",
    "title": "🕹 Координация",
-   "desc": "Точность и ловкость движений"
+   "desc": "Точность и ловкость движений",
+   "title_en": "🕹 Coordination",
+   "desc_en": "Precision and dexterity"
   }
  ]
 }

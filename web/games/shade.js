@@ -1,5 +1,5 @@
 Arcade.register({
-  howto: 'Один квадрат чуть светлее остальных — найди его. Поле растёт, разница тает. Ошибка — минус 3 секунды. 30 секунд.',
+  howto: L('Один квадрат чуть светлее остальных — найди его. Поле растёт, разница тает. Ошибка — минус 3 секунды. 30 секунд.', 'One square is slightly lighter than the rest — find it. The grid grows and the difference fades. A mistake costs 3 seconds. 30 seconds.'),
   start(api) {
     const box = api.el('div', 'fill');
     const grid = api.el('div', 'grid', box);

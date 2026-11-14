@@ -1,5 +1,5 @@
 Arcade.register({
-  howto: 'Бей хомяков 🐹 (+1), не трогай бомбы 💣 (−3). Чем дальше, тем быстрее. 30 секунд.',
+  howto: L('Бей хомяков 🐹 (+1), не трогай бомбы 💣 (−3). Чем дальше, тем быстрее. 30 секунд.', 'Whack the hamsters 🐹 (+1), leave the bombs 💣 alone (−3). It speeds up as you go. 30 seconds.'),
   start(api) {
     const box = api.el('div', 'fill');
     const grid = api.el('div', 'grid g3', box);

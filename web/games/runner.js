@@ -1,5 +1,5 @@
 Arcade.register({
-  howto: 'Тапай (или пробел), чтобы прыгать через препятствия. В воздухе можно прыгнуть ещё раз.',
+  howto: L('Тапай (или пробел), чтобы прыгать через препятствия. В воздухе можно прыгнуть ещё раз.', 'Tap (or space) to jump over obstacles. You can jump once more in the air.'),
   start(api) {
     const g = api.canvas(), x = g.ctx, C = api.colors;
     const s = 26, px = 60;

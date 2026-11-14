@@ -1,17 +1,17 @@
 // Мысленное вращение: та же фигура повёрнута или это её зеркальное отражение?
 Arcade.register({
-  howto: 'Справа — левая фигура, повёрнутая на какой-то угол. Или её зеркальное отражение? Реши в уме. Фигуры усложняются. Ошибка −3 с. 60 секунд.',
+  howto: L('Справа — левая фигура, повёрнутая на какой-то угол. Или её зеркальное отражение? Реши в уме. Фигуры усложняются. Ошибка −3 с. 60 секунд.', 'On the right is the left shape rotated by some angle. Or is it its mirror image? Decide in your head. The shapes get harder. A mistake costs 3 s. 60 seconds.'),
   start(api) {
     const box = api.el('div', 'fill');
-    api.el('div', 'hint', box, 'Та же фигура или зеркальная?');
+    api.el('div', 'hint', box, L('Та же фигура или зеркальная?', 'Same shape or mirrored?'));
     const row = api.el('div', '', box);
     row.style.cssText = 'display:flex;gap:14px;align-items:center;justify-content:center';
     const A = api.el('div', '', row);
     api.el('div', 'hint', row, '⟳');
     const B = api.el('div', '', row);
     const ch = api.el('div', 'choices', box);
-    const same = api.el('button', 'btn', ch, '✅ Та же');
-    const mir = api.el('button', 'btn ghost', ch, '🪞 Зеркальная');
+    const same = api.el('button', 'btn', ch, L('✅ Та же', '✅ Same'));
+    const mir = api.el('button', 'btn ghost', ch, L('🪞 Зеркальная', '🪞 Mirrored'));
     const tm = api.timer(60);
     let isMirror = false;
 

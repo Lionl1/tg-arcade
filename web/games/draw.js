@@ -19,7 +19,7 @@ Arcade.register({
       api.on(s, 'click', () => { color = c; eraser = false; mark(); });
     });
     const sizeBtn = api.el('button', 'btn ghost', tools, '');
-    const eraserBtn = api.el('button', 'btn ghost', tools, '🧽 Ластик');
+    const eraserBtn = api.el('button', 'btn ghost', tools, L('🧽 Ластик', '🧽 Eraser'));
     const undoBtn = api.el('button', 'btn ghost', tools, '↶');
     const clearBtn = api.el('button', 'btn ghost', tools, '🗑');
     function mark() {

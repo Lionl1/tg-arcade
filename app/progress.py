@@ -15,6 +15,7 @@ from datetime import date, datetime, timedelta, timezone
 
 from .catalog import Catalog, Game
 from .db import Store
+from .i18n import tr
 from .prefs import USER, Prefs, schema
 
 AVATARS = ["🦊", "🐼", "🐨", "🐯", "🦁", "🐸", "🐵", "🐶", "🐱", "🐰", "🦉", "🐧", "🐙", "🦄", "🐲", "🦖", "🐢", "🐬",
@@ -22,26 +23,26 @@ AVATARS = ["🦊", "🐼", "🐨", "🐯", "🦁", "🐸", "🐵", "🐶", "🐱
 NICK_RE = re.compile(r"^[\w .\-]{2,20}$")
 
 
-def clean_nickname(raw: str | None) -> str | None:
+def clean_nickname(raw: str | None, lang: str = "ru") -> str | None:
     """Ник 2–20 символов: буквы, цифры, пробел, точка, дефис, подчёркивание. Пусто — вернуть имя из Telegram."""
     if raw is None:
         return None
     nick = " ".join(raw.split())
     if not nick:
         return None
-    if not NICK_RE.match(nick) or nick.lower().startswith("игрок №") or "http" in nick.lower():
-        raise ValueError("Ник: 2–20 символов, буквы, цифры, пробел, точка, дефис или _")
+    if not NICK_RE.match(nick) or nick.lower().startswith(("игрок №", "player #")) or "http" in nick.lower():
+        raise ValueError(tr(lang, "Ник: 2–20 символов, буквы, цифры, пробел, точка, дефис или _",
+                            "Nickname: 2–20 characters — letters, digits, space, dot, hyphen or _"))
     return nick
 
 
 LEVELS = 12  # уровней на «странице»; сами уровни бесконечные
 MAX_LEVEL = 9999
-DIFFS = ["Лёгкая", "Обычная", "Сложная", "Экстрим"]
 # навыки для «тренировки дня» (аркадную координацию и факты-знания не навязываем)
 COGNITIVE = ["speed", "attention", "memory", "flex", "logic", "spatial", "math", "language"]
 ACH_XP = 25
-TITLES = [(1, "Новичок"), (3, "Любопытный"), (5, "Ученик"), (8, "Знаток"), (12, "Мыслитель"),
-          (16, "Мастер"), (20, "Гроссмейстер"), (30, "Легенда")]
+TITLES = [(1, "Новичок", "Rookie"), (3, "Любопытный", "Curious"), (5, "Ученик", "Apprentice"), (8, "Знаток", "Expert"),
+          (12, "Мыслитель", "Thinker"), (16, "Мастер", "Master"), (20, "Гроссмейстер", "Grandmaster"), (30, "Легенда", "Legend")]
 
 
 # ---------- уровни внутри игры ----------
@@ -87,8 +88,9 @@ def level_from_xp(xp: int, step: int) -> tuple[int, int, int]:
     return n, step * n * (n - 1), step * (n + 1) * n
 
 
-def title_for(level: int) -> str:
-    return [t for lv, t in TITLES if level >= lv][-1]
+def title_for(level: int, lang: str = "ru") -> str:
+    ru, en = [(r, e) for lv, r, e in TITLES if level >= lv][-1]
+    return tr(lang, ru, en)
 
 
 def local_now(tz: int, now: float | None = None) -> datetime:
@@ -105,37 +107,42 @@ class Ach:
     desc: str
     key: str  # какая метрика из stats
     goal: int
+    title_en: str = ""
+    desc_en: str = ""
+
+    def view(self, lang: str) -> dict:
+        return {"code": self.code, "emoji": self.emoji, "title": tr(lang, self.title, self.title_en), "desc": tr(lang, self.desc, self.desc_en)}
 
 
 ACHIEVEMENTS: list[Ach] = [
-    Ach("first", "👣", "Первый шаг", "Сыграй первую игру", "plays", 1),
-    Ach("plays10", "🔥", "Разогрев", "Сыграй 10 партий", "plays", 10),
-    Ach("plays100", "🏃", "Завсегдатай", "Сыграй 100 партий", "plays", 100),
-    Ach("plays500", "🦾", "Ветеран", "Сыграй 500 партий", "plays", 500),
-    Ach("variety10", "🎨", "Разносторонний", "Попробуй 10 разных игр", "games", 10),
-    Ach("variety30", "🧳", "Коллекционер", "Попробуй 30 разных игр", "games", 30),
-    Ach("sections", "🧭", "Исследователь", "Сыграй во всех разделах", "sections", 3),
-    Ach("daily1", "📅", "Первая тренировка", "Заверши тренировку дня", "daily", 1),
-    Ach("daily30", "🗓", "Тридцать тренировок", "Заверши 30 тренировок дня", "daily", 30),
-    Ach("streak3", "✨", "Три дня подряд", "Серия тренировок 3 дня", "best_streak", 3),
-    Ach("streak7", "🌟", "Неделя", "Серия тренировок 7 дней", "best_streak", 7),
-    Ach("streak30", "💎", "Железная воля", "Серия тренировок 30 дней", "best_streak", 30),
-    Ach("lvl5", "🎓", "Ученик", "Достигни 5-го уровня профиля", "level", 5),
-    Ach("lvl10", "🧠", "Мыслитель", "Достигни 10-го уровня профиля", "level", 10),
-    Ach("lvl20", "👑", "Гроссмейстер", "Достигни 20-го уровня профиля", "level", 20),
-    Ach("skill5", "🔬", "Специалист", "Прокачай любой навык до 5", "max_skill", 5),
-    Ach("harmony", "☯️", "Гармония", "Все 8 когнитивных навыков — уровень 3+", "min_cog_skill", 3),
-    Ach("records10", "📈", "Рекордсмен", "Обнови личный рекорд 10 раз", "records", 10),
-    Ach("stars30", "⭐", "Звездочёт", "Собери 30 звёзд на уровнях", "stars", 30),
-    Ach("stars150", "🌌", "Созвездие", "Собери 150 звёзд", "stars", 150),
-    Ach("perfect10", "💯", "Перфекционист", "10 уровней на 3 звезды", "three_star", 10),
-    Ach("level12", "🏔", "Покоритель", "Пройди 12-й уровень в любой игре", "max_level", 12),
-    Ach("level30", "♾️", "Бесконечность", "Пройди 30-й уровень в любой игре", "max_level", 30),
-    Ach("tour_win", "🏆", "Чемпион", "Победи в турнире чата", "tour_win", 1),
-    Ach("duel_win", "⚔️", "Дуэлянт", "Выиграй дуэль", "duel_win", 1),
-    Ach("early", "🌅", "Ранняя пташка", "Потренируйся до 8 утра", "early", 1),
-    Ach("night", "🦉", "Сова", "Потренируйся после 23:00", "night", 1),
-    Ach("comeback", "🔁", "Возвращение", "Вернись после перерыва в неделю", "comeback", 1),
+    Ach("first", "👣", "Первый шаг", "Сыграй первую игру", "plays", 1, "First step", "Play your first game"),
+    Ach("plays10", "🔥", "Разогрев", "Сыграй 10 партий", "plays", 10, "Warm-up", "Play 10 games"),
+    Ach("plays100", "🏃", "Завсегдатай", "Сыграй 100 партий", "plays", 100, "Regular", "Play 100 games"),
+    Ach("plays500", "🦾", "Ветеран", "Сыграй 500 партий", "plays", 500, "Veteran", "Play 500 games"),
+    Ach("variety10", "🎨", "Разносторонний", "Попробуй 10 разных игр", "games", 10, "All-rounder", "Try 10 different games"),
+    Ach("variety30", "🧳", "Коллекционер", "Попробуй 30 разных игр", "games", 30, "Collector", "Try 30 different games"),
+    Ach("sections", "🧭", "Исследователь", "Сыграй во всех разделах", "sections", 3, "Explorer", "Play in every section"),
+    Ach("daily1", "📅", "Первая тренировка", "Заверши тренировку дня", "daily", 1, "First workout", "Finish a daily workout"),
+    Ach("daily30", "🗓", "Тридцать тренировок", "Заверши 30 тренировок дня", "daily", 30, "Thirty workouts", "Finish 30 daily workouts"),
+    Ach("streak3", "✨", "Три дня подряд", "Серия тренировок 3 дня", "best_streak", 3, "Three in a row", "3-day workout streak"),
+    Ach("streak7", "🌟", "Неделя", "Серия тренировок 7 дней", "best_streak", 7, "A week", "7-day workout streak"),
+    Ach("streak30", "💎", "Железная воля", "Серия тренировок 30 дней", "best_streak", 30, "Iron will", "30-day workout streak"),
+    Ach("lvl5", "🎓", "Ученик", "Достигни 5-го уровня профиля", "level", 5, "Apprentice", "Reach profile level 5"),
+    Ach("lvl10", "🧠", "Мыслитель", "Достигни 10-го уровня профиля", "level", 10, "Thinker", "Reach profile level 10"),
+    Ach("lvl20", "👑", "Гроссмейстер", "Достигни 20-го уровня профиля", "level", 20, "Grandmaster", "Reach profile level 20"),
+    Ach("skill5", "🔬", "Специалист", "Прокачай любой навык до 5", "max_skill", 5, "Specialist", "Raise any skill to 5"),
+    Ach("harmony", "☯️", "Гармония", "Все 8 когнитивных навыков — уровень 3+", "min_cog_skill", 3, "Harmony", "All 8 cognitive skills at level 3+"),
+    Ach("records10", "📈", "Рекордсмен", "Обнови личный рекорд 10 раз", "records", 10, "Record breaker", "Beat your personal best 10 times"),
+    Ach("stars30", "⭐", "Звездочёт", "Собери 30 звёзд на уровнях", "stars", 30, "Stargazer", "Collect 30 stars on levels"),
+    Ach("stars150", "🌌", "Созвездие", "Собери 150 звёзд", "stars", 150, "Constellation", "Collect 150 stars"),
+    Ach("perfect10", "💯", "Перфекционист", "10 уровней на 3 звезды", "three_star", 10, "Perfectionist", "10 levels with 3 stars"),
+    Ach("level12", "🏔", "Покоритель", "Пройди 12-й уровень в любой игре", "max_level", 12, "Conqueror", "Clear level 12 in any game"),
+    Ach("level30", "♾️", "Бесконечность", "Пройди 30-й уровень в любой игре", "max_level", 30, "Infinity", "Clear level 30 in any game"),
+    Ach("tour_win", "🏆", "Чемпион", "Победи в турнире чата", "tour_win", 1, "Champion", "Win a chat tournament"),
+    Ach("duel_win", "⚔️", "Дуэлянт", "Выиграй дуэль", "duel_win", 1, "Duelist", "Win a duel"),
+    Ach("early", "🌅", "Ранняя пташка", "Потренируйся до 8 утра", "early", 1, "Early bird", "Train before 8 am"),
+    Ach("night", "🦉", "Сова", "Потренируйся после 23:00", "night", 1, "Night owl", "Train after 11 pm"),
+    Ach("comeback", "🔁", "Возвращение", "Вернись после перерыва в неделю", "comeback", 1, "Comeback", "Return after a week-long break"),
 ]
 ACH_BY_CODE = {a.code: a for a in ACHIEVEMENTS}
 
@@ -149,36 +156,39 @@ class Progress:
         """Имя для таблиц и сообщений в чат: «Игрок №…» (приватность), свой ник или имя из Telegram — с эмодзи-аватаром."""
         p = await self.prefs.user(user_id)
         if p["hide_name"]:
-            return f"Игрок №{str(user_id)[-4:]}"
+            return tr(p.get("lang") or "ru", "Игрок №", "Player #") + str(user_id)[-4:]
         row = await self.store._one("SELECT nickname, avatar FROM users WHERE user_id=?", (user_id,))
         nick, avatar = (row or (None, None))
         base = nick or name
         return f"{avatar} {base}" if avatar else base
 
-    async def set_identity(self, user_id: int, name: str, tz: int | None, nickname: str | None, avatar: str | None) -> dict:
-        await self.touch_user(user_id, name, tz)
-        nick = clean_nickname(nickname)
+    async def set_identity(self, user_id: int, name: str, tz: int | None, nickname: str | None, avatar: str | None,
+                           lang: str = "ru") -> dict:
+        await self.touch_user(user_id, name, tz, lang)
+        nick = clean_nickname(nickname, lang)
         if avatar is not None and avatar not in AVATARS and avatar != "":
-            raise ValueError("Такой аватарки нет")
+            raise ValueError(tr(lang, "Такой аватарки нет", "No such avatar"))
         await self.store._exec("UPDATE users SET nickname=?, avatar=? WHERE user_id=?", (nick, avatar or None, user_id))
         return {"nickname": nick, "avatar": avatar or None}
 
     # ---------- пользователь ----------
 
-    async def touch_user(self, user_id: int, name: str, tz: int | None) -> int:
-        """Создать/обновить игрока (часовой пояс и имя из Telegram); вернуть часовой пояс.
+    async def touch_user(self, user_id: int, name: str, tz: int | None, lang: str | None = None) -> int:
+        """Создать/обновить игрока (часовой пояс, имя из Telegram, язык интерфейса); вернуть часовой пояс.
         name — всегда настоящее имя из Telegram, не «табличное» (ник/аватар/«Игрок №»)."""
         tz = tz if tz is not None and -840 <= tz <= 720 else None
-        row = await self.store._one("SELECT tz, name FROM users WHERE user_id=?", (user_id,))
+        lang = lang if lang in ("ru", "en") else None
+        row = await self.store._one("SELECT tz, name, lang FROM users WHERE user_id=?", (user_id,))
         if row is None:
             await self.store._exec(
-                "INSERT OR IGNORE INTO users (user_id, name, tz, created) VALUES (?, ?, ?, ?)",
-                (user_id, name, tz if tz is not None else -180, int(time.time())),
+                "INSERT OR IGNORE INTO users (user_id, name, tz, created, lang) VALUES (?, ?, ?, ?, ?)",
+                (user_id, name, tz if tz is not None else -180, int(time.time()), lang),
             )
             return tz if tz is not None else -180
         new_tz = tz if tz is not None else row[0]
-        if new_tz != row[0] or name != row[1]:
-            await self.store._exec("UPDATE users SET tz=?, name=? WHERE user_id=?", (new_tz, name, user_id))
+        new_lang = lang or row[2]
+        if new_tz != row[0] or name != row[1] or new_lang != row[2]:
+            await self.store._exec("UPDATE users SET tz=?, name=?, lang=? WHERE user_id=?", (new_tz, name, new_lang, user_id))
         return new_tz
 
     # ---------- опыт ----------
@@ -225,7 +235,7 @@ class Progress:
 
     # ---------- тренировка дня и серия ----------
 
-    async def daily(self, user_id: int, day: str) -> list[str]:
+    async def daily(self, user_id: int, day: str, lang: str | None = None) -> list[str]:
         row = await self.store._one("SELECT games FROM daily WHERE user_id=? AND day=?", (user_id, day))
         if row:
             return json.loads(row[0])
@@ -239,10 +249,11 @@ class Progress:
         picked = [first] + rnd.sample(rest[: max(4, size)], size - 2)
         games: list[str] = []
         for s in picked:
-            pool = [g.id for g in self.catalog.games.values() if s in g.skills and g.id not in games and g.section == "brain"]
+            pool = [g.id for g in self.catalog.games.values() if s in g.skills and g.id not in games and g.section == "brain" and g.visible(lang)]
             if pool:
                 games.append(rnd.choice(sorted(pool)))
-        study = [g.id for g in self.catalog.games.values() if g.section in ("ege", "learn") and not g.app and g.id not in games]
+        study = [g.id for g in self.catalog.games.values()
+                 if g.section in ("ege", "learn") and not g.app and g.id not in games and g.visible(lang)]
         if study:
             games.append(rnd.choice(sorted(study)))
         await self.store._exec("INSERT OR IGNORE INTO daily (user_id, day, games) VALUES (?, ?, ?)", (user_id, day, json.dumps(games)))
@@ -252,8 +263,9 @@ class Progress:
         """{игра: сколько партий сегодня} — одним запросом (и для тренировки дня, и для убывания опыта)."""
         return dict(await self.store._all("SELECT game, COUNT(*) FROM plays WHERE user_id=? AND day=? GROUP BY game", (user_id, day)))
 
-    async def daily_state(self, user_id: int, day: str, played: set[str] | None = None, games: list[str] | None = None) -> dict:
-        games = games if games is not None else await self.daily(user_id, day)
+    async def daily_state(self, user_id: int, day: str, played: set[str] | None = None, games: list[str] | None = None,
+                          lang: str | None = None) -> dict:
+        games = games if games is not None else await self.daily(user_id, day, lang)
         if played is None:
             played = set(await self._played_today(user_id, day))
         items = [{"id": g, "done": g in played} for g in games]
@@ -325,7 +337,7 @@ class Progress:
             "INSERT OR IGNORE INTO achievements (user_id, code, ts) VALUES (?, ?, ?)", (user_id, code, int(time.time()))
         ) == 1
 
-    async def check_achievements(self, user_id: int, today: str, st: dict | None = None) -> list[dict]:
+    async def check_achievements(self, user_id: int, today: str, st: dict | None = None, lang: str = "ru") -> list[dict]:
         """Статистика считается один раз; ачивки дают опыт → уровень профиля пересчитываем в памяти, без новых запросов."""
         st = st or await self.stats(user_id, today)
         have, new = set(st["_have"]), []
@@ -336,18 +348,18 @@ class Progress:
             for a in fresh:
                 have.add(a.code)
                 if await self.award(user_id, a.code):
-                    new.append({"code": a.code, "emoji": a.emoji, "title": a.title, "desc": a.desc})
+                    new.append(a.view(lang))
             st["_total_xp"] += ACH_XP * len(fresh)
             st["level"] = level_from_xp(st["_total_xp"], 25)[0]  # могла открыться ачивка за уровень
 
     # ---------- запись партии ----------
 
     async def record_play(self, user_id: int, name: str, tz: int | None, game: Game, score: int,
-                          mode: str = "free", level: int | None = None) -> dict:
-        tz = await self.touch_user(user_id, name, tz)
+                          mode: str = "free", level: int | None = None, lang: str = "ru") -> dict:
+        tz = await self.touch_user(user_id, name, tz, lang)
         now = local_now(tz)
         day = now.date().isoformat()
-        daily_games = await self.daily(user_id, day)
+        daily_games = await self.daily(user_id, day, lang)
         today = await self._played_today(user_id, day)
         daily_before = await self.daily_state(user_id, day, set(today), daily_games)
 
@@ -387,14 +399,14 @@ class Progress:
         daily_after = await self.daily_state(user_id, day, set(today) | {game.id}, daily_games)  # без повторного запроса
         st = await self.stats(user_id, day)
         after_play_xp = st["_total_xp"]
-        new_ach = await self.check_achievements(user_id, day, st)
+        new_ach = await self.check_achievements(user_id, day, st, lang)
         after_xp = after_play_xp + ACH_XP * len(new_ach)
         before_xp = after_play_xp - xp
         lv_before = level_from_xp(before_xp, 25)[0]
         lv, start, nxt = level_from_xp(after_xp, 25)
         return {
             "xp": after_xp - before_xp, "play_xp": xp, "variety": variety, "in_daily": in_daily,
-            "level": lv, "title": title_for(lv), "level_up": lv > lv_before, "xp_total": after_xp,
+            "level": lv, "title": title_for(lv, lang), "level_up": lv > lv_before, "xp_total": after_xp,
             "xp_start": start, "xp_next": nxt,
             "stars": stars, "record": bool(record), "unlocked": unlocked_new,
             "daily": daily_after, "daily_completed": daily_after["done"] and not daily_before["done"],
@@ -403,8 +415,8 @@ class Progress:
 
     # ---------- профиль ----------
 
-    async def profile(self, user_id: int, name: str, tz: int | None) -> dict:
-        tz = await self.touch_user(user_id, name, tz)
+    async def profile(self, user_id: int, name: str, tz: int | None, lang: str = "ru") -> dict:
+        tz = await self.touch_user(user_id, name, tz, lang)
         day = local_now(tz).date().isoformat()
         st = await self.stats(user_id, day)
         xp = st.pop("_total_xp")  # опыт и навыки — из уже посчитанной статистики, без лишних запросов
@@ -422,26 +434,26 @@ class Progress:
         skills = []
         for s in self.catalog.skills:
             slv, sst, snx = level_from_xp(int(sk.get(s.id, 0)), 15)
-            skills.append({"id": s.id, "title": s.title, "desc": s.desc, "level": slv, "xp": int(sk.get(s.id, 0)), "start": sst, "next": snx})
+            skills.append({"id": s.id, "title": s.t(lang), "desc": s.d(lang), "level": slv, "xp": int(sk.get(s.id, 0)), "start": sst, "next": snx})
         return {
-            "name": name, "level": lv, "title": title_for(lv), "xp": xp, "xp_start": start, "xp_next": nxt,
-            "skills": skills, "streak": await self.streak(user_id, day), "daily": await self.daily_state(user_id, day),
+            "name": name, "level": lv, "title": title_for(lv, lang), "xp": xp, "xp_start": start, "xp_next": nxt,
+            "skills": skills, "streak": await self.streak(user_id, day), "daily": await self.daily_state(user_id, day, lang=lang),
             "stats": st, "games": games, "levels_total": LEVELS,
             "achievements": [
-                {"code": a.code, "emoji": a.emoji, "title": a.title, "desc": a.desc, "unlocked": a.code in have,
+                {**a.view(lang), "unlocked": a.code in have,
                  "progress": min(a.goal, st.get(a.key, 0)), "goal": a.goal}
                 for a in ACHIEVEMENTS
             ],
             "reminder": {"on": bool(user[0]), "time": user[1], "can_write": bool(user[2])},
             "nickname": user[3], "avatar": user[4], "avatars": AVATARS,
             "prefs": await self.prefs.user(user_id),
-            "prefs_schema": schema(USER),
+            "prefs_schema": schema(USER, lang),
         }
 
     # ---------- напоминания ----------
 
-    async def set_reminder(self, user_id: int, name: str, tz: int | None, on: bool, at: str) -> None:
-        await self.touch_user(user_id, name, tz)
+    async def set_reminder(self, user_id: int, name: str, tz: int | None, on: bool, at: str, lang: str | None = None) -> None:
+        await self.touch_user(user_id, name, tz, lang)
         h, m = (int(x) for x in at.split(":"))
         if not (0 <= h < 24 and 0 <= m < 60):
             raise ValueError("bad time")
@@ -449,20 +461,21 @@ class Progress:
                                (int(on), f"{h:02d}:{m:02d}", user_id))
 
     async def due_reminders(self, now: float | None = None) -> list[tuple[int, str, dict]]:
+        """Возвращает (user_id, имя, info); в info["lang"] — язык игрока."""
         """Кому пора напомнить: включено, местное время наступило, сегодня ещё не напоминали и тренировка не сделана.
         «Напомнили» отмечается только после успешной отправки (mark_reminded) — сбой сети не съедает напоминание."""
         out = []
-        for user_id, name, tz, at, reminded in await self.store._all(
-                "SELECT user_id, name, tz, remind_time, reminded_on FROM users WHERE remind_on=1 AND can_write=1"):
+        for user_id, name, tz, at, reminded, lang in await self.store._all(
+                "SELECT user_id, name, tz, remind_time, reminded_on, COALESCE(lang, 'ru') FROM users WHERE remind_on=1 AND can_write=1"):
             loc = local_now(tz, now)
             day = loc.date().isoformat()
             if reminded == day or loc.strftime("%H:%M") < at:
                 continue
-            daily = await self.daily_state(user_id, day)
+            daily = await self.daily_state(user_id, day, lang=lang)
             if daily["done"]:
                 await self.mark_reminded(user_id, day)  # тренировка уже сделана — сегодня не напоминаем
             else:
-                out.append((user_id, name, {"daily": daily, "streak": await self.streak(user_id, day), "day": day}))
+                out.append((user_id, name, {"daily": daily, "streak": await self.streak(user_id, day), "day": day, "lang": lang}))
         return out
 
     async def mark_reminded(self, user_id: int, day: str) -> None:

@@ -1,6 +1,6 @@
 // Собери сумму — быстрый счёт и комбинаторика
 Arcade.register({
-  howto: 'Выделяй числа, которые в сумме дают цель. Сколько чисел — неважно, очки = количество использованных чисел. Перебор — выделение сбросится. 60 секунд.',
+  howto: L('Выделяй числа, которые в сумме дают цель. Сколько чисел — неважно, очки = количество использованных чисел. Перебор — выделение сбросится. 60 секунд.', 'Select numbers that add up to the target. Any count works; points = how many numbers you used. Overshoot and the selection resets. 60 seconds.'),
   start(api) {
     const box = api.el('div', 'fill');
     const goal = api.el('div', 'learn-q', box);
@@ -17,11 +17,11 @@ Arcade.register({
     function newTarget() {
       const k = 2 + api.randi(Math.min(3, 1 + Math.floor(api.score / 8)));
       target = api.shuffle([...vals.keys()]).slice(0, k).reduce((s, i) => s + vals[i], 0);
-      goal.textContent = `Цель: ${target}`;
+      goal.textContent = L(`Цель: ${target}`, `Target: ${target}`);
     }
     function draw() {
       const sum = [...picked].reduce((s, i) => s + vals[i], 0);
-      now.textContent = `Сумма: ${sum}`;
+      now.textContent = L(`Сумма: ${sum}`, `Sum: ${sum}`);
       tiles.forEach((t, i) => { t.style.background = picked.has(i) ? 'var(--accent)' : ''; t.style.color = picked.has(i) ? 'var(--accent-fg)' : ''; });
       return sum;
     }

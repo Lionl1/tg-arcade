@@ -1,5 +1,5 @@
 Arcade.register({
-  howto: 'Нажатие переключает лампу и четырёх соседей. Погаси все лампы, чтобы пройти уровень. 90 секунд, сколько уровней успеешь?',
+  howto: L('Нажатие переключает лампу и четырёх соседей. Погаси все лампы, чтобы пройти уровень. 90 секунд, сколько уровней успеешь?', 'A tap toggles a lamp and its four neighbours. Turn all lamps off to clear the level. 90 seconds — how many levels can you do?'),
   start(api) {
     const N = 5;
     const box = api.el('div', 'fill');
@@ -26,7 +26,7 @@ Arcade.register({
         t.textContent = on[i] ? '💡' : '';
         t.style.background = on[i] ? 'color-mix(in srgb, var(--warn) 45%, var(--card))' : '';
       });
-      info.textContent = `Уровень ${level} · ходов: ${moves}`;
+      info.textContent = L(`Уровень ${level} · ходов: ${moves}`, `Level ${level} · moves: ${moves}`);
     }
     function build() {
       do {
@@ -42,7 +42,7 @@ Arcade.register({
       toggle(+t.dataset.i); moves++; api.haptic('select'); draw();
       if (!on.some(Boolean)) {
         lock = true; api.addScore(1); api.haptic('success'); api.tone(990, 120);
-        info.textContent = 'Готово!'; level++;
+        info.textContent = L('Готово!', 'Done!'); level++;
         api.after(500, build);
       }
     });

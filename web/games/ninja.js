@@ -1,6 +1,6 @@
 // Ниндзя: карабкайся по двум стенам, перепрыгивая шипы
 Arcade.register({
-  howto: 'Ниндзя бежит вверх по стене. Тап (или пробел) — прыжок на противоположную стену. Шипы на стене — смерть, в прыжке над ними пролетаешь. Монеты +5.',
+  howto: L('Ниндзя бежит вверх по стене. Тап (или пробел) — прыжок на противоположную стену. Шипы на стене — смерть, в прыжке над ними пролетаешь. Монеты +5.', 'The ninja runs up the wall. Tap (or space) to jump to the opposite wall. Spikes on the wall are deadly; mid-jump you fly over them. Coins +5.'),
   start(api) {
     const g = api.canvas(), x = g.ctx, C = api.colors;
     const WALL = 26, r = 13, JUMP = 0.38;

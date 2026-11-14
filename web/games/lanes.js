@@ -1,6 +1,6 @@
 // Три дорожки: свайп влево/вправо — смена полосы, вверх — прыжок через низкий барьер
 Arcade.register({
-  howto: 'Свайп ←/→ меняет дорожку, свайп ↑ (или пробел) — прыжок через низкий оранжевый барьер. Красные стены только объезжать. Монетки +5. Скорость растёт.',
+  howto: L('Свайп ←/→ меняет дорожку, свайп ↑ (или пробел) — прыжок через низкий оранжевый барьер. Красные стены только объезжать. Монетки +5. Скорость растёт.', 'Swipe ←/→ to change lanes, swipe ↑ (or space) to jump the low orange barrier. Red walls can only be avoided. Coins +5. The speed grows.'),
   start(api) {
     const g = api.canvas(), x = g.ctx, C = api.colors;
     let lane = 1, px = 0, jump = 0, dist = 0, coins = 0, obs = [], next = 0.6, dead = false;

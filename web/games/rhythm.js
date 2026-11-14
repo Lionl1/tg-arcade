@@ -1,5 +1,5 @@
 Arcade.register({
-  howto: 'Круг сжимается к кольцу — тапни в момент совпадения. Идеально +3, хорошо +1, мимо — минус жизнь (их 3).',
+  howto: L('Круг сжимается к кольцу — тапни в момент совпадения. Идеально +3, хорошо +1, мимо — минус жизнь (их 3).', 'The circle shrinks towards the ring — tap the moment they match. Perfect +3, good +1, a miss costs a life (you have 3).'),
   start(api) {
     const g = api.canvas(), x = g.ctx, C = api.colors;
     let t = 0, active = true, lives = 3, msg = null, beats = 0;
@@ -17,16 +17,16 @@ Arcade.register({
       if (!active) return;
       const p = t / period();
       const diff = Math.abs(1 - p);
-      if (diff < 0.06) judge('Идеально!', C.good, 3);
-      else if (diff < 0.16) judge('Хорошо', C.accent, 1);
-      else judge('Мимо', C.bad, 0);
+      if (diff < 0.06) judge(L('Идеально!', 'Perfect!'), C.good, 3);
+      else if (diff < 0.16) judge(L('Хорошо', 'Good'), C.accent, 1);
+      else judge(L('Мимо', 'Miss'), C.bad, 0);
     });
 
     api.loop((dt) => {
       const cx = g.W / 2, cy = g.H / 2, T = Math.min(g.W, g.H) * 0.13, Rs = Math.min(g.W, g.H) * 0.45;
       if (active) {
         t += dt;
-        if (t / period() > 1.2) { judge('Поздно', C.bad, 0); if (api.ended) return; }
+        if (t / period() > 1.2) { judge(L('Поздно', 'Late'), C.bad, 0); if (api.ended) return; }
       }
       x.fillStyle = C.bg; x.fillRect(0, 0, g.W, g.H);
       x.strokeStyle = C.fg; x.lineWidth = 6;

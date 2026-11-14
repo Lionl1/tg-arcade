@@ -3,14 +3,14 @@ Arcade.register({
   app: true,
   start(api) {
     const box = api.el('div', 'appbox');
-    const title = api.el('input', '', box); title.type = 'text'; title.placeholder = 'Вопрос, например: Куда идём?'; title.maxLength = 60;
+    const title = api.el('input', '', box); title.type = 'text'; title.placeholder = L('Вопрос, например: Куда идём?', 'Question, e.g.: Where are we going?'); title.maxLength = 60;
     const ta = api.el('textarea', '', box);
-    ta.value = 'Пицца\nСуши\nБургеры\nШаурма\nГотовим сами';
+    ta.value = L('Пицца\nСуши\nБургеры\nШаурма\nГотовим сами', 'Pizza\nSushi\nBurgers\nTacos\nCook at home');
     const cv = api.el('canvas', '', box);
     cv.width = cv.height = 640;
     cv.style.cssText = 'width:min(100%,42vh);aspect-ratio:1;align-self:center';
     const ctx = cv.getContext('2d');
-    const spin = api.el('button', 'btn', box, '🎡 Крутить');
+    const spin = api.el('button', 'btn', box, L('🎡 Крутить', '🎡 Spin'));
     const res = api.el('div', 'learn-q', box); res.style.textAlign = 'center';
     let angle = 0, busy = false;
     const items = () => ta.value.split('\n').map((s) => s.trim()).filter(Boolean).slice(0, 24);
@@ -48,14 +48,14 @@ Arcade.register({
     api.on(ta, 'input', draw);
     api.on(spin, 'click', async () => {
       const it = items();
-      if (busy || it.length < 2) { if (it.length < 2) api.toast('Нужно хотя бы 2 варианта'); return; }
+      if (busy || it.length < 2) { if (it.length < 2) api.toast(L('Нужно хотя бы 2 варианта', 'At least 2 options are needed')); return; }
       busy = true; spin.disabled = true; res.textContent = '';
       const q = title.value.trim();
       let index;
       try {
         const d = await api.roll({ kind: 'pick', items: it, post: true });
         index = d.index;
-        if (d.sent) api.toast(d.group ? 'Результат отправлен в чат' : 'Результат отправлен в личку');
+        if (d.sent) api.toast(d.group ? L('Результат отправлен в чат', 'Result sent to the chat') : L('Результат отправлен в личку', 'Result sent to your private chat'));
       } catch (e) { index = api.randi(it.length); api.toast(e.message); }
       api.haptic('medium');
       await animateTo(index, it.length);

@@ -1,10 +1,10 @@
 // Быки и коровы — дедукция: угадай код по подсказкам
 Arcade.register({
   tiers: true, // в личной игре длина кода: 3 → 4 → 4 → 5
-  howto: 'Компьютер загадал код из разных цифр (обычно 4; в личной игре длина растёт с успехами). Вводи догадки: 🐂 бык — цифра на своём месте, 🐄 корова — цифра есть, но в другом месте. Угадай за минимум попыток (максимум 12).',
+  howto: L('Компьютер загадал код из разных цифр (обычно 4; в личной игре длина растёт с успехами). Вводи догадки: 🐂 бык — цифра на своём месте, 🐄 корова — цифра есть, но в другом месте. Угадай за минимум попыток (максимум 12).', 'The computer picked a code of distinct digits (usually 4; in personal play the length grows as you succeed). Enter guesses: 🐂 bull — right digit in the right place, 🐄 cow — the digit is there but elsewhere. Crack it in as few tries as possible (12 max).'),
   start(api) {
-    const L = [3, 4, 4, 5][api.tier - 1], MAX = L >= 5 ? 15 : 12;
-    const secret = api.shuffle([...'0123456789']).slice(0, L).join('');
+    const LEN = [3, 4, 4, 5][api.tier - 1], MAX = LEN >= 5 ? 15 : 12;
+    const secret = api.shuffle([...'0123456789']).slice(0, LEN).join('');
     const box = api.el('div', 'fill');
     box.style.justifyContent = 'flex-start';
     const hist = api.el('div', '', box);
@@ -21,7 +21,7 @@ Arcade.register({
     }
     let guess = '', tries = 0, over = false;
     const draw = () => {
-      shown.textContent = (guess + '_____').slice(0, L);
+      shown.textContent = (guess + '_____').slice(0, LEN);
       for (const d of '0123456789') keys[d].disabled = guess.includes(d) || over;
     };
     function submit() {
@@ -33,11 +33,11 @@ Arcade.register({
       row.innerHTML = `<span style="letter-spacing:6px">${guess}</span><span>🐂 ${bulls} &nbsp; 🐄 ${cows}</span>`;
       hist.scrollTop = hist.scrollHeight;
       guess = '';
-      if (bulls === L) { over = true; api.haptic('success'); draw(); return api.after(700, () => api.end(tries)); }
+      if (bulls === LEN) { over = true; api.haptic('success'); draw(); return api.after(700, () => api.end(tries)); }
       api.haptic(bulls ? 'light' : 'select');
       if (tries >= MAX) {
         over = true; draw();
-        const r = api.el('div', 'hint', hist, `Не угадал — был код ${secret}`);
+        const r = api.el('div', 'hint', hist, L(`Не угадал — был код ${secret}`, `Not cracked — the code was ${secret}`));
         r.style.textAlign = 'center';
         return api.after(1800, () => api.end(null));
       }
@@ -49,7 +49,7 @@ Arcade.register({
       if (b.dataset.k === '⌫') guess = guess.slice(0, -1);
       else guess += b.dataset.k;
       draw();
-      if (guess.length === L) submit();
+      if (guess.length === LEN) submit();
     });
     draw();
   },

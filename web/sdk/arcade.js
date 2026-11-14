@@ -32,7 +32,7 @@
   let event = null; // {kind, title, single, played, note, closed} — приходит с сервера
 
   const PAGE = 12; // уровней на странице; сами уровни бесконечные
-  const DIFF_NAMES = ['Лёгкая', 'Обычная', 'Сложная', 'Экстрим'];
+  const DIFF_NAMES = L('Лёгкая|Обычная|Сложная|Экстрим', 'Easy|Normal|Hard|Extreme').split('|');
   const DIFF_COLORS = ['var(--good)', 'var(--accent)', 'var(--bad)', '#a371f7'];
   // сложность растёт плавно и без потолка: скорость игры и время таймера
   const speedOf = (k) => Math.min(1.6, 0.85 + 0.3 * Math.min(1, (k - 1) / 11) + 0.02 * Math.max(0, k - 12));
@@ -107,8 +107,8 @@
   // ---------- форматирование, уровни, хранилище ----------
   function fmt(v) {
     if (v == null) return '—';
-    if (meta.format === 'ms') return v + ' мс';
-    if (meta.format === 'sec') return (v / 1000).toFixed(2) + ' с';
+    if (meta.format === 'ms') return v + L(' мс', ' ms');
+    if (meta.format === 'sec') return (v / 1000).toFixed(2) + L(' с', ' s');
     return String(v) + (meta.unit ? ' ' + meta.unit : '');
   }
   const asc = () => meta.order === 'asc';
@@ -135,10 +135,10 @@
   async function api(path, body) {
     const r = await fetch(new URL('api/' + path, location.href), {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(Object.assign({ initData, ctx, tz: TZ }, body)),
+      body: JSON.stringify(Object.assign({ initData, ctx, tz: TZ, lang: LANG }, body)),
     });
     if (!r.ok) {
-      let msg = 'Ошибка ' + r.status;
+      let msg = L('Ошибка ', 'Error ') + r.status;
       try { msg = (await r.json()).detail || msg; } catch (e) { /* noop */ }
       throw new Error(msg);
     }
@@ -169,8 +169,8 @@
   // ---------- оверлеи ----------
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   function boardHtml(top, group) {
-    if (!top || !top.length) return event ? '' : '<p class="muted">Таблица пуста — будь первым!</p>';
-    const label = event ? (event.kind === 'duel' ? 'Дуэль' : 'Таблица турнира') : group ? 'Рекорды чата' : 'Твои рекорды';
+    if (!top || !top.length) return event ? '' : `<p class="muted">${L('Таблица пуста — будь первым!', 'The table is empty — be the first!')}</p>`;
+    const label = event ? (event.kind === 'duel' ? L('Дуэль', 'Duel') : L('Таблица турнира', 'Tournament table')) : group ? L('Рекорды чата', 'Chat records') : L('Твои рекорды', 'Your records');
     return `<p class="muted">${label}</p><ol class="lb">` + top.map((r, i) =>
       `<li class="${r.me ? 'me' : ''}"><span class="n">${['🥇', '🥈', '🥉'][i] || i + 1}</span><span class="nm">${esc(r.name)}</span><span class="sc">${fmt(r.score)}</span></li>`
     ).join('') + '</ol>';
@@ -179,15 +179,15 @@
     if (!p) return '';
     const span = Math.max(1, p.xp_next - p.xp_start), have = p.xp_total - p.xp_start;
     const notes = [];
-    if (p.in_daily) notes.push('🎯 тренировка дня');
-    if (p.record) notes.push('📈 рекорд');
-    if (p.variety < 1) notes.push('↘ повтор: другие игры дают больше');
+    if (p.in_daily) notes.push(L('🎯 тренировка дня', '🎯 daily workout'));
+    if (p.record) notes.push(L('📈 рекорд', '📈 record'));
+    if (p.variety < 1) notes.push(L('↘ повтор: другие игры дают больше', '↘ repeat: other games give more'));
     let html = `<div class="prog"><div class="xp">+${p.xp} XP${notes.length ? ' · ' + notes.join(' · ') : ''}</div>
       <div class="bar"><i style="width:${Math.min(100, (have / span) * 100)}%"></i></div>
-      <div class="muted">Уровень ${p.level} · ${esc(p.title)} · ${have}/${span}</div>`;
-    if (p.level_up) html += `<div class="badge">🎉 Новый уровень профиля: ${p.level}!</div>`;
-    if (p.daily_completed) html += '<div class="badge">🔥 Тренировка дня завершена!</div>';
-    else if (p.in_daily) html += `<div class="muted">Тренировка дня: ${p.daily.count}/${p.daily.games.length}</div>`;
+      <div class="muted">${L('Уровень', 'Level')} ${p.level} · ${esc(p.title)} · ${have}/${span}</div>`;
+    if (p.level_up) html += `<div class="badge">🎉 ${L('Новый уровень профиля', 'New profile level')}: ${p.level}!</div>`;
+    if (p.daily_completed) html += `<div class="badge">${L('🔥 Тренировка дня завершена!', '🔥 Daily workout complete!')}</div>`;
+    else if (p.in_daily) html += `<div class="muted">${L('Тренировка дня', 'Daily workout')}: ${p.daily.count}/${p.daily.games.length}</div>`;
     for (const a of p.achievements || []) html += `<div class="ach-new">${a.emoji} <b>${esc(a.title)}</b><small>${esc(a.desc)} · +25 XP</small></div>`;
     return html + '</div>';
   }
@@ -199,11 +199,11 @@
   function bind(card, actions) {
     card.querySelectorAll('[data-act]').forEach((b) => b.addEventListener('click', () => actions[b.dataset.act](b)));
   }
-  const hubLink = () => (authed ? '<a class="hublink" href="hub.html">🧠 Профиль и тренировка дня</a>' : '');
+  const hubLink = () => (authed ? `<a class="hublink" href="hub.html">${L('🧠 Профиль и тренировка дня', '🧠 Profile and daily workout')}</a>` : '');
 
   function setHudTitle() {
     hud.title.textContent = opts.mode === 'level'
-      ? `${meta.emoji} Ур. ${opts.level} · цель ${fmt(goalOf(opts.level))}`
+      ? `${meta.emoji} ${L('Ур.', 'Lv.')} ${opts.level} · ${L('цель', 'goal')} ${fmt(goalOf(opts.level))}`
       : meta.emoji + ' ' + meta.title;
   }
 
@@ -225,15 +225,15 @@
       <h1>${esc(meta.title)}</h1>
       <p class="howto">${esc(def.howto || meta.desc)}</p>
       <div class="modes">
-        <button class="btn" data-act="levels">🎯 Уровни<small class="lvinfo">Бесконечные уровни: каждый новый сложнее, до 3 ★ за каждый</small></button>
-        <button class="btn ghost" data-act="free">♾ Свободная игра<small>${startParam && !qs.get('g') ? 'Рекорды этого чата' : 'Личные рекорды'}${best != null ? ' · лучший: ' + fmt(best) : ''}</small></button>
+        <button class="btn" data-act="levels">${L('🎯 Уровни', '🎯 Levels')}<small class="lvinfo">${L('Бесконечные уровни: каждый новый сложнее, до 3 ★ за каждый', 'Endless levels: each one harder, up to 3 ★ each')}</small></button>
+        <button class="btn ghost" data-act="free">${L('♾ Свободная игра', '♾ Free play')}<small>${startParam && !qs.get('g') ? L('Рекорды этого чата', "This chat's records") : L('Личные рекорды', 'Personal records')}${best != null ? L(' · лучший: ', ' · best: ') + fmt(best) : ''}</small></button>
       </div>
       ${hubLink()}
       <div class="board"></div>`);
     bind(card, { levels: showLevels, free: () => startRound({ mode: 'free' }) });
     loadLevels().then(() => {
       const el = card.querySelector('.lvinfo');
-      if (el) el.textContent = `Ты на уровне ${levels.unlocked} · ⭐ ${totalStars()} · уровни бесконечные`;
+      if (el) el.textContent = L(`Ты на уровне ${levels.unlocked} · ⭐ ${totalStars()} · уровни бесконечные`, `You're on level ${levels.unlocked} · ⭐ ${totalStars()} · levels never end`);
     }).catch(() => {});
     if (authed) api('top').then((d) => { card.querySelector('.board').innerHTML = boardHtml(d.top, d.group); }).catch(() => {});
   }
@@ -244,7 +244,7 @@
       <h1>${esc(meta.title)}</h1>
       <p>${esc(def.howto || meta.desc)}</p>
       <div class="ev"></div>
-      <div class="row"><button class="btn" data-act="play">▶ Играть</button></div>
+      <div class="row"><button class="btn" data-act="play">${L('▶ Играть', '▶ Play')}</button></div>
       <div class="board"></div>`);
     const playBtn = card.querySelector('[data-act=play]');
     const evBox = card.querySelector('.ev');
@@ -256,7 +256,7 @@
         api('start').then(go).catch((e) => { evBox.innerHTML = `<div class="badge">${esc(e.message)}</div>`; });
       },
     });
-    if (!authed) { evBox.innerHTML = '<p class="muted">Режим с общим уровнем (отладка)</p>'; return; }
+    if (!authed) { evBox.innerHTML = `<p class="muted">${L('Режим с общим уровнем (отладка)', 'Shared-level mode (debug)')}</p>`; return; }
     if (!event) playBtn.disabled = true; // ждём правила события, иначе попытка дуэли не зачтётся
     api('top').then((d) => {
       event = d.event || null;
@@ -271,16 +271,16 @@
 
   let lvPage = null;
   async function showLevels() {
-    const card = show(`<div class="emoji">${meta.emoji}</div><h1>Уровни</h1><p class="lvsum">Загружаю…</p>
+    const card = show(`<div class="emoji">${meta.emoji}</div><h1>${L('Уровни', 'Levels')}</h1><p class="lvsum">${L('Загружаю…', 'Loading…')}</p>
       <div class="lvnav"><button class="btn ghost" data-act="prev">◀</button><b class="pg"></b><button class="btn ghost" data-act="next">▶</button></div>
       <div class="levels"></div>
-      <p class="muted"><span style="color:${DIFF_COLORS[0]}">●</span> лёгкие 1–3 · <span style="color:${DIFF_COLORS[1]}">●</span> обычные 4–8 · <span style="color:${DIFF_COLORS[2]}">●</span> сложные 9–20 · <span style="color:${DIFF_COLORS[3]}">●</span> экстрим 21+</p>
-      <div class="row"><button class="btn ghost" data-act="menu">← Назад</button></div>`);
+      <p class="muted"><span style="color:${DIFF_COLORS[0]}">●</span> ${L('лёгкие', 'easy')} 1–3 · <span style="color:${DIFF_COLORS[1]}">●</span> ${L('обычные', 'normal')} 4–8 · <span style="color:${DIFF_COLORS[2]}">●</span> ${L('сложные', 'hard')} 9–20 · <span style="color:${DIFF_COLORS[3]}">●</span> ${L('экстрим', 'extreme')} 21+</p>
+      <div class="row"><button class="btn ghost" data-act="menu">${L('← Назад', '← Back')}</button></div>`);
     try { await loadLevels(); } catch (e) { card.querySelector('.lvsum').textContent = e.message; bind(card, { menu: showMenu }); return; }
     const pages = Math.ceil(levels.levels.length / PAGE);
     if (lvPage === null || lvPage >= pages) lvPage = Math.floor((levels.unlocked - 1) / PAGE);
     const draw = () => {
-      card.querySelector('.lvsum').textContent = `⭐ ${totalStars()} · открыт уровень ${levels.unlocked}. Набери цель — откроется следующий.`;
+      card.querySelector('.lvsum').textContent = L(`⭐ ${totalStars()} · открыт уровень ${levels.unlocked}. Набери цель — откроется следующий.`, `⭐ ${totalStars()} · level ${levels.unlocked} unlocked. Reach the goal to unlock the next one.`);
       card.querySelector('.pg').textContent = `${lvPage * PAGE + 1}–${(lvPage + 1) * PAGE}`;
       card.querySelector('[data-act=prev]').disabled = lvPage === 0;
       card.querySelector('[data-act=next]').disabled = lvPage >= pages - 1;
@@ -315,7 +315,7 @@
     const t = tierGet(), par = meta.par, good = asc() ? score <= par : score >= par, bad = asc() ? score > par * 1.6 : score < par * 0.4;
     const nt = good ? Math.min(4, t + 1) : bad ? Math.max(1, t - 1) : t;
     store.set('tier:' + gameId, nt);
-    return nt > t ? `<div class="badge">⬆️ Следующая партия сложнее: ступень ${nt}/4</div>` : nt < t ? `<p class="muted">Следующая партия чуть проще: ступень ${nt}/4</p>` : `<p class="muted">Сложность: ступень ${t}/4</p>`;
+    return nt > t ? `<div class="badge">${L('⬆️ Следующая партия сложнее: ступень', '⬆️ Next round is harder: step')} ${nt}/4</div>` : nt < t ? `<p class="muted">${L('Следующая партия чуть проще: ступень', 'Next round is a bit easier: step')} ${nt}/4</p>` : `<p class="muted">${L('Сложность: ступень', 'Difficulty: step')} ${t}/4</p>`;
   }
 
   function finish(score) {
@@ -328,24 +328,24 @@
     haptic(rec ? 'success' : 'warning');
     const card = show(`
       <div class="emoji">${rec ? '🏆' : meta.emoji}</div>
-      <h1>Игра окончена</h1>
+      <h1>${L('Игра окончена', 'Game over')}</h1>
       <div class="big">${fmt(score)}</div>
-      ${rec && prev != null ? '<div class="badge">Новый личный рекорд!</div>' : ''}
+      ${rec && prev != null ? `<div class="badge">${L('Новый личный рекорд!', 'New personal best!')}</div>` : ''}
       ${tierNote}
       <div class="progress"></div>
-      <div class="board">${authed ? '<p class="muted">Сохраняю результат…</p>' : '<p class="muted">Открой игру из Telegram, чтобы копить опыт и попадать в таблицы</p>'}</div>
-      <div class="row"><button class="btn ghost" data-act="menu">Меню</button>${single ? '' : '<button class="btn" data-act="again">↻ Ещё раз</button>'}</div>`);
+      <div class="board">${authed ? `<p class="muted">${L('Сохраняю результат…', 'Saving the result…')}</p>` : `<p class="muted">${L('Открой игру из Telegram, чтобы копить опыт и попадать в таблицы', 'Open the game from Telegram to earn XP and get on leaderboards')}</p>`}</div>
+      <div class="row"><button class="btn ghost" data-act="menu">${L('Меню', 'Menu')}</button>${single ? '' : `<button class="btn" data-act="again">${L('↻ Ещё раз', '↻ Again')}</button>`}</div>`);
     bind(card, { again: () => startRound(opts), menu: showMenu });
     if (authed && score != null) {
       api('score', { score }).then((d) => {
         if (d.event) event = d.event;
         card.querySelector('.progress').innerHTML = progressHtml(d.progress);
         card.querySelector('.board').innerHTML =
-          (d.chat_record && d.group && !event ? '<div class="badge">Рекорд чата! Бот расскажет всем 😎</div>' : '') +
+          (d.chat_record && d.group && !event ? `<div class="badge">${L('Рекорд чата! Бот расскажет всем 😎', 'Chat record! The bot will tell everyone 😎')}</div>` : '') +
           (event ? `<p class="muted">${esc(event.note)}</p>` : '') +
-          (d.rank ? `<p class="muted">Место: ${d.rank}</p>` : '') + boardHtml(d.top, d.group);
+          (d.rank ? `<p class="muted">${L('Место', 'Rank')}: ${d.rank}</p>` : '') + boardHtml(d.top, d.group);
         celebrate(d.progress);
-      }).catch((e) => { card.querySelector('.board').innerHTML = `<p class="muted">Не сохранилось: ${esc(e.message)}</p>`; });
+      }).catch((e) => { card.querySelector('.board').innerHTML = `<p class="muted">${L('Не сохранилось', 'Not saved')}: ${esc(e.message)}</p>`; });
     }
   }
 
@@ -357,21 +357,21 @@
     let near = '';
     if (!passed && score != null) {
       const diff = asc() ? score - goal : goal - score;
-      near = `<p>До цели не хватило: <b>${meta.format === 'sec' ? (diff / 1000).toFixed(2) + ' с' : diff + (meta.format === 'ms' ? ' мс' : '')}</b>. Ещё попытка?</p>`;
+      near = `<p>${L('До цели не хватило', 'Short of the goal by')}: <b>${meta.format === 'sec' ? (diff / 1000).toFixed(2) + L(' с', ' s') : diff + (meta.format === 'ms' ? L(' мс', ' ms') : '')}</b>. ${L('Ещё попытка?', 'Try again?')}</p>`;
     } else if (passed && stars < 3) {
       const g = asc() ? [goal, goal * 0.85, goal * 0.7] : [goal, goal * 1.25, goal * 1.5];
-      near = `<p class="muted">Для ${'★'.repeat(stars + 1)}: ${fmt(Math.ceil(g[stars]))}</p>`;
+      near = `<p class="muted">${L('Для', 'For')} ${'★'.repeat(stars + 1)}: ${fmt(Math.ceil(g[stars]))}</p>`;
     }
     const card = show(`
       <div class="emoji">${passed ? (stars === 3 ? '🌟' : '✅') : '😤'}</div>
-      <h1>Уровень ${k} ${passed ? 'пройден' : 'не пройден'}</h1>
+      <h1>${passed ? L(`Уровень ${k} пройден`, `Level ${k} cleared`) : L(`Уровень ${k} не пройден`, `Level ${k} failed`)}</h1>
       <div class="stars ${passed ? 'on' : ''}">${starStr(stars)}</div>
       <div class="big">${fmt(score)}</div>
-      <p class="muted">Цель: ${fmt(goal)} · ${DIFF_NAMES[diffOf(k)]} · скорость ×${speedOf(k).toFixed(2)}</p>
+      <p class="muted">${L('Цель', 'Goal')}: ${fmt(goal)} · ${DIFF_NAMES[diffOf(k)]} · ${L('скорость', 'speed')} ×${speedOf(k).toFixed(2)}</p>
       ${near}
-      <div class="progress">${authed ? '<p class="muted">Сохраняю…</p>' : ''}</div>
-      <div class="row"><button class="btn ghost" data-act="levels">Уровни</button><button class="btn ${passed ? 'ghost' : ''}" data-act="again">↻ Ещё раз</button>
-      ${passed ? '<button class="btn" data-act="next">Дальше ▶</button>' : ''}</div>`);
+      <div class="progress">${authed ? `<p class="muted">${L('Сохраняю…', 'Saving…')}</p>` : ''}</div>
+      <div class="row"><button class="btn ghost" data-act="levels">${L('Уровни', 'Levels')}</button><button class="btn ${passed ? 'ghost' : ''}" data-act="again">${L('↻ Ещё раз', '↻ Again')}</button>
+      ${passed ? `<button class="btn" data-act="next">${L('Дальше ▶', 'Next ▶')}</button>` : ''}</div>`);
     const nextK = k + 1;
     bind(card, {
       levels: showLevels,
@@ -383,9 +383,9 @@
     api('level', { level: k, score }).then((d) => {
       levels = { unlocked: d.unlocked, levels: d.levels };
       card.querySelector('.progress').innerHTML =
-        (d.progress.unlocked ? `<div class="badge">🔓 Открыт уровень ${d.progress.unlocked}</div>` : '') + progressHtml(d.progress);
+        (d.progress.unlocked ? `<div class="badge">🔓 ${L('Открыт уровень', 'Unlocked level')} ${d.progress.unlocked}</div>` : '') + progressHtml(d.progress);
       celebrate(d.progress);
-    }).catch((e) => { card.querySelector('.progress').innerHTML = `<p class="muted">Не сохранилось: ${esc(e.message)}</p>`; });
+    }).catch((e) => { card.querySelector('.progress').innerHTML = `<p class="muted">${L('Не сохранилось', 'Not saved')}: ${esc(e.message)}</p>`; });
   }
 
   function celebrate(p) {
@@ -428,11 +428,11 @@
       authed, isGroup: !!(startParam && startParam.split('_')[1] && startParam.split('_')[1][0] === 'm' && !qs.get('g')),
       /** Приложения: отправить картинку/текст. send: 'chat' — бот пришлёт в этот чат, 'any' — выбрать любой чат, 'none' — только сохранить */
       async share(p) {
-        if (!authed) throw new Error('Открой из Telegram, чтобы отправлять в чат');
+        if (!authed) throw new Error(L('Открой из Telegram, чтобы отправлять в чат', 'Open from Telegram to send to the chat'));
         const d = await api('share', p);
         if (p.send === 'any') {
           if (d.prepared && tg && tg.shareMessage) tg.shareMessage(d.prepared);
-          else throw new Error('Пересылка в любой чат недоступна — используй «В этот чат»');
+          else throw new Error(L('Пересылка в любой чат недоступна — используй «В этот чат»', 'Sharing to any chat is unavailable — use “To this chat”'));
         }
         return d;
       },
@@ -446,7 +446,7 @@
         const el = document.createElement('a'); el.href = dataUrl; el.download = filename; el.click();
       },
       /** Честный жребий на сервере (бот сам публикует результат в чат) */
-      roll(p) { return authed ? api('roll', p) : Promise.reject(new Error('Открой из Telegram, чтобы жребий был честным и попал в чат')); },
+      roll(p) { return authed ? api('roll', p) : Promise.reject(new Error(L('Открой из Telegram, чтобы жребий был честным и попал в чат', 'Open from Telegram so the draw is fair and posted to the chat'))); },
       /** Панель отправки: image() → dataURL PNG или text() → строка */
       shareBar(parent, { image, text, filename = 'arcade.png' }) {
         // для пересылки — JPEG на белом фоне (Telegram принимает в подготовленных сообщениях только JPEG), для файла — PNG
@@ -467,16 +467,16 @@
           try { await fn(); } catch (e) { a.toast(e.message); } finally { btn.disabled = false; }
         };
         if (image) {
-          const s = a.el('button', 'btn ghost', bar, '💾 Сохранить');
-          a.on(s, 'click', () => run(s, async () => { await a.save(image(), filename); a.toast('Сохраняю файл…'); }));
+          const s = a.el('button', 'btn ghost', bar, L('💾 Сохранить', '💾 Save'));
+          a.on(s, 'click', () => run(s, async () => { await a.save(image(), filename); a.toast(L('Сохраняю файл…', 'Saving the file…')); }));
         }
-        const c = a.el('button', 'btn', bar, '📤 В этот чат');
+        const c = a.el('button', 'btn', bar, L('📤 В этот чат', '📤 To this chat'));
         a.on(c, 'click', () => run(c, async () => {
           const d = await a.share(image ? { kind: 'image', image: await jpeg(), send: 'chat' } : { kind: 'text', text: text(), send: 'chat' });
-          a.toast(d.sent ? (d.group ? 'Отправил в чат ✅' : 'Отправил тебе в личку ✅') : 'Сохранено');
+          a.toast(d.sent ? (d.group ? L('Отправил в чат ✅', 'Sent to the chat ✅') : L('Отправил тебе в личку ✅', 'Sent to your private chat ✅')) : L('Сохранено', 'Saved'));
           a.haptic('success');
         }));
-        const any = a.el('button', 'btn ghost', bar, '↗️ В любой чат');
+        const any = a.el('button', 'btn ghost', bar, L('↗️ В любой чат', '↗️ To any chat'));
         a.on(any, 'click', () => run(any, async () => a.share(image ? { kind: 'image', image: await jpeg(), send: 'any' } : { kind: 'text', text: text(), send: 'any' })));
         return bar;
       },
@@ -543,7 +543,7 @@
         let left = sec * tf * 1000, last = performance.now(), done = false;
         hud.timer.hidden = false;
         const draw = () => {
-          hud.timer.textContent = Math.ceil(left / 1000) + 'с';
+          hud.timer.textContent = Math.ceil(left / 1000) + L('с', 's');
           hud.timer.classList.toggle('low', left <= 5000);
         };
         draw();
@@ -639,7 +639,7 @@
   window.Arcade = {
     /** Игра не смогла загрузиться (нет данных/сети) — показать понятную ошибку вместо пустого экрана */
     fail(msg) {
-      show(`<div class="emoji">⚠️</div><h1>Не загрузилось</h1><p>${esc(msg)}</p><div class="row"><button class="btn" onclick="location.reload()">↻ Повторить</button></div>`);
+      show(`<div class="emoji">⚠️</div><h1>${L('Не загрузилось', "Didn't load")}</h1><p>${esc(msg)}</p><div class="row"><button class="btn" onclick="location.reload()">${L('↻ Повторить', '↻ Retry')}</button></div>`);
     },
     register(d) {
       def = d;
@@ -653,10 +653,10 @@
   (async () => {
     try {
       const cat = await (await fetch('games/catalog.json', { cache: 'no-cache' })).json();
-      meta = cat.games.find((g) => g.id === gameId);
+      meta = localize(cat.games.find((g) => g.id === gameId));
     } catch (e) { /* ниже покажем ошибку */ }
     if (!meta) {
-      show('<div class="emoji">🤷</div><h1>Игра не найдена</h1><p>Открой игру из каталога бота.</p><a class="hublink" href="hub.html">🧠 В профиль</a>');
+      show(`<div class="emoji">🤷</div><h1>${L('Игра не найдена', 'Game not found')}</h1><p>${L('Открой игру из каталога бота.', "Open a game from the bot's catalog.")}</p><a class="hublink" href="hub.html">${L('🧠 В профиль', '🧠 To profile')}</a>`);
       return;
     }
     meta.par = meta.par || 10;
@@ -664,7 +664,7 @@
     setHudTitle();
     const s = document.createElement('script');
     s.src = 'games/' + gameId + '.js?v=' + (window.ARCADE_BUILD || ''); // версия сборки — чтобы Telegram не держал старый файл
-    s.onerror = () => show('<div class="emoji">⚠️</div><h1>Не загрузилась</h1><p>Попробуй позже.</p>');
+    s.onerror = () => show(`<div class="emoji">⚠️</div><h1>${L('Не загрузилась', "Didn't load")}</h1><p>${L('Попробуй позже.', 'Try again later.')}</p>`);
     document.body.appendChild(s);
   })();
 })();

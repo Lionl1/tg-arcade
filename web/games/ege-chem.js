@@ -1,7 +1,8 @@
-// Химия: вещества и формулы (8–11 класс, ЕГЭ). d — сложность.
+// Химия: вещества и формулы (8–11 класс, ЕГЭ). d — сложность. Названия на двух языках.
+const CHEM_EN = {"H₂O": "water", "NaCl": "sodium chloride (table salt)", "CO₂": "carbon dioxide", "H₂SO₄": "sulfuric acid", "HCl": "hydrochloric acid", "NH₃": "ammonia", "CH₄": "methane", "HNO₃": "nitric acid", "NaOH": "sodium hydroxide", "CaCO₃": "calcium carbonate (chalk, marble)", "C₂H₅OH": "ethanol", "C₆H₁₂O₆": "glucose", "H₂O₂": "hydrogen peroxide", "CO": "carbon monoxide", "NaHCO₃": "sodium bicarbonate (baking soda)", "KMnO₄": "potassium permanganate", "CH₃COOH": "acetic acid", "O₃": "ozone", "Fe₂O₃": "iron(III) oxide", "CaO": "calcium oxide (quicklime)", "Ca(OH)₂": "calcium hydroxide (slaked lime)", "CuSO₄": "copper(II) sulfate", "AgNO₃": "silver nitrate", "H₃PO₄": "phosphoric acid", "SO₂": "sulfur dioxide", "C₂H₂": "acetylene", "C₆H₆": "benzene"};
 Arcade.register(Learn.deck({
-  ask: 'Какое это вещество?',
-  askRev: 'Формула вещества',
+  ask: L('Какое это вещество?', 'Which substance is this?'),
+  askRev: L('Формула вещества', 'Formula of the substance'),
   both: true,
   big: false,
   cards: [
@@ -11,5 +12,5 @@ Arcade.register(Learn.deck({
     ['KMnO₄', 'перманганат калия', 2], ['CH₃COOH', 'уксусная кислота', 2], ['O₃', 'озон', 2], ['Fe₂O₃', 'оксид железа(III)', 3], ['CaO', 'оксид кальция (негашёная известь)', 3],
     ['Ca(OH)₂', 'гидроксид кальция (гашёная известь)', 3], ['CuSO₄', 'сульфат меди(II)', 3], ['AgNO₃', 'нитрат серебра', 3], ['H₃PO₄', 'ортофосфорная кислота', 3],
     ['SO₂', 'оксид серы(IV)', 3], ['C₂H₂', 'ацетилен', 3], ['C₆H₆', 'бензол', 3],
-  ].map(([q, a, d]) => ({ q, a, d })),
+  ].map(([q, a, d]) => ({ q, a: L(a, CHEM_EN[q]), d })),
 }));

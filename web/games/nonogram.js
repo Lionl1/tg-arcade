@@ -1,6 +1,6 @@
 // Японский кроссворд: восстанови картинку по числам. Генератор рисует случайную картинку и считает подсказки.
 Arcade.register({
-  howto: 'Числа у строки/столбца — длины закрашенных отрезков по порядку (между ними хотя бы одна пустая клетка). Тап закрашивает клетку; в режиме ✖ ставишь пометку «точно пусто». Решено, когда все числа совпали. Поле растёт. 5 минут.',
+  howto: L('Числа у строки/столбца — длины закрашенных отрезков по порядку (между ними хотя бы одна пустая клетка). Тап закрашивает клетку; в режиме ✖ ставишь пометку «точно пусто». Решено, когда все числа совпали. Поле растёт. 5 минут.', 'The numbers by each row/column are the lengths of filled runs, in order (with at least one empty cell between them). A tap fills a cell; in ✖ mode you mark “definitely empty”. Solved when all numbers match. The grid grows. 5 minutes.'),
   start(api) {
     const box = api.el('div', 'fill');
     box.style.gap = '10px';
@@ -8,7 +8,7 @@ Arcade.register({
     const wrap = api.el('div', '', box);
     const row = api.el('div', 'row', box);
     row.style.cssText = 'width:min(90vw,360px)';
-    const modeBtn = api.el('button', 'btn', row, '✏️ Закрашивать');
+    const modeBtn = api.el('button', 'btn', row, L('✏️ Закрашивать', '✏️ Fill'));
     api.timer(300);
     let n = Math.min(10, 5 + Math.floor((api.level || 0) / 4)), sol, cur, rows, cols, mark = false, solved = 0;
 
@@ -25,7 +25,7 @@ Arcade.register({
       draw();
     }
     function draw() {
-      info.textContent = `Поле ${n}×${n} · решено: ${solved}`;
+      info.textContent = L(`Поле ${n}×${n} · решено: ${solved}`, `Grid ${n}×${n} · solved: ${solved}`);
       const maxR = Math.max(...rows.map((r) => r.length)), maxC = Math.max(...cols.map((c) => c.length));
       const size = Math.floor(Math.min(window.innerWidth * 0.92, window.innerHeight * 0.55) / (n + Math.max(maxR, maxC) * 0.6));
       const fs = Math.max(9, Math.floor(size * 0.42));
@@ -65,7 +65,7 @@ Arcade.register({
         api.after(700, fresh);
       }
     });
-    api.on(modeBtn, 'click', () => { mark = !mark; modeBtn.textContent = mark ? '✖ Помечать пустые' : '✏️ Закрашивать'; modeBtn.className = mark ? 'btn ghost' : 'btn'; });
+    api.on(modeBtn, 'click', () => { mark = !mark; modeBtn.textContent = mark ? L('✖ Помечать пустые', '✖ Mark empty') : L('✏️ Закрашивать', '✏️ Fill'); modeBtn.className = mark ? 'btn ghost' : 'btn'; });
     fresh();
   },
 });

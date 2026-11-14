@@ -1,5 +1,5 @@
 Arcade.register({
-  howto: 'Тапай (или пробел), чтобы шарик подлетал. Пролетай в просветы между колоннами.',
+  howto: L('Тапай (или пробел), чтобы шарик подлетал. Пролетай в просветы между колоннами.', 'Tap (or space) to make the balloon rise. Fly through the gaps between the columns.'),
   start(api) {
     const g = api.canvas(), C = api.colors, x = g.ctx;
     const r = 15, px = g.W * 0.28, w = 58, G = 1150, FLAP = -360;
@@ -49,7 +49,7 @@ Arcade.register({
       x.beginPath(); x.ellipse(px - 5, y - 6, 4, 6, -0.5, 0, 7); x.fill();
       if (!started) {
         x.fillStyle = C.fg; x.font = '600 18px system-ui'; x.textAlign = 'center';
-        x.fillText('Тапни, чтобы взлететь', g.W / 2, g.H * 0.65);
+        x.fillText(L('Тапни, чтобы взлететь', 'Tap to take off'), g.W / 2, g.H * 0.65);
       }
     });
   },

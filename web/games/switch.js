@@ -1,6 +1,6 @@
 // Переключение задач: правило зависит от того, где появилось число
 Arcade.register({
-  howto: 'Число появляется в верхней или нижней панели. Сверху отвечай: «чётное?». Снизу: «больше 5?». Правило меняется на лету — тренирует гибкость мышления. Ошибка −2 с. 45 секунд.',
+  howto: L('Число появляется в верхней или нижней панели. Сверху отвечай: «чётное?». Снизу: «больше 5?». Правило меняется на лету — тренирует гибкость мышления. Ошибка −2 с. 45 секунд.', 'A number appears in the top or bottom panel. Top: answer “even?”. Bottom: “greater than 5?”. The rule changes on the fly — this trains mental flexibility. A mistake costs 2 s. 45 seconds.'),
   start(api) {
     const box = api.el('div', 'fill');
     box.style.gap = '10px';
@@ -12,11 +12,11 @@ Arcade.register({
       v.style.fontSize = 'min(18vw,80px)';
       return v;
     };
-    const top = mk('Сверху: число ЧЁТНОЕ?');
-    const bot = mk('Снизу: число БОЛЬШЕ 5?');
+    const top = mk(L('Сверху: число ЧЁТНОЕ?', 'Top: is the number EVEN?'));
+    const bot = mk(L('Снизу: число БОЛЬШЕ 5?', 'Bottom: is the number GREATER THAN 5?'));
     const ch = api.el('div', 'choices', box);
-    const no = api.el('button', 'btn ghost', ch, 'Нет');
-    const yes = api.el('button', 'btn', ch, 'Да');
+    const no = api.el('button', 'btn ghost', ch, L('Нет', 'No'));
+    const yes = api.el('button', 'btn', ch, L('Да', 'Yes'));
     const tm = api.timer(45);
     let answer = false, cancelT = () => {};
 

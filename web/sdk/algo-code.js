@@ -591,3 +591,19 @@ assert [r.val, r.next.val, r.next.next.val] == [3, 2, 1] and r.next.next.next is
     jsTest: `minCoins([1, 3, 4], 6) === 2 && minCoins([2], 3) === -1 && minCoins([1, 5, 10], 27) === 5`,
   },
 };
+
+// Комментарии в коде для английского интерфейса (сам код и тесты не меняются)
+window.ALGO_CODE_EN = [
+  ["grid — список строк, '#' — стена; возвращает длину кратчайшего пути или -1", "grid is a list of strings, '#' is a wall; returns the shortest path length or -1"],
+  ['Есть ли путь? Обход в глубину со стеком', 'Is there a path? Depth-first search with a stack'],
+  ['для простоты — сортируемый массив вместо кучи', 'for simplicity, a sorted array instead of a heap'],
+  ['graph = {вершина: [(сосед, вес), ...]}; возвращает кратчайшие расстояния', 'graph = {vertex: [(neighbour, weight), ...]}; returns the shortest distances'],
+  ['массив вместо кучи — проще читать', 'an array instead of a heap — easier to read'],
+  ['2 — последний пришёл, первым ушёл', '2 — last in, first out'],
+  ['1 — первым пришёл, первым ушёл', '1 — first in, first out'],
+  ['1 (для больших очередей — кольцевой буфер)', '1 (for large queues use a ring buffer)'],
+  ['1 — в Python куча минимальная', "1 — Python's heap is a min-heap"],
+  ['своя max-куча: вставка с «всплытием»', 'our own max-heap: insert with “sift up”'],
+  ['max-куча на массиве', 'max-heap on an array'],
+  ['dp[s] — минимум монет для суммы s', 'dp[s] — the fewest coins for sum s'],
+];

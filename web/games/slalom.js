@@ -1,6 +1,6 @@
 // Слалом: веди лыжника пальцем через ворота, объезжай ёлки
 Arcade.register({
-  howto: 'Веди пальцем влево-вправо (или стрелки). Проезжай между флажками ворот (+1). Пропустил ворота — минус жизнь, врезался в ёлку — конец. Склон всё круче.',
+  howto: L('Веди пальцем влево-вправо (или стрелки). Проезжай между флажками ворот (+1). Пропустил ворота — минус жизнь, врезался в ёлку — конец. Склон всё круче.', 'Drag left and right (or use the arrows). Pass between the gate flags (+1). Missing a gate costs a life, hitting a tree ends the run. The slope keeps getting steeper.'),
   start(api) {
     const g = api.canvas(), x = g.ctx, C = api.colors, keys = api.keys();
     let px = g.W / 2, target = px, objs = [], next = 0.8, dist = 0, lives = 3, dead = false, trail = [];

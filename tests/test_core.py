@@ -124,7 +124,7 @@ def client(tmp_path: Path):
     settings = Settings(bot_token=TOKEN, db_path=str(tmp_path / "t.db"))
     records = []
 
-    async def on_record(chat_id, game, name, score):
+    async def on_record(chat_id, game, name, score, lang="ru"):
         records.append((chat_id, game.id, name, score))
 
     store = Store(settings.db_path)
@@ -487,3 +487,52 @@ def test_group_posting_guard(tmp_path):
         await member.guard(42, 1)  # личка — без ограничений
 
     asyncio.run(run())
+
+
+# ---------- два языка ----------
+
+def test_i18n_language_pick():
+    from app.i18n import from_code, pick
+
+    assert from_code("ru") == "ru" and from_code("uk") == "ru" and from_code("en-US") == "en" and from_code("pt-br") == "en"
+    assert from_code(None) == "ru"
+    assert pick("en", "ru") == "en" and pick("auto", "de") == "en" and pick(None, "kk") == "ru"
+
+
+def test_catalog_languages():
+    cat = Catalog(ROOT / "web/games/catalog.json")
+    ru, en = cat.list(lang="ru"), cat.list(lang="en")
+    assert all(g.lang != "en" for g in ru) and all(g.lang != "ru" for g in en)
+    assert cat.get("ege-stress") not in en and cat.get("en-confused") in en
+    assert all(g.title_en for g in en), "у каждой игры английского каталога есть английское название"
+    for s in cat.sections:
+        assert s.title_en and all(gr.title_en for gr in s.groups)
+    snake = cat.get("snake")
+    assert snake.label("en") == "🐍 Snake" or snake.t("en") == "Snake"
+    assert cat.find("snake", "en") is snake and cat.find("змейка", "en") is snake  # ищем на любом языке
+    assert cat.get("reaction").fmt(250, "en") == "250 ms" and cat.get("reaction").fmt(250) == "250 мс"
+
+
+def test_profile_and_events_in_english(client):
+    c = client
+    r = c.post("/api/profile", json={"initData": init_data(81), "lang": "en"}).json()
+    assert r["title"] == "Rookie"
+    assert any(a["title"] == "First step" for a in r["achievements"])
+    assert r["skills"][0]["title"].endswith("Speed")
+    assert {o["key"]: o for o in r["prefs_schema"]}["lang"]["title"] == "Language"
+    daily = [c.catalog.get(i["id"]) for i in r["daily"]["games"]]
+    assert all(g.lang != "ru" for g in daily), "в тренировку дня англоязычному не попадают русские колоды"
+    # язык из настроек сохраняется для напоминаний
+    c.post("/api/settings", json={"initData": init_data(81), "changes": {"lang": "en"}})
+    assert asyncio.run(c.store._one("SELECT lang FROM users WHERE user_id=81"))[0] == "en"
+    # турнир, созданный на английском, объявляется по-английски
+    asyncio.run(c.events.create_tournament(-500, c.catalog.get("snake"), 30, 81, "Ann", "en"))
+    assert "Tournament" in c.bot.sent[-1][1] and "Турнир" not in c.bot.sent[-1][1]
+
+
+def test_reminder_text_languages():
+    from app.reminders import reminder_text
+
+    info = {"daily": {"games": [1, 2, 3], "count": 1}, "streak": {"current": 4, "freezes": 1}, "lang": "en"}
+    assert "daily workout" in reminder_text("Ann Lee", info) and "Streak" in reminder_text("Ann Lee", info)
+    assert "тренировку дня" in reminder_text("Аня", {**info, "lang": "ru"})

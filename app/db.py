@@ -30,7 +30,8 @@ CREATE TABLE IF NOT EXISTS events (
     ends_at       INTEGER NOT NULL,
     status        TEXT    NOT NULL DEFAULT 'active',
     message_id    INTEGER,
-    created       INTEGER NOT NULL
+    created       INTEGER NOT NULL,
+    lang          TEXT    NOT NULL DEFAULT 'ru'  -- язык сообщений события (ru | en)
 );
 CREATE INDEX IF NOT EXISTS events_due ON events (status, ends_at);
 
@@ -46,6 +47,7 @@ CREATE TABLE IF NOT EXISTS users (
     created     INTEGER NOT NULL,
     prefs       TEXT    NOT NULL DEFAULT '{}',   -- личные настройки (только отличия от умолчаний)
     nickname    TEXT,                            -- свой ник (вместо имени из Telegram)
+    lang        TEXT,                            -- язык интерфейса (ru | en): для напоминаний
     avatar      TEXT                             -- эмодзи-аватар
 );
 CREATE TABLE IF NOT EXISTS chats (
@@ -101,7 +103,7 @@ CREATE TABLE IF NOT EXISTS event_scores (
 );
 """
 
-EVENT_COLS = "id, kind, chat_id, game, created_by, creator_name, opponent_id, opponent_name, ends_at, status, message_id, created"
+EVENT_COLS = "id, kind, chat_id, game, created_by, creator_name, opponent_id, opponent_name, ends_at, status, message_id, created, lang"
 
 
 @dataclass
@@ -118,6 +120,7 @@ class Event:
     status: str
     message_id: int | None
     created: int
+    lang: str = "ru"
 
 
 @dataclass
@@ -161,6 +164,11 @@ class Store:
                         await conn.execute("ALTER TABLE users ADD COLUMN nickname TEXT")
                     if "avatar" not in cols:
                         await conn.execute("ALTER TABLE users ADD COLUMN avatar TEXT")
+                    if "lang" not in cols:
+                        await conn.execute("ALTER TABLE users ADD COLUMN lang TEXT")
+                    ecols = {r[1] for r in await (await conn.execute("PRAGMA table_info(events)")).fetchall()}
+                    if "lang" not in ecols:
+                        await conn.execute("ALTER TABLE events ADD COLUMN lang TEXT NOT NULL DEFAULT 'ru'")
                     await conn.commit()
                     self._conn = conn
         return self._conn
@@ -241,13 +249,13 @@ class Store:
         return await cur.fetchone()
 
     async def create_event(self, kind: str, chat_id: int, game: str, user_id: int, name: str, ends_at: int,
-                           opponent_id: int | None = None, opponent_name: str | None = None) -> Event:
+                           opponent_id: int | None = None, opponent_name: str | None = None, lang: str = "ru") -> Event:
         db = await self._db()
         async with self._lock:
             cur = await db.execute(
-                "INSERT INTO events (kind, chat_id, game, created_by, creator_name, opponent_id, opponent_name, ends_at, created)"
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (kind, chat_id, game, user_id, name, opponent_id, opponent_name, ends_at, int(time.time())),
+                "INSERT INTO events (kind, chat_id, game, created_by, creator_name, opponent_id, opponent_name, ends_at, created, lang)"
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (kind, chat_id, game, user_id, name, opponent_id, opponent_name, ends_at, int(time.time()), lang),
             )
             await db.commit()
             event_id = cur.lastrowid

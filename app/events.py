@@ -13,6 +13,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ReplyParam
 
 from .catalog import Catalog, Game
 from .db import Event, Store
+from .i18n import tr
 from .links import Links
 
 log = logging.getLogger("arcade.events")
@@ -25,7 +26,7 @@ MAX_ACTIVE = int(os.getenv("MAX_ACTIVE_EVENTS", "5"))  # одновременн�
 EDIT_EVERY = 4.0  # не чаще, чем раз в N секунд правим карточку
 MEDALS = ["🥇", "🥈", "🥉"]
 
-DUR_RE = re.compile(r"^(\d{1,4})\s*(m|м|min|мин|h|ч|час|часа|часов|d|д|дн|день|дня|дней)?$", re.I)
+DUR_RE = re.compile(r"^(\d{1,4})\s*(m|min|mins|minutes?|м|мин|h|hr|hrs|hours?|ч|час|часа|часов|d|days?|д|дн|день|дня|дней)?$", re.I)
 
 
 def parse_duration(token: str) -> int | None:
@@ -41,14 +42,15 @@ def parse_duration(token: str) -> int | None:
     return n
 
 
-def fmt_left(sec: float) -> str:
+def fmt_left(sec: float, lang: str = "ru") -> str:
     sec = max(0, int(sec))
     d, h, m = sec // 86400, sec % 86400 // 3600, sec % 3600 // 60
+    D, H, M = ("d", "h", "min") if lang == "en" else ("д", "ч", "мин")
     if d:
-        return f"{d} д {h} ч" if h else f"{d} д"
+        return f"{d} {D} {h} {H}" if h else f"{d} {D}"
     if h:
-        return f"{h} ч {m} мин" if m else f"{h} ч"
-    return f"{max(m, 1)} мин"
+        return f"{h} {H} {m} {M}" if m else f"{h} {H}"
+    return f"{max(m, 1)} {M}"
 
 
 class EventError(Exception):
@@ -69,34 +71,36 @@ class Events:
 
     # ---------- создание ----------
 
-    async def _check_limit(self, chat_id: int) -> None:
+    async def _check_limit(self, chat_id: int, lang: str) -> None:
         if len(await self.store.active_events(chat_id)) >= MAX_ACTIVE:
-            raise EventError(429, f"В чате уже {MAX_ACTIVE} активных турниров и дуэлей — дождитесь итогов. /events")
+            raise EventError(429, tr(lang, f"В чате уже {MAX_ACTIVE} активных турниров и дуэлей — дождитесь итогов. /events",
+                                     f"This chat already has {MAX_ACTIVE} active tournaments and duels — wait for the results. /events"))
 
     async def chat_prefs(self, chat_id: int) -> dict:
         from .prefs import CHAT, defaults
         return await self.progress.prefs.chat(chat_id) if self.progress else defaults(CHAT)
 
-    async def create_tournament(self, chat_id: int, game: Game, minutes: int | None, user_id: int, name: str) -> Event:
+    async def create_tournament(self, chat_id: int, game: Game, minutes: int | None, user_id: int, name: str,
+                                lang: str = "ru") -> Event:
         cp = await self.chat_prefs(chat_id)
         if not cp["tours"]:
-            raise EventError(403, "Турниры в этом чате выключены админами (/settings)")
-        await self._check_limit(chat_id)
+            raise EventError(403, tr(lang, "Турниры в этом чате выключены админами (/settings)", "Admins turned tournaments off in this chat (/settings)"))
+        await self._check_limit(chat_id, lang)
         minutes = max(TOUR_MIN, min(TOUR_MAX, minutes or cp["tour_minutes"]))
-        ev = await self.store.create_event("tour", chat_id, game.id, user_id, name, int(time.time()) + minutes * 60)
+        ev = await self.store.create_event("tour", chat_id, game.id, user_id, name, int(time.time()) + minutes * 60, lang=lang)
         await self._post(ev, pin=cp["pin"])
         return ev
 
     async def create_duel(self, chat_id: int, game: Game, user_id: int, name: str,
-                          opponent_id: int | None = None, opponent_name: str | None = None) -> Event:
+                          opponent_id: int | None = None, opponent_name: str | None = None, lang: str = "ru") -> Event:
         if opponent_id == user_id:
-            raise EventError(400, "С самим собой дуэль не получится 🙂")
+            raise EventError(400, tr(lang, "С самим собой дуэль не получится 🙂", "You can't duel yourself 🙂"))
         cp = await self.chat_prefs(chat_id)
         if not cp["duels"]:
-            raise EventError(403, "Дуэли в этом чате выключены админами (/settings)")
-        await self._check_limit(chat_id)
+            raise EventError(403, tr(lang, "Дуэли в этом чате выключены админами (/settings)", "Admins turned duels off in this chat (/settings)"))
+        await self._check_limit(chat_id, lang)
         ev = await self.store.create_event(
-            "duel", chat_id, game.id, user_id, name, int(time.time()) + cp["duel_hours"] * 3600, opponent_id, opponent_name
+            "duel", chat_id, game.id, user_id, name, int(time.time()) + cp["duel_hours"] * 3600, opponent_id, opponent_name, lang
         )
         await self._post(ev)
         return ev
@@ -106,41 +110,45 @@ class Events:
     async def card(self, ev: Event) -> tuple[str, InlineKeyboardMarkup | None]:
         game = self.catalog.get(ev.game)
         active = ev.status == "active"
+        L = ev.lang
+        left = fmt_left(ev.ends_at - time.time(), L)
         if ev.kind == "tour":
             rows = await self.store.event_top(ev.id, game.asc, 10)
-            lines = [f"{MEDALS[i] if i < 3 else f'{i + 1}.'} {escape(r.name)} — {game.fmt(r.best)}" for i, r in enumerate(rows)]
-            status = f"⏳ До финиша: {fmt_left(ev.ends_at - time.time())}" if active else "🏁 Турнир завершён"
+            lines = [f"{MEDALS[i] if i < 3 else f'{i + 1}.'} {escape(r.name)} — {game.fmt(r.best, L)}" for i, r in enumerate(rows)]
+            status = tr(L, f"⏳ До финиша: {left}", f"⏳ Ends in: {left}") if active else tr(L, "🏁 Турнир завершён", "🏁 Tournament over")
             text = (
-                f"🏆 <b>Турнир: {escape(game.name)}</b>\n{escape(game.desc)}\n\n"
-                "Уровень у всех одинаковый, попыток сколько угодно — в зачёт идёт лучшая.\n"
-                f"{status}\n\n" + ("\n".join(lines) if lines else "Пока никто не сыграл — будь первым!")
+                f"🏆 <b>{tr(L, 'Турнир', 'Tournament')}: {escape(game.label(L))}</b>\n{escape(game.d(L))}\n\n"
+                + tr(L, "Уровень у всех одинаковый, попыток сколько угодно — в зачёт идёт лучшая.\n",
+                     "Everyone plays the same level, unlimited tries — your best one counts.\n")
+                + f"{status}\n\n" + ("\n".join(lines) if lines else tr(L, "Пока никто не сыграл — будь первым!", "No one has played yet — be the first!"))
             )
-            play = "▶️ Играть"
+            play = tr(L, "▶️ Играть", "▶️ Play")
         else:
             a = await self.store.event_entry(ev.id, ev.created_by)
             b = await self.store.event_entry(ev.id, ev.opponent_id) if ev.opponent_id else None
 
             def line(name: str, entry) -> str:
                 if entry and entry[0] is not None:
-                    return f"{escape(name)} — " + (game.fmt(entry[0]) if not active else "✅ сыграно")
-                return f"{escape(name)} — " + ("⏳ ждём" if active else "не сыграно")
+                    return f"{escape(name)} — " + (game.fmt(entry[0], L) if not active else tr(L, "✅ сыграно", "✅ played"))
+                return f"{escape(name)} — " + (tr(L, "⏳ ждём", "⏳ waiting") if active else tr(L, "не сыграно", "didn't play"))
 
-            opp = ev.opponent_name or "кто примет вызов?"
-            status = f"⏳ Осталось: {fmt_left(ev.ends_at - time.time())}" if active else "🏁 Дуэль завершена"
+            opp = ev.opponent_name or tr(L, "кто примет вызов?", "who accepts the challenge?")
+            status = tr(L, f"⏳ Осталось: {left}", f"⏳ Time left: {left}") if active else tr(L, "🏁 Дуэль завершена", "🏁 Duel over")
             text = (
-                f"⚔️ <b>Дуэль: {escape(game.name)}</b>\n"
+                f"⚔️ <b>{tr(L, 'Дуэль', 'Duel')}: {escape(game.label(L))}</b>\n"
                 f"{escape(ev.creator_name)} vs {escape(opp)}\n\n"
-                "Один и тот же уровень, у каждого одна попытка. Результаты откроются, когда сыграют оба.\n"
-                f"{status}\n\n{line(ev.creator_name, a)}\n"
-                + (line(ev.opponent_name, b) if ev.opponent_id else "🫵 Нажми «Принять вызов», чтобы сразиться")
+                + tr(L, "Один и тот же уровень, у каждого одна попытка. Результаты откроются, когда сыграют оба.\n",
+                     "Same level, one try each. Results are revealed when both have played.\n")
+                + f"{status}\n\n{line(ev.creator_name, a)}\n"
+                + (line(ev.opponent_name, b) if ev.opponent_id else tr(L, "🫵 Нажми «Принять вызов», чтобы сразиться", "🫵 Tap “Accept challenge” to fight"))
             )
-            play = "▶️ Играть" if ev.opponent_id else "⚔️ Принять вызов"
+            play = tr(L, "▶️ Играть", "▶️ Play") if ev.opponent_id else tr(L, "⚔️ Принять вызов", "⚔️ Accept challenge")
         if not active or not self.links:
             return text, None
         kb = InlineKeyboardMarkup(
             inline_keyboard=[
                 [InlineKeyboardButton(text=play, url=self.links.event(ev.game, ev.id))],
-                [InlineKeyboardButton(text="🔄 Обновить", callback_data=f"ev:{ev.id}")],
+                [InlineKeyboardButton(text=tr(L, "🔄 Обновить", "🔄 Refresh"), callback_data=f"ev:{ev.id}")],
             ]
         )
         return text, kb
@@ -193,41 +201,42 @@ class Events:
     def _open(ev: Event, grace: int = 0) -> bool:
         return ev.status == "active" and time.time() < ev.ends_at + grace
 
-    async def _join_duel(self, ev: Event, user_id: int, name: str) -> Event:
+    async def _join_duel(self, ev: Event, user_id: int, name: str, lang: str = "ru") -> Event:
         if user_id in (ev.created_by, ev.opponent_id):
             return ev
         if ev.opponent_id is None and await self.store.claim_opponent(ev.id, user_id, name):
             self._spawn(self.refresh(ev.id))
             return await self.store.get_event(ev.id)
-        raise EventError(403, "Это чужая дуэль — брось свой вызов: /duel")
+        raise EventError(403, tr(lang, "Это чужая дуэль — брось свой вызов: /duel", "This is someone else's duel — start your own: /duel"))
 
-    async def info(self, ev: Event, user_id: int) -> dict:
+    async def info(self, ev: Event, user_id: int, lang: str = "ru") -> dict:
         game = self.catalog.get(ev.game)
         entry = await self.store.event_entry(ev.id, user_id)
-        left = fmt_left(ev.ends_at - time.time())
+        L = lang
+        left = fmt_left(ev.ends_at - time.time(), L)
         if ev.kind == "tour":
             open_ = self._open(ev)
             return {
                 "kind": "tour", "single": False, "closed": not open_,
-                "title": f"🏆 Турнир · до финиша {left}" if open_ else "🏁 Турнир завершён",
-                "note": "Уровень у всех одинаковый. Попыток сколько угодно, в зачёт идёт лучшая." if open_
-                else "Можно потренироваться в обычном режиме: /play " + game.title,
+                "title": tr(L, f"🏆 Турнир · до финиша {left}", f"🏆 Tournament · ends in {left}") if open_ else tr(L, "🏁 Турнир завершён", "🏁 Tournament over"),
+                "note": tr(L, "Уровень у всех одинаковый. Попыток сколько угодно, в зачёт идёт лучшая.", "Everyone plays the same level. Unlimited tries, your best one counts.") if open_
+                else tr(L, "Можно потренироваться в обычном режиме: /play ", "You can practise in normal mode: /play ") + game.t(L),
             }
         opp = ev.opponent_name or "?"
         outsider = ev.opponent_id is not None and user_id not in (ev.created_by, ev.opponent_id)
         played = entry is not None
         if not self._open(ev):
-            note = "Дуэль завершена"
+            note = tr(L, "Дуэль завершена", "Duel over")
         elif outsider:
-            note = "Это чужая дуэль — брось свой вызов: /duel"
+            note = tr(L, "Это чужая дуэль — брось свой вызов: /duel", "This is someone else's duel — start your own: /duel")
         elif played:
-            note = "Попытка использована. Результат откроется, когда сыграет соперник."
+            note = tr(L, "Попытка использована. Результат откроется, когда сыграет соперник.", "Try used. The result is revealed when your opponent plays.")
         else:
-            note = f"Одна попытка! Уровень такой же, как у соперника. Осталось {left}."
+            note = tr(L, f"Одна попытка! Уровень такой же, как у соперника. Осталось {left}.", f"One try! Same level as your opponent. {left} left.")
         return {
             "kind": "duel", "single": True, "played": played,
             "closed": played or outsider or not self._open(ev),
-            "title": f"⚔️ Дуэль: {ev.creator_name} vs {opp}", "note": note,
+            "title": f"⚔️ {tr(L, 'Дуэль', 'Duel')}: {ev.creator_name} vs {opp}", "note": note,
         }
 
     async def top(self, ev: Event, user_id: int) -> list:
@@ -238,27 +247,27 @@ class Events:
                 return []  # не подглядываем результат соперника до своей попытки
         return await self.store.event_top(ev.id, game.asc, 10)
 
-    async def start(self, ev: Event, user_id: int, name: str) -> None:
+    async def start(self, ev: Event, user_id: int, name: str, lang: str = "ru") -> None:
         if not self._open(ev):
-            raise EventError(410, "Это событие уже закончилось")
+            raise EventError(410, tr(lang, "Это событие уже закончилось", "This event is already over"))
         if ev.kind != "duel":
             return
-        ev = await self._join_duel(ev, user_id, name)
+        ev = await self._join_duel(ev, user_id, name, lang)
         if not await self.store.start_attempt(ev.id, user_id, name):
-            raise EventError(409, "Ты уже использовал свою попытку в этой дуэли")
+            raise EventError(409, tr(lang, "Ты уже использовал свою попытку в этой дуэли", "You've already used your try in this duel"))
         self._spawn(self.refresh(ev.id))
 
-    async def submit(self, ev: Event, user_id: int, name: str, score: int) -> None:
+    async def submit(self, ev: Event, user_id: int, name: str, score: int, lang: str = "ru") -> None:
         if not self._open(ev, GRACE):
-            raise EventError(410, "Событие уже закончилось")
+            raise EventError(410, tr(lang, "Событие уже закончилось", "The event is already over"))
         game = self.catalog.get(ev.game)
         if ev.kind == "tour":
             await self.store.event_submit(ev.id, user_id, name, score, game.asc, single=False)
             self._spawn(self.refresh(ev.id))
             return
-        ev = await self._join_duel(ev, user_id, name)
+        ev = await self._join_duel(ev, user_id, name, lang)
         if not await self.store.event_submit(ev.id, user_id, name, score, game.asc, single=True):
-            raise EventError(409, "Попытка в дуэли не была начата или уже засчитана")
+            raise EventError(409, tr(lang, "Попытка в дуэли не была начата или уже засчитана", "The duel try wasn't started or was already counted"))
         a = await self.store.event_entry(ev.id, ev.created_by)
         b = await self.store.event_entry(ev.id, ev.opponent_id) if ev.opponent_id else None
         if a and b and a[0] is not None and b[0] is not None and await self.store.finish_event(ev.id):
@@ -273,6 +282,8 @@ class Events:
         if not ev or not self.bot:
             return
         game = self.catalog.get(ev.game)
+        L = ev.lang
+        G = escape(game.label(L))
         await self.refresh(ev.id, force=True)
         if ev.kind == "tour":
             rows = await self.store.event_top(ev.id, game.asc, 3)
@@ -280,10 +291,11 @@ class Events:
             if rows and self.progress:
                 await self.progress.award(rows[0].user_id, "tour_win")
             if rows:
-                podium = "\n".join(f"{MEDALS[i]} <b>{escape(r.name)}</b> — {game.fmt(r.best)}" for i, r in enumerate(rows))
-                text = f"🏁 Турнир по {escape(game.name)} завершён!\n\n{podium}\n\nУчастников: {n}. Ещё один? /tournament"
+                podium = "\n".join(f"{MEDALS[i]} <b>{escape(r.name)}</b> — {game.fmt(r.best, L)}" for i, r in enumerate(rows))
+                text = tr(L, f"🏁 Турнир по {G} завершён!\n\n{podium}\n\nУчастников: {n}. Ещё один? /tournament",
+                          f"🏁 The {G} tournament is over!\n\n{podium}\n\nPlayers: {n}. Another one? /tournament")
             else:
-                text = f"🏁 Турнир по {escape(game.name)} завершён — никто не сыграл 😴"
+                text = tr(L, f"🏁 Турнир по {G} завершён — никто не сыграл 😴", f"🏁 The {G} tournament is over — nobody played 😴")
             try:
                 await self.bot.unpin_chat_message(ev.chat_id, message_id=ev.message_id)
             except TelegramAPIError:
@@ -293,23 +305,24 @@ class Events:
             b = await self.store.event_entry(ev.id, ev.opponent_id) if ev.opponent_id else None
             sa = a[0] if a else None
             sb = b[0] if b else None
-            A, B = escape(ev.creator_name), escape(ev.opponent_name or "соперник")
+            A, B = escape(ev.creator_name), escape(ev.opponent_name or tr(L, "соперник", "opponent"))
             if sa is not None and sb is not None:
                 if sa == sb:
-                    text = f"🤝 Дуэль в {escape(game.name)}: ничья! {A} и {B} — по {game.fmt(sa)}"
+                    text = tr(L, f"🤝 Дуэль в {G}: ничья! {A} и {B} — по {game.fmt(sa, L)}", f"🤝 {G} duel: a draw! {A} and {B} — {game.fmt(sa, L)} each")
                 else:
                     a_wins = (sa < sb) if game.asc else (sa > sb)
                     if self.progress:
                         await self.progress.award(ev.created_by if a_wins else ev.opponent_id, "duel_win")
                     (w, ws), (l, ls) = ((A, sa), (B, sb)) if a_wins else ((B, sb), (A, sa))
-                    text = f"⚔️ Дуэль в {escape(game.name)}: 🏆 <b>{w}</b> побеждает {l} — {game.fmt(ws)} против {game.fmt(ls)}"
+                    text = tr(L, f"⚔️ Дуэль в {G}: 🏆 <b>{w}</b> побеждает {l} — {game.fmt(ws, L)} против {game.fmt(ls, L)}",
+                              f"⚔️ {G} duel: 🏆 <b>{w}</b> beats {l} — {game.fmt(ws, L)} vs {game.fmt(ls, L)}")
             elif sa is not None or sb is not None:
                 w = A if sa is not None else B
                 if self.progress:
                     await self.progress.award(ev.created_by if sa is not None else ev.opponent_id, "duel_win")
-                text = f"⚔️ Дуэль в {escape(game.name)}: 🏆 <b>{w}</b> побеждает — соперник не успел сыграть"
+                text = tr(L, f"⚔️ Дуэль в {G}: 🏆 <b>{w}</b> побеждает — соперник не успел сыграть", f"⚔️ {G} duel: 🏆 <b>{w}</b> wins — the opponent didn't play in time")
             else:
-                text = f"⚔️ Дуэль в {escape(game.name)} отменена — никто не сыграл"
+                text = tr(L, f"⚔️ Дуэль в {G} отменена — никто не сыграл", f"⚔️ {G} duel cancelled — nobody played")
         reply = ReplyParameters(message_id=ev.message_id, allow_sending_without_reply=True) if ev.message_id else None
         await self.bot.send_message(ev.chat_id, text, reply_parameters=reply)
 

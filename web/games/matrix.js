@@ -1,6 +1,6 @@
 // Матрица памяти — зрительно-пространственная память
 Arcade.register({
-  howto: 'На миг загорятся клетки — запомни и нажми их все. С каждым уровнем клеток больше, поле растёт. Ошибка — минус жизнь, всего 3. Очки = сколько клеток удержал в памяти.',
+  howto: L('На миг загорятся клетки — запомни и нажми их все. С каждым уровнем клеток больше, поле растёт. Ошибка — минус жизнь, всего 3. Очки = сколько клеток удержал в памяти.', 'Some cells light up for a moment — remember them and tap them all. Each level has more cells and a bigger grid. A mistake costs a life, 3 in total. Points = how many cells you held in memory.'),
   start(api) {
     const box = api.el('div', 'fill');
     const info = api.el('div', 'hint', box);
@@ -15,11 +15,11 @@ Arcade.register({
       tiles = [...Array(n * n)].map((_, i) => { const t = api.el('button', 'tile', grid); t.dataset.i = i; return t; });
       targets = new Set(api.shuffle([...tiles.keys()]).slice(0, k));
       found = 0; input = false;
-      info.textContent = `Запоминай ${k} клеток · ${'❤️'.repeat(lives)}`;
+      info.textContent = L(`Запоминай ${k} клеток · ${'❤️'.repeat(lives)}`, `Memorise ${k} cells · ${'❤️'.repeat(lives)}`);
       for (const i of targets) tiles[i].style.background = 'var(--accent)';
       api.after(900 + k * 130, () => {
         for (const i of targets) tiles[i].style.background = '';
-        input = true; info.textContent = `Найди ${k} клеток · ${'❤️'.repeat(lives)}`;
+        input = true; info.textContent = L(`Найди ${k} клеток · ${'❤️'.repeat(lives)}`, `Find ${k} cells · ${'❤️'.repeat(lives)}`);
       });
     }
     api.on(grid, 'pointerdown', (e) => {

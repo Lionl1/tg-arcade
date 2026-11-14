@@ -1,6 +1,6 @@
 Arcade.register(Learn.deck({
-  ask: 'Переведи на русский',
-  askRev: 'Переведи на английский',
+  ask: L('Переведи на русский', 'Translate into Russian'),
+  askRev: L('Переведи на английский', 'Translate into English'),
   both: true,
   cards: [
     ['cat', 'кошка'], ['dog', 'собака'], ['house', 'дом'], ['water', 'вода'], ['apple', 'яблоко'], ['book', 'книга'],

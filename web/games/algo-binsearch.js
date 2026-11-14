@@ -1,8 +1,8 @@
 // Бинарный поиск
 Arcade.register(Algo.viz({
-  about: 'В отсортированном массиве смотрим на середину: если искомое меньше — отбрасываем правую половину, иначе левую. Каждый шаг вдвое сужает поиск.',
-  complexity: 'O(log n): для миллиона элементов — не больше 20 шагов',
-  code: ['lo, hi = 0, n-1', 'while lo <= hi:', '  mid = (lo + hi) // 2', '  if a[mid] == x: return mid', '  if a[mid] < x: lo = mid + 1', '  else: hi = mid - 1', 'return -1  # не нашли'],
+  about: L('В отсортированном массиве смотрим на середину: если искомое меньше — отбрасываем правую половину, иначе левую. Каждый шаг вдвое сужает поиск.', 'In a sorted array look at the middle: if the target is smaller, drop the right half, otherwise the left. Each step halves the search.'),
+  complexity: L('O(log n): для миллиона элементов — не больше 20 шагов', 'O(log n): at most 20 steps for a million elements'),
+  code: ['lo, hi = 0, n-1', 'while lo <= hi:', '  mid = (lo + hi) // 2', '  if a[mid] == x: return mid', '  if a[mid] < x: lo = mid + 1', '  else: hi = mid - 1', L('return -1  # не нашли', 'return -1  # not found')],
   make(api) {
     const set = new Set(); while (set.size < 15) set.add(api.randi(98) + 1);
     const a = [...set].sort((x, y) => x - y);
@@ -17,21 +17,21 @@ Arcade.register(Algo.viz({
       F.push({ s: { a, hi: h, marks, x }, l, t });
     };
     let lo = 0, hi = a.length - 1;
-    p(0, `Ищем ${x}`, lo, hi);
+    p(0, L(`Ищем ${x}`, `Looking for ${x}`), lo, hi);
     while (lo <= hi) {
       const mid = (lo + hi) >> 1;
-      p(2, `Середина: a[${mid}] = ${a[mid]}`, lo, hi, mid);
-      if (a[mid] === x) { p(3, `Нашли ${x} на позиции ${mid}!`, lo, hi, mid, true); return F; }
-      if (a[mid] < x) { lo = mid + 1; p(4, `${a[mid]} < ${x} — ищем правее`, lo, hi); } else { hi = mid - 1; p(5, `${a[mid]} > ${x} — ищем левее`, lo, hi); }
+      p(2, L(`Середина: a[${mid}] = ${a[mid]}`, `Middle: a[${mid}] = ${a[mid]}`), lo, hi, mid);
+      if (a[mid] === x) { p(3, L(`Нашли ${x} на позиции ${mid}!`, `Found ${x} at position ${mid}!`), lo, hi, mid, true); return F; }
+      if (a[mid] < x) { lo = mid + 1; p(4, L(`${a[mid]} < ${x} — ищем правее`, `${a[mid]} < ${x} — search to the right`), lo, hi); } else { hi = mid - 1; p(5, L(`${a[mid]} > ${x} — ищем левее`, `${a[mid]} > ${x} — search to the left`), lo, hi); }
     }
-    p(6, `${x} нет в массиве`, 1, 0);
+    p(6, L(`${x} нет в массиве`, `${x} is not in the array`), 1, 0);
     return F;
   },
   draw(ctx, W, H, f, C) {
     const { a, hi = {}, marks = {}, x } = f.s;
     const n = a.length, c = Math.min(44, (W - 16) / n), ox = (W - c * n) / 2, y = H / 2 - c / 2;
     ctx.font = `700 ${c * 0.4}px system-ui`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillStyle = C.fg; ctx.fillText(`ищем: ${x}`, W / 2, y - 40);
+    ctx.fillStyle = C.fg; ctx.fillText(L(`ищем: ${x}`, `target: ${x}`), W / 2, y - 40);
     a.forEach((v, k) => {
       ctx.fillStyle = hi[k] === 'hint' ? 'rgba(127,127,127,.18)' : hi[k] ? C[hi[k]] : C.accent;
       ctx.fillRect(ox + k * c + 2, y, c - 4, c);

@@ -1,5 +1,5 @@
 Arcade.register({
-  howto: 'Свайпай (или стрелки), чтобы поворачивать. Ешь ягоды и не врезайся в стены и в себя.',
+  howto: L('Свайпай (или стрелки), чтобы поворачивать. Ешь ягоды и не врезайся в стены и в себя.', 'Swipe (or use the arrows) to turn. Eat berries and do not crash into the walls or yourself.'),
   start(api) {
     const g = api.canvas(), C = api.colors, x = g.ctx;
     const cols = 15, cell = Math.floor(g.W / cols), rows = Math.max(10, Math.floor(g.H / cell));

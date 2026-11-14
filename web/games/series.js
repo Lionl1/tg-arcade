@@ -1,6 +1,6 @@
 // Продолжи ряд — поиск закономерности; новые типы рядов открываются по мере роста счёта
 Arcade.register({
-  howto: 'Найди закономерность и выбери следующее число. Чем больше очков, тем хитрее ряды: шаги, умножение, квадраты, чередование, суммы. Ошибка −4 с. 90 секунд.',
+  howto: L('Найди закономерность и выбери следующее число. Чем больше очков, тем хитрее ряды: шаги, умножение, квадраты, чередование, суммы. Ошибка −4 с. 90 секунд.', 'Find the pattern and pick the next number. The more points, the trickier the series: steps, multiplication, squares, alternation, sums. A mistake costs 4 s. 90 seconds.'),
   start(api) {
     const R = (n) => api.randi(n);
     const GENS = [
@@ -15,7 +15,7 @@ Arcade.register({
       () => { const a = R(4) + 1, k = R(2) + 2, c = R(3) + 1; const f = [a]; for (let i = 1; i < 7; i++) f.push(f[i - 1] * k - c); return (i) => f[i]; }, // ×k −c
     ];
     const box = api.el('div', 'fill');
-    api.el('div', 'hint', box, 'Какое число следующее?');
+    api.el('div', 'hint', box, L('Какое число следующее?', 'Which number comes next?'));
     const q = api.el('div', 'learn-q', box);
     q.style.fontVariantNumeric = 'tabular-nums';
     const ch = api.el('div', 'choices', box);

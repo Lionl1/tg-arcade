@@ -1,6 +1,6 @@
 Arcade.register({
   tiers: true, // в личной игре: 6 → 8 → 10 → 12 пар
-  howto: 'Открывай по две карточки и ищи пары. Чем меньше ходов, тем лучше.',
+  howto: L('Открывай по две карточки и ищи пары. Чем меньше ходов, тем лучше.', 'Flip two cards at a time and find the pairs. The fewer moves, the better.'),
   start(api) {
     const pool = ['🍎', '🍋', '🍇', '🍉', '🥝', '🍒', '🍑', '🥥', '🍍', '🥕', '🌶️', '🍄', '🐙', '🦊', '🐸', '🦉'];
     const faces = api.shuffle(pool).slice(0, [6, 8, 10, 12][api.tier - 1]);

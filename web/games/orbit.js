@@ -1,5 +1,5 @@
 Arcade.register({
-  howto: 'Точка бежит по кругу. Тап (или пробел) меняет направление. Собирай звёзды и не врезайся в шипы.',
+  howto: L('Точка бежит по кругу. Тап (или пробел) меняет направление. Собирай звёзды и не врезайся в шипы.', 'The dot runs around a circle. Tap (or space) to reverse. Collect stars and avoid the spikes.'),
   start(api) {
     const g = api.canvas(), x = g.ctx, C = api.colors, TAU = Math.PI * 2;
     const dist = (p, q) => { const d = (((p - q) % TAU) + TAU) % TAU; return Math.min(d, TAU - d); };

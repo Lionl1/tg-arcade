@@ -1,6 +1,6 @@
 Arcade.register({
   tiers: true, // в личной игре: 3×3 → 4×4 → 4×4 → 5×5
-  howto: 'Двигай фишки в пустую клетку: тапни фишку в одном ряду или столбце с пустой. Собери 1–15 по порядку. Время пойдёт с первого хода.',
+  howto: L('Двигай фишки в пустую клетку: тапни фишку в одном ряду или столбце с пустой. Собери 1–15 по порядку. Время пойдёт с первого хода.', 'Slide tiles into the empty cell: tap a tile in the same row or column as the gap. Put 1–15 in order. The clock starts with your first move.'),
   start(api) {
     const N = [3, 4, 4, 5][api.tier - 1];
     const box = api.el('div', 'fill');

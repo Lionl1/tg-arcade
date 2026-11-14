@@ -4,8 +4,8 @@ Arcade.register({
   start(api) {
     const TEMPLATES = [['🐸', '#3fb950'], ['😹', '#e3b341'], ['🤔', '#4a90e2'], ['🔥', '#e5534b'], ['😎', '#a371f7'], ['🐶', '#f0883e'], ['💀', '#30363d'], ['🥲', '#39c5cf']];
     const box = api.el('div', 'appbox');
-    const top = api.el('input', '', box); top.type = 'text'; top.placeholder = 'Текст сверху'; top.maxLength = 80;
-    const bottom = api.el('input', '', box); bottom.type = 'text'; bottom.placeholder = 'Текст снизу'; bottom.maxLength = 80;
+    const top = api.el('input', '', box); top.type = 'text'; top.placeholder = L('Текст сверху', 'Top text'); top.maxLength = 80;
+    const bottom = api.el('input', '', box); bottom.type = 'text'; bottom.placeholder = L('Текст снизу', 'Bottom text'); bottom.maxLength = 80;
     const tpl = api.el('div', 'toolbar', box);
     const cv = api.el('canvas', '', box);
     cv.width = cv.height = 720;
@@ -19,7 +19,7 @@ Arcade.register({
       api.on(b, 'click', () => { bg = t; photo = null; draw(); });
     });
     const file = api.el('input', '', tpl); file.type = 'file'; file.accept = 'image/*'; file.hidden = true;
-    const pick = api.el('button', 'btn ghost', tpl, '🖼 Своё фото');
+    const pick = api.el('button', 'btn ghost', tpl, L('🖼 Своё фото', '🖼 My photo'));
     api.on(pick, 'click', () => file.click());
     api.on(file, 'change', () => {
       const f = file.files[0];

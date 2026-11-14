@@ -1,6 +1,6 @@
 // Фруктовые уравнения — система уравнений в картинках
 Arcade.register({
-  howto: 'Каждый фрукт — какое-то число. По равенствам вычисли, что спрашивают. Сначала два фрукта, потом три и умножение. Ошибка −5 с. 90 секунд.',
+  howto: L('Каждый фрукт — какое-то число. По равенствам вычисли, что спрашивают. Сначала два фрукта, потом три и умножение. Ошибка −5 с. 90 секунд.', 'Each fruit stands for a number. Use the equations to work out the answer. First two fruits, then three and multiplication. A mistake costs 5 s. 90 seconds.'),
   start(api) {
     const FRUITS = ['🍎', '🍌', '🍇', '🍓', '🍒', '🥝', '🍑', '🍍'];
     const box = api.el('div', 'fill');

@@ -1,7 +1,7 @@
 // Английский B1–B2: слова уровня старшей школы и ЕГЭ. d: 2 — B1, 3 — B2.
 Arcade.register(Learn.deck({
-  ask: 'Переведи на русский',
-  askRev: 'Как это по-английски?',
+  ask: L('Переведи на русский', 'Translate into Russian'),
+  askRev: L('Как это по-английски?', 'How do you say it in English?'),
   both: true,
   cards: [
     ...[['achieve', 'достигать'], ['advantage', 'преимущество'], ['afford', 'позволить себе'], ['although', 'хотя'], ['appear', 'появляться'], ['attempt', 'попытка'],

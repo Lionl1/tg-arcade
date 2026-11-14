@@ -1,7 +1,7 @@
 // ЕГЭ математика: вычисления (дроби, десятичные, степени, корни). Генератор — бесконечно новых заданий.
 Arcade.register(Learn.deck({
-  ask: 'Найдите значение выражения',
-  howto: 'Задания в духе первой части ЕГЭ: дроби, десятичные, степени, корни. Сложность растёт со счётом. 90 секунд, ошибка −3 с.',
+  ask: L('Найдите значение выражения', 'Evaluate the expression'),
+  howto: L('Задания в духе первой части ЕГЭ: дроби, десятичные, степени, корни. Сложность растёт со счётом. 90 секунд, ошибка −3 с.', 'Exam-style arithmetic: fractions, decimals, powers, roots. Difficulty grows with your score. 90 seconds, a mistake costs 3 s.'),
   seconds: 90,
   gen(api) {
     const R = (lo, hi) => lo + api.randi(hi - lo + 1);

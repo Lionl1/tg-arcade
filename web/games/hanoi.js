@@ -1,6 +1,6 @@
 // Ханойская башня — планирование на несколько ходов вперёд
 Arcade.register({
-  howto: 'Перенеси всю башню на правый стержень. Тапни стержень, откуда взять верхний диск, потом — куда положить. Больший диск нельзя класть на меньший. Каждая башня на диск выше. Очки = диски собранных башен, ×2 за минимальное число ходов. 3 минуты.',
+  howto: L('Перенеси всю башню на правый стержень. Тапни стержень, откуда взять верхний диск, потом — куда положить. Больший диск нельзя класть на меньший. Каждая башня на диск выше. Очки = диски собранных башен, ×2 за минимальное число ходов. 3 минуты.', 'Move the whole tower to the right peg. Tap the peg to take the top disc from, then where to put it. A bigger disc can never go on a smaller one. Each tower has one more disc. Points = discs of finished towers, ×2 for the minimum number of moves. 3 minutes.'),
   start(api) {
     const box = api.el('div', 'fill');
     const info = api.el('div', 'hint', box);
@@ -20,7 +20,7 @@ Arcade.register({
       moves = 0; sel = null; lock = false; draw();
     }
     function draw() {
-      info.textContent = `Дисков: ${n} · ходов: ${moves} (минимум ${2 ** n - 1})`;
+      info.textContent = L(`Дисков: ${n} · ходов: ${moves} (минимум ${2 ** n - 1})`, `Discs: ${n} · moves: ${moves} (minimum ${2 ** n - 1})`);
       pegEls.forEach((p, i) => {
         p.innerHTML = '';
         p.style.outline = sel === i ? '3px solid var(--accent)' : '';
@@ -49,7 +49,7 @@ Arcade.register({
         lock = true;
         const perfect = moves === 2 ** n - 1;
         api.addScore(perfect ? n * 2 : n); api.haptic('success'); api.tone(990, 120);
-        info.textContent = perfect ? '🏆 Идеально — минимум ходов!' : 'Башня собрана!';
+        info.textContent = perfect ? L('🏆 Идеально — минимум ходов!', '🏆 Perfect — minimum moves!') : L('Башня собрана!', 'Tower done!');
         n = Math.min(8, n + 1);
         api.after(900, reset);
       }

@@ -1,5 +1,5 @@
 Arcade.register({
-  howto: 'Свайпай (или стрелки): точка катится по коридору до развилки. Доберись до флажка. Каждый пройденный лабиринт +1 очко и +5 секунд.',
+  howto: L('Свайпай (или стрелки): точка катится по коридору до развилки. Доберись до флажка. Каждый пройденный лабиринт +1 очко и +5 секунд.', 'Swipe (or use the arrows): the dot rolls along the corridor to the next fork. Reach the flag. Each maze solved gives +1 point and +5 seconds.'),
   start(api) {
     const g = api.canvas(), x = g.ctx, C = api.colors;
     const DIRS = { up: [0, -1, 1], right: [1, 0, 2], down: [0, 1, 4], left: [-1, 0, 8] };

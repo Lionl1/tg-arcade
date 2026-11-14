@@ -1,5 +1,5 @@
 Arcade.register({
-  howto: 'Точки появятся на мгновение. Сколько их было? Ошибка — минус жизнь, всего 3.',
+  howto: L('Точки появятся на мгновение. Сколько их было? Ошибка — минус жизнь, всего 3.', 'Dots appear for a moment. How many were there? A mistake costs a life, 3 in total.'),
   start(api) {
     const box = api.el('div', 'fill');
     const info = api.el('div', 'hint', box, '❤️❤️❤️');
@@ -34,7 +34,7 @@ Arcade.register({
       input = false;
       if (+b.dataset.v === answer) { api.addScore(1); api.haptic('light'); }
       else {
-        lives--; api.haptic('error'); info.textContent = (lives > 0 ? '❤️'.repeat(lives) : '') + ` · было ${answer}`;
+        lives--; api.haptic('error'); info.textContent = (lives > 0 ? '❤️'.repeat(lives) : '') + L(` · было ${answer}`, ` · it was ${answer}`);
         if (lives <= 0) return api.after(900, () => api.end());
       }
       api.after(400, round);

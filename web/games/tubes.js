@@ -1,6 +1,6 @@
 // Пробирки: рассортируй цвета так, чтобы в каждой пробирке был один цвет. Генератор строит головоломку из решённого состояния.
 Arcade.register({
-  howto: 'Тапни пробирку, потом другую — верхний цвет перельётся (только на такой же цвет или в пустую). Собери каждую пробирку одного цвета. Каждая решённая головоломка добавляет цвет. 3 минуты.',
+  howto: L('Тапни пробирку, потом другую — верхний цвет перельётся (только на такой же цвет или в пустую). Собери каждую пробирку одного цвета. Каждая решённая головоломка добавляет цвет. 3 минуты.', 'Tap a tube, then another — the top colour pours over (only onto the same colour or into an empty tube). Make every tube a single colour. Each solved puzzle adds a colour. 3 minutes.'),
   start(api) {
     const CAP = 4;
     const COLORS = ['#e5534b', '#4a90e2', '#3fb950', '#e3b341', '#a371f7', '#f0883e', '#39c5cf', '#db61a2', '#8b949e', '#7ee787', '#ffa198', '#1f6feb'];
@@ -10,8 +10,8 @@ Arcade.register({
     field.style.cssText = 'display:flex;flex-wrap:wrap;justify-content:center;gap:12px;max-width:min(94vw,520px)';
     const row = api.el('div', 'row', box);
     row.style.cssText = 'width:min(90vw,360px)';
-    const undoBtn = api.el('button', 'btn ghost', row, '↶ Ход назад');
-    const resetBtn = api.el('button', 'btn ghost', row, '↺ Заново');
+    const undoBtn = api.el('button', 'btn ghost', row, L('↶ Ход назад', '↶ Undo'));
+    const resetBtn = api.el('button', 'btn ghost', row, L('↺ Заново', '↺ Restart'));
     api.timer(180);
     let n = Math.min(9, 3 + Math.floor((api.level || 0) / 3)), tubes, start, sel = null, history = [], solved = 0;
 
@@ -42,7 +42,7 @@ Arcade.register({
       return true;
     }
     function draw() {
-      info.textContent = `Цветов: ${n} · решено: ${solved}`;
+      info.textContent = L(`Цветов: ${n} · решено: ${solved}`, `Colours: ${n} · solved: ${solved}`);
       field.innerHTML = '';
       tubes.forEach((tb, i) => {
         const el = api.el('button', '', field);

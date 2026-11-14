@@ -1,7 +1,7 @@
 // ЕГЭ информатика: системы счисления (генератор)
 Arcade.register(Learn.deck({
-  ask: 'Переведите число',
-  howto: 'Переводы между двоичной, восьмеричной, шестнадцатеричной и десятичной системами + подсчёт единиц в двоичной записи. 90 секунд, ошибка −3 с.',
+  ask: L('Переведите число', 'Convert the number'),
+  howto: L('Переводы между двоичной, восьмеричной, шестнадцатеричной и десятичной системами + подсчёт единиц в двоичной записи. 90 секунд, ошибка −3 с.', 'Conversions between binary, octal, hexadecimal and decimal + counting ones in binary. 90 seconds, a mistake costs 3 s.'),
   seconds: 90,
   gen(api) {
     const R = (lo, hi) => lo + api.randi(hi - lo + 1);
@@ -14,6 +14,6 @@ Arcade.register(Learn.deck({
     if (t === 2) return { q: `${n.toString(16).toUpperCase()}₁₆ = ?₁₀`, a: n, wrong: api.shuffle(near()).slice(0, 3) };
     if (t === 3) return { q: `${n.toString(8)}₈ = ?₁₀`, a: n, wrong: api.shuffle(near()).slice(0, 3) };
     const ones = n.toString(2).split('').filter((c) => c === '1').length;
-    return { q: `Сколько единиц в двоичной записи числа ${n}?`, a: ones, wrong: [ones + 1, ones - 1, ones + 2].filter((v) => v >= 0) };
+    return { q: L(`Сколько единиц в двоичной записи числа ${n}?`, `How many ones are in the binary form of ${n}?`), a: ones, wrong: [ones + 1, ones - 1, ones + 2].filter((v) => v >= 0) };
   },
 }));

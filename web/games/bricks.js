@@ -1,5 +1,5 @@
 Arcade.register({
-  howto: 'Веди пальцем, чтобы двигать платформу. Тап — запустить мяч. 3 жизни.',
+  howto: L('Веди пальцем, чтобы двигать платформу. Тап — запустить мяч. 3 жизни.', 'Drag to move the paddle. Tap to launch the ball. 3 lives.'),
   start(api) {
     const g = api.canvas(), x = g.ctx, C = api.colors, keys = api.keys();
     const pw = Math.max(70, g.W * 0.22), ph = 12, br = 7;
@@ -68,7 +68,7 @@ Arcade.register({
       x.fillStyle = C.accent; api.rr(x, px - pw / 2, g.H - 60, pw, ph, 6); x.fill();
       x.fillStyle = C.fg; x.beginPath(); x.arc(ball.x, ball.y, br, 0, 7); x.fill();
       x.font = '16px system-ui'; x.textAlign = 'left'; x.fillText('❤️'.repeat(lives), 10, 28);
-      if (held) { x.textAlign = 'center'; x.fillStyle = C.hint; x.fillText('Тапни, чтобы запустить', g.W / 2, g.H - 100); }
+      if (held) { x.textAlign = 'center'; x.fillStyle = C.hint; x.fillText(L('Тапни, чтобы запустить', 'Tap to launch'), g.W / 2, g.H - 100); }
     });
   },
 });

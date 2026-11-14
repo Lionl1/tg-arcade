@@ -1,5 +1,5 @@
 Arcade.register({
-  howto: 'Тапни, чтобы опустить блок. Что свисает — отрезается. Точное попадание сохраняет ширину.',
+  howto: L('Тапни, чтобы опустить блок. Что свисает — отрезается. Точное попадание сохраняет ширину.', 'Tap to drop the block. Whatever overhangs is cut off. A perfect drop keeps the width.'),
   start(api) {
     const g = api.canvas(), x = g.ctx, C = api.colors;
     const bh = 26;

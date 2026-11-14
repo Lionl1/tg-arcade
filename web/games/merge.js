@@ -1,11 +1,11 @@
 // Эволюция: сдвигай поле 5×5, одинаковые существа сливаются в следующую стадию
 Arcade.register({
-  howto: 'Свайпай (или стрелки): все фигурки съезжают в ту сторону. Две одинаковые при встрече превращаются в следующую стадию: 🥚 → 🐣 → 🐥 → 🐓 → 🦆 → 🦢 → 🦅 → 🦚 → 🦄 → 🐉. После каждого хода появляется новое яйцо. Очки — за каждое слияние.',
+  howto: L('Свайпай (или стрелки): все фигурки съезжают в ту сторону. Две одинаковые при встрече превращаются в следующую стадию: 🥚 → 🐣 → 🐥 → 🐓 → 🦆 → 🦢 → 🦅 → 🦚 → 🦄 → 🐉. После каждого хода появляется новое яйцо. Очки — за каждое слияние.', 'Swipe (or use the arrows): all pieces slide that way. Two identical ones merge into the next stage: 🥚 → 🐣 → 🐥 → 🐓 → 🦆 → 🦢 → 🦅 → 🦚 → 🦄 → 🐉. A new egg appears after every move. Points for every merge.'),
   start(api) {
     const STAGES = ['🥚', '🐣', '🐥', '🐓', '🦆', '🦢', '🦅', '🦚', '🦄', '🐉'];
     const N = 5;
     const box = api.el('div', 'fill');
-    const info = api.el('div', 'hint', box, 'Лучшая стадия: 🥚');
+    const info = api.el('div', 'hint', box, L('Лучшая стадия: 🥚', 'Best stage: 🥚'));
     const grid = api.el('div', 'grid', box);
     grid.style.cssText += `;grid-template-columns:repeat(${N},1fr);gap:6px;max-width:min(92vw,54vh);padding:8px;border-radius:18px;background:var(--card)`;
     const tiles = [...Array(N * N)].map(() => {
@@ -26,7 +26,7 @@ Arcade.register({
         tiles[i].style.background = v >= 0 ? `hsl(${40 + v * 32} 70% 55% / .28)` : 'color-mix(in srgb, var(--fg) 6%, transparent)';
         if (merged.has(i)) tiles[i].animate([{ transform: 'scale(1.25)' }, { transform: 'scale(1)' }], { duration: 160 });
       });
-      info.textContent = `Лучшая стадия: ${STAGES[top]} (${top + 1}/${STAGES.length})`;
+      info.textContent = L(`Лучшая стадия: ${STAGES[top]} (${top + 1}/${STAGES.length})`, `Best stage: ${STAGES[top]} (${top + 1}/${STAGES.length})`);
     }
     const line = (k, dir) => [...Array(N).keys()].map((j) => {
       if (dir === 'left') return k * N + j;

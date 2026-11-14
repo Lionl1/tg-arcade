@@ -1,5 +1,5 @@
 Arcade.register({
-  howto: 'Жми зелёные кружки, пока не исчезли. Красные не трогай! Ошибка или пропуск — минус жизнь, всего 3.',
+  howto: L('Жми зелёные кружки, пока не исчезли. Красные не трогай! Ошибка или пропуск — минус жизнь, всего 3.', 'Tap the green circles before they vanish. Never tap the red ones! A mistake or a miss costs a life, 3 in total.'),
   start(api) {
     const g = api.canvas(), x = g.ctx, C = api.colors;
     let items = [], spawn = 0.4, lives = 3;

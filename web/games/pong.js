@@ -1,5 +1,5 @@
 Arcade.register({
-  howto: 'Веди пальцем свою ракетку внизу и забивай компьютеру. Пропустишь 3 мяча — конец.',
+  howto: L('Веди пальцем свою ракетку внизу и забивай компьютеру. Пропустишь 3 мяча — конец.', 'Drag your paddle at the bottom and score against the computer. Miss 3 balls and it is over.'),
   start(api) {
     const g = api.canvas(), x = g.ctx, C = api.colors, keys = api.keys();
     const ph = 12, br = 8;

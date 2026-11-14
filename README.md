@@ -1,143 +1,119 @@
-# 🕹 Аркада — мини-игры для Telegram-групп
+# 🕹 Brain Arcade — mini-games for Telegram groups
 
-Бот с каталогом HTML5 мини-игр, которые открываются как Telegram Mini App. Сценарий в группе:
+**English** · [Русский](README.ru.md)
 
-1. `/games` (или `/play змейка`, `/play` — случайная) → бот присылает карточку игры с кнопкой **▶️ Играть**.
-2. Игра открывается прямо в Telegram, результат уходит на сервер (подпись `initData` проверяется).
-3. У каждого чата своя таблица рекордов (`/top змейка` или кнопка 🏆), при новом рекорде чата бот пишет в группу «⚔️ Побить рекорд».
+A Telegram bot with a catalog of HTML5 mini-games that open as a Telegram Mini App. The idea: AI does more and more of our thinking, so the brain needs a daily workout — 5 minutes of brain training, study with spaced repetition and exam prep, plus arcade games to relax.
 
-## Разделы (в порядке важности)
+The whole app is bilingual — **English and Russian**. The language comes from the user's Telegram settings and can be changed in `/settings` (private chat), the “Settings” tab of the Mini App, or per group with `/settings` in the group.
 
-Главная идея — ежедневно нагружать мозг, пока нейросети думают за нас: в меню первыми идут «Тренировка дня», тренажёры и учёба; аркады — отдых в конце.
+In a group:
 
-| Раздел | Что внутри |
+1. `/games` (or `/play snake`, `/play` for a random one) → the bot posts a game card with a **▶️ Play** button.
+2. The game opens right inside Telegram and the result goes to the server (the `initData` signature is checked).
+3. Every chat has its own leaderboard (`/top snake` or the 🏆 button); when someone sets a chat record the bot announces it with “⚔️ Beat the record”.
+
+## Sections (in order of importance)
+
+| Section | What's inside |
 |---|---|
-| 🧠 Тренировка мозга | реакция, счёт (в т.ч. «Прикинь»), память (N-назад, **двойной N-назад**), внимание, логика (судоку, пробирки, японский кроссворд, **шахматные задачи Lichess**), интеллект, **🛡 критическое мышление** (логические выводы, когнитивные искажения, логические ошибки), слова |
-| 🎓 ЕГЭ и школа | математика (6 тем с генераторами: вычисления, уравнения, логарифмы, проценты и вероятность, производная и прогрессии, тригонометрия), русский (ударения — задание 4, **паронимы — задание 5**, словарные слова, -тся/-ться), литература (авторы, герои, **теория литературы**), история (даты, **правители и реформы**, **картины и архитектура из Wikidata**), **обществознание (понятия)**, информатика (системы счисления, логические выражения — генераторы), физика (формулы и единицы), химия |
-| 📚 Учёба и языки | все страны (столицы, флаги, части света, **соседи**, **кто больше**), английский (слова A1, **800 фраз Tatoeba**), **Trivia на английском (600 вопросов)**, математика, наука |
-| 💻 Алгоритмы | пошаговые анимации + тест «Сложность алгоритмов» |
-| 🕹 Отдых: аркады | бегалки и ловкость |
-| 🛠 Для чата | рисовалка, мемы, честный жребий, команды, раздели счёт |
+| 🧠 Brain training | reaction, numbers (incl. estimation), memory (N-back, **dual N-back**), attention, logic (sudoku, test tubes, nonograms, **Lichess chess puzzles**), reasoning, **🛡 critical thinking** (syllogisms, cognitive biases, logical fallacies), words |
+| 🎓 Exams & school | **English interface:** math (6 generated topics: arithmetic, equations, logarithms, percent & probability, derivatives & sequences, trig), English (commonly confused words, spelling, grammar & usage, advanced vocabulary), literature (literary terms, who wrote it, famous characters), history (key dates, US presidents, **famous paintings from Wikidata**), civics & economics, computer science, physics, chemistry. **Russian interface:** the same math and sciences plus Russian-exam (ЕГЭ) courses — stress, paronyms, Russian literature and history |
+| 📚 Study & languages | every country (capitals, flags, continents, neighbours, which is bigger), **Russian for English speakers** (basic and advanced words, 800 Tatoeba phrases) / English for Russian speakers, trivia (600 questions), math, biology |
+| 💻 Algorithms | step-by-step animations with pseudocode and real, tested Python and JavaScript; practice (build the code, be the sort, trace the code, find the bug) and flashcards |
+| 🕹 Chill: arcade | runners and skill games |
+| 🛠 For chats | drawing, memes, fair draws, teams, bill splitting |
 
-Тренировка дня: скорость/внимание + слабые навыки + **одна учебная колода** (вспоминание — самая доказанная техника).
+The daily workout picks a speed/attention game, games for your weakest skills and **one study deck** (retrieval practice is the best-proven technique).
 
-**Постепенное усложнение в свободной игре**: аркады и тренажёры ускоряются по ходу партии; в тестах-карточках, «Цвет или слово», «Сортировке», «Переключении» после разминки появляется сокращающийся лимит на ответ; одиночные головоломки («Пары», «Цифры по порядку», «Пятнашки», «Судоку», «Быки и коровы») в личной игре растут ступенями 1–4 по результатам (в чатах и турнирах — стандартный размер, чтобы рекорды были честными).
+**Gradual difficulty in free play**: arcade games and trainers speed up during a round; flashcard tests and several trainers add a shrinking answer time limit; single puzzles grow in steps 1–4 in personal play (chats and tournaments use the standard size so records stay fair).
 
-**Проверка контента**: `node tools/check_games.mjs` (входит в `pytest`) — прогоняет каждый генератор тысячи раз, ищет неоднозначные карточки и битые варианты, проигрывает все шахматные задачи. Источники данных и лицензии — [docs/credits.md](docs/credits.md).
+**Content checks**: `node tools/check_games.mjs` (run by `pytest`) loads every game in **both languages**, runs each generator thousands of times, looks for ambiguous cards and broken options, flags Russian text left in the English interface, replays every chess puzzle and executes all teaching code in real Python. Data sources and licences: [docs/credits.md](docs/credits.md).
 
-Приложение — запись в каталоге с `"app": true`: без очков и уровней, SDK сразу вызывает `start(api)`. Для отправки есть `api.shareBar(parent, {image|text})`, `api.share`, `api.save`, `api.roll`. Картинки сохраняются в `data/uploads` и раздаются по `/u/<id>.png`; «в любой чат» — через `savePreparedInlineMessage` + `Telegram.WebApp.shareMessage`.
+## Progression and profile
 
-## Настройки
+The design follows research findings — summary and sources in [docs/research.md](docs/research.md).
 
-- **Личные** — вкладка «⚙️ Настройки» в хабе (`/settings` в личке даёт кнопку): звук, вибрация, тема (как в Telegram / тёмная / светлая), крупный текст, анимации, что открывать при запуске игры (меню / сразу уровни / сразу свободная игра), подсказки, игр в тренировке дня (3 или 5), карточек за подход, скорость анимации алгоритмов, скрытие имени в таблицах, напоминание. Хранятся на сервере (`users.prefs`, только отличия от умолчаний) и в `localStorage` — применяются мгновенно и одинаковы на всех устройствах.
-- **Группы** — `/settings` в группе (менять могут только админы): объявления о рекордах, турниры вкл/выкл и длительность по умолчанию, закреплять карточку, дуэли вкл/выкл и время на дуэль (`chats.prefs`).
-- **Сервер** — ограничения в `.env` (см. `.env.example`): `TOUR_MIN_MINUTES`, `TOUR_MAX_MINUTES`, `EVENT_GRACE_SECONDS`, `MAX_ACTIVE_EVENTS`, `MAX_UPLOADS_PER_DAY`, `UPLOADS_KEEP_DAYS`.
+- **Hub** (`/profile`): Today, Games, Profile, Science, Settings tabs.
+- **Daily workout** — 3 (or 5) games for different skills, ≈5 minutes, fixed for the day.
+- **Streak** — days with a finished workout; every 7 days give a “freeze” (up to 2) that covers one missed day.
+- **Endless levels in every game** with 1–3 ★; speed and timer change smoothly with the level.
+- **XP**, profile levels and titles, **10 skills**, **28 achievements**, optional **daily reminder** in private messages.
+- **Flashcards** with spaced repetition (1 → 3 → 7 → 14 → 30 days).
 
-Все параметры описаны декларативно в `app/prefs.py` (умолчание, допустимые значения, подписи) — новый пункт = одна строка там.
+Locally without Telegram: `DEV_AUTH=1` on the server and `?dev` in the URL (`hub.html?dev`, `play.html?g=snake&dev`); `?lang=en` forces the language.
 
-## Открытые источники
+## Tournaments and duels
 
-Куда расти дальше — уровни и материалы с открытыми лицензиями: [docs/sources.md](docs/sources.md).
-
-## Прогрессия и профиль
-
-Дизайн опирается на исследования — выжимка и источники в [docs/research.md](docs/research.md).
-
-- **Хаб** (`/profile`, кнопка «🧠 Профиль и тренировка дня», Mini App без игры): вкладки «Сегодня», «Игры», «Профиль», «Наука».
-- **Тренировка дня** — 3 игры на разные навыки (≈5 минут), первая всегда на скорость/внимание, остальные — по самым слабым навыкам. Набор фиксируется на день (`daily`).
-- **Серия** — дни с завершённой тренировкой; каждые 7 дней серии дают «заморозку» (до 2), она прикрывает один пропуск.
-- **Бесконечные уровни в каждой игре**: у каждого своё зерно (расклад одинаковый при каждой попытке), цель от `par` игры (0.35·par → 2·par к 12-му, дальше +0.05·par за уровень; для «меньше — лучше» цель стремится к 0.65·par и не переходит его), 1–3 ★. Скорость игры и время таймера меняются плавно: ×0.85/×1.25 на 1-м уровне → ×1.15/×0.85 к 12-му → до ×1.6/×0.6. Метки: лёгкие 1–3, обычные 4–8, сложные 9–20, экстрим 21+. Следующий уровень открывается за ≥1 ★.
-- **Опыт (XP)**: 10 за партию + 5 за звезду + 10 за личный рекорд, ×1.2/×1.5 за сложность, +15 за игру из тренировки дня; повтор одной игры за день — ×0.5 после 3-й и ×0.25 после 6-й (разнообразие выгоднее). Ачивка = +25 XP.
-- **Навыки** (10): опыт игры делится между её навыками (`skills` в `catalog.json`).
-- **Ачивки** (27): партии, разнообразие, тренировки, серии, уровни, звёзды, рекорды, турниры и дуэли, время суток, возвращение.
-- **Напоминания** — включаются в профиле: одно сообщение в личку в выбранное местное время, только если тренировка не сделана. Mini App запрашивает у Telegram разрешение писать (`requestWriteAccess`).
-- **Карточки «Учёбы»** — интервальные повторения (1 → 3 → 7 → 14 → 30 дней).
-
-Локально без Telegram: `DEV_AUTH=1` на сервере и `?dev` в адресе (`hub.html?dev`, `play.html?g=snake&dev`) — тестовый пользователь id=1.
-
-## Турниры и дуэли
-
-| Команда | Что делает |
+| Command | What it does |
 |---|---|
-| `/tournament змейка 30м` | Турнир (время `10м`, `2ч`, `1д`; по умолчанию 1 ч; без игры — случайная). Карточка закрепляется и обновляется вживую, по таймеру бот объявляет подиум. |
-| `/duel змейка` | Открытый вызов: соперником становится первый, кто нажмёт «Принять вызов». |
-| `/duel змейка` ответом на сообщение | Вызвать конкретного человека. |
-| `/events` | Что сейчас идёт в чате. |
+| `/tournament snake 30m` | A tournament (`10m`, `2h`, `1d`; default from chat settings). The card is pinned and updated live; the bot announces the podium when time is up. |
+| `/duel snake` | An open challenge: the first to tap “Accept challenge” becomes the opponent. |
+| `/duel snake` as a reply | Challenge that person. |
+| `/events` | What's running in the chat. |
 
-То же самое — кнопками «🏆 Турнир на 1 ч» и «⚔️ Дуэль» на карточке любой игры.
+Everyone plays the **same level** (the event id seeds the RNG). A duel is one try, locked on the server when it starts.
 
-- **Один уровень на всех.** Ссылка события `…?startapp=<game>_e<id>_<hmac>`; SDK берёт `e<id>` как зерно ГСЧ, и `api.rand/randi/pick/shuffle` дают всем одну и ту же последовательность: одинаковые платформы, примеры, лабиринты. Поэтому в играх нельзя использовать `Math.random` — только `api.rand()`. Проверка вне Telegram: `play.html?g=maze&seed=42`.
-- **Турнир:** попыток сколько угодно, в зачёт лучшая. После финиша есть 90 с, чтобы доиграть начатую партию.
-- **Дуэль:** одна попытка, которая фиксируется на сервере в момент старта (`/api/start`), так что выйти и переиграть не получится. Результат соперника скрыт до своей попытки. Итог объявляется, как только сыграли оба, либо через 24 ч (неявка = поражение).
-- Не больше 5 активных событий на чат.
+## Settings
 
-## Устройство
+- **Personal** — language, sound, vibration, theme, text size, animations, what opens first, tips, games in the daily workout, cards per session, algorithm animation speed, hiding your name, reminder. Stored on the server and in `localStorage`.
+- **Group** — `/settings` in the group (admins only): bot language, record announcements, tournaments and duels on/off and their length, pinning.
+- **Server** — limits in `.env` (see `.env.example`).
+
+All options are declared in `app/prefs.py` (default, allowed values, labels in both languages).
+
+## How it's built
 
 ```
-main.py              веб-сервер (FastAPI) + бот (aiogram) в одном процессе
-app/bot.py           команды, каталог по жанрам, карточки, таблицы
-app/events.py        турниры и дуэли: карточка, правила попыток, итоги по таймеру
-app/links.py         ссылки t.me/<bot>/<app>?startapp=...
-app/web.py           /api/top, /api/start, /api/score + статика web/
-app/security.py      проверка initData, подписанные ссылки «игра+чат» (startapp)
-app/db.py            SQLite: лучший результат игрока по (чат, игра)
-web/play.html        единая страница-плеер Mini App
-web/sdk/arcade.js    SDK: тема Telegram, HUD, меню, game over, таблица, ввод, холст, хаптика, звук
-web/games/catalog.json  метаданные всех игр (бот и плеер читают отсюда)
-web/games/<id>.js    одна игра = один файл
+main.py              web server (FastAPI) + bot (aiogram) in one process
+app/i18n.py          languages: tr(lang, "по-русски", "in English"), language from Telegram / settings
+app/bot.py           commands, catalog by section, game cards, leaderboards
+app/events.py        tournaments and duels
+app/web.py           API + static files
+app/progress.py      XP, levels, skills, daily workout, streaks, achievements, reminders
+web/sdk/prefs.js     personal settings + interface language: L('по-русски', 'in English')
+web/sdk/arcade.js    game SDK: Telegram theme, HUD, menus, levels, leaderboards, input, canvas
+web/sdk/learn.js     flashcard engine (spaced repetition + points test)
+web/games/catalog.json  metadata of all games (title/desc + title_en/desc_en, "lang" for single-language games)
+web/games/<id>.js    one game = one file
 ```
 
-Ссылка на игру выглядит так: `https://t.me/<bot>/<app>?startapp=<game>_<chat>_<hmac>`. Сервер берёт `start_param` из подписанной Telegram `initData`, поэтому записать очки в чужой чат нельзя.
+## Adding a game
 
-## Как добавить игру
-
-1. Добавь запись в `web/games/catalog.json`: `id`, `title`, `emoji`, `genre`, `desc`; для игр «меньше = лучше» поставь `"order": "asc"`, формат `"format": "ms" | "sec"`, подпись `"unit"`.
-2. Создай `web/games/<id>.js`:
+1. Add an entry to `web/games/catalog.json`: `id`, `title`, `title_en`, `emoji`, `section`, `group`, `desc`, `desc_en`; `"lang": "en"` or `"ru"` if the content exists in one language only.
+2. Create `web/games/<id>.js`, with every visible string as `L('Русский', 'English')`:
 
 ```js
 Arcade.register({
-  howto: 'Как играть',
+  howto: L('Как играть', 'How to play'),
   start(api) {
-    const g = api.canvas();            // или DOM: api.el('div', 'fill')
+    const g = api.canvas();
     api.onTap((x, y) => api.addScore(1));
-    api.timer(30);                     // по нулю сам вызовет api.end()
-    api.loop((dt) => { /* рисуем */ });
+    api.timer(30);
+    api.loop((dt) => { /* draw */ });
   },
 });
 ```
 
-Всё, что создано через `api` (`on`, `loop`, `after`, `every`, `timer`), убирается само после `api.end()`. Ещё есть `onSwipe`, `onAction`, `keys`, `pos`, `haptic`, `tone`, `rr`, `rand/randi/pick/shuffle/clamp`, а в `api.colors` лежат цвета из темы Telegram.
+3. `uv run pytest` — checks the catalog, every deck and generator in both languages.
 
-3. `uv run pytest`: тест проверяет, что у каждой записи каталога есть файл игры.
-
-## Локальный запуск
+## Running locally
 
 ```bash
 uv sync
-uv run python main.py          # без BOT_TOKEN поднимается только веб: http://localhost:8080
+uv run python main.py          # without BOT_TOKEN only the web part runs: http://localhost:8080
 ```
 
-Игры можно гонять в браузере: `http://localhost:8080/` (каталог) или `play.html?g=snake`. Вне Telegram рекорды хранятся в localStorage.
+## Connecting to Telegram
 
-## Подключение к Telegram
+1. @BotFather → `/newbot` → put the token into `.env` (`BOT_TOKEN`).
+2. You need a public HTTPS address; for development: `cloudflared tunnel --url http://localhost:8080` → `WEBAPP_URL`.
+3. Set the bot's Mini App URL in @BotFather to `<WEBAPP_URL>/play.html`.
+4. `uv run python main.py`, add the bot to a group, `/games`.
 
-1. @BotFather → `/newbot` → токен в `.env` (`BOT_TOKEN`, см. `.env.example`).
-2. Нужен публичный HTTPS-адрес. Для разработки: `cloudflared tunnel --url http://localhost:8080` → `WEBAPP_URL`.
-3. @BotFather → `/newapp` → выбери бота, URL: `<WEBAPP_URL>/play.html`, short name, например `play` → `APP_SHORT_NAME`.
-4. `uv run python main.py`, добавь бота в группу, `/games`.
+## Limitations
 
-Временный адрес cloudflared меняется при каждом запуске, тогда URL в BotFather (`/myapps`) придётся обновлять. Для продакшна: `docker compose up -d` на сервере с доменом и TLS.
+Scores are computed on the client, so a determined cheater can submit any number; the server checks the signature, range and rate only. Not suitable for money competitions.
 
-## Ограничения
+## Licence
 
-- Очки считаются на клиенте, поэтому упорный читер может отправить любое число. Сервер проверяет только подпись, диапазон и частоту (не чаще 1 раза в секунду). Для «соревнований на деньги» это не подходит.
-
-## Лицензия
-
-Код — [MIT](LICENSE). Данные из открытых источников сохраняют свои лицензии (CC0, CC BY 2.0 FR, CC BY-SA 4.0, ODbL 1.0) — подробно в [docs/credits.md](docs/credits.md). Если распространяете производные наборы вопросов Open Trivia DB, они остаются под CC BY-SA 4.0.
-
-## Как помочь проекту
-
-- Новая игра = запись в `web/games/catalog.json` + файл `web/games/<id>.js` (см. «Как добавить игру» выше).
-- Новая колода для учёбы = `Learn.deck({...})` с карточками `{q, a, d}` (d — сложность 1–3).
-- Перед пулреквестом: `uv run pytest` — он же прогоняет `node tools/check_games.mjs` (проверку всех колод и генераторов).
+Code — [MIT](LICENSE). Open data keeps its own licences (CC0, CC BY 2.0 FR, CC BY-SA 4.0, ODbL 1.0) — see [docs/credits.md](docs/credits.md).

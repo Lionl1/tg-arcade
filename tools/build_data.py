@@ -151,6 +151,43 @@ def ege_art() -> None:
     print(f"ege-art: {len(cards)} картин, {len(per)} художников", file=sys.stderr)
 
 
+SKIP_EN = re.compile(r"^(Self-portrait|Self-Portrait|Portrait|Untitled|Still life|Still Life|Study|Composition|Landscape|Sketch)\b|\d{3,}|\(")
+
+
+# игра для школьников: без откровенных сюжетов
+ADULT_EN = re.compile(r"Origine|Masturbat|\bNu\b|Nude|desnuda|Sleepers|Woman in the Waves|Odalisque|Bather|Turkish Bath|Olympia|Venus of Urbino|Sleeping Venus|Rokeby Venus|Anadyom|Venus and Cupid|Danaë|Puberty|Manaò", re.I)
+
+
+def en_art() -> None:
+    """Известные картины мира с английскими названиями — колода для английского интерфейса."""
+    by_title: dict[str, set[str]] = {}
+    info: dict[str, tuple[int, str]] = {}
+    for r in _rows("paintings_world"):
+        t, who = r["pl"].strip(), r["al"]
+        if SKIP_EN.search(t) or ADULT_EN.search(t) or len(t) > 60 or t.lower() == t or who.split()[-1] in t or t in {"The Fif"}:
+            continue
+        if r.get("y") and r.get("dy") and int(r["y"]) > int(r["dy"]):
+            continue
+        by_title.setdefault(t, set()).add(who)
+        sl = int(r["sl"])
+        if t not in info or sl > info[t][0]:
+            info[t] = (sl, r.get("y", ""))
+    per: dict[str, int] = {}
+    cards = []
+    for t in sorted(info, key=lambda t: -info[t][0]):
+        if len(by_title[t]) != 1:
+            continue
+        who = next(iter(by_title[t]))
+        if per.get(who, 0) >= 6:
+            continue
+        per[who] = per.get(who, 0) + 1
+        sl, y = info[t]
+        cards.append([t, who, y, 1 if sl >= 40 else 2 if sl >= 15 else 3])
+    data = {"source": "Wikidata (CC0 1.0), https://www.wikidata.org — query in tools/wikidata_fetch.py", "cards": cards}
+    (OUT / "en-art.json").write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), "utf-8")
+    print(f"en-art: {len(cards)} paintings, {len(per)} artists", file=sys.stderr)
+
+
 def ege_arch() -> None:
     archs: dict[str, set[str]] = {}
     sls: dict[str, int] = {}
@@ -177,3 +214,4 @@ if __name__ == "__main__":
     if (RAW / "wikidata").exists():
         ege_art()
         ege_arch()
+        en_art()

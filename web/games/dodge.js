@@ -1,5 +1,5 @@
 Arcade.register({
-  howto: 'Веди пальцем (или стрелками), чтобы двигать платформу. Каждая пролетевшая глыба — очко.',
+  howto: L('Веди пальцем (или стрелками), чтобы двигать платформу. Каждая пролетевшая глыба — очко.', 'Drag (or use the arrows) to move the platform. Every boulder that flies past is a point.'),
   start(api) {
     const g = api.canvas(), C = api.colors, x = g.ctx, keys = api.keys();
     const pw = 54, ph = 14;

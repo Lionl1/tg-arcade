@@ -1,13 +1,13 @@
 // Трасса: перестраивайся между полосами и обгоняй поток
 Arcade.register({
-  howto: 'Тап по левой/правой половине (или ←/→) — перестроиться. Обгоняй машины, не врезаясь. Близкий обгон — бонус +3. Скорость всё выше.',
+  howto: L('Тап по левой/правой половине (или ←/→) — перестроиться. Обгоняй машины, не врезаясь. Близкий обгон — бонус +3. Скорость всё выше.', 'Tap the left/right half (or ←/→) to change lanes. Overtake cars without crashing. A close pass gives +3. The speed keeps rising.'),
   start(api) {
     const g = api.canvas(), x = g.ctx, C = api.colors;
-    const L = 4;
+    const LANES = 4;
     let lane = 1, px = 0, cars = [], next = 0.5, dist = 0, bonus = 0, dead = false;
     const laneX = (i) => g.W * (0.125 + 0.25 * i);
     px = laneX(lane);
-    const move = (d) => { if (!dead) { lane = api.clamp(lane + d, 0, L - 1); api.haptic('select'); } };
+    const move = (d) => { if (!dead) { lane = api.clamp(lane + d, 0, LANES - 1); api.haptic('select'); } };
     api.onTap((tx) => move(tx < api.W / 2 ? -1 : 1));
     api.on(window, 'keydown', (e) => { if (e.code === 'ArrowLeft') move(-1); if (e.code === 'ArrowRight') move(1); });
 
@@ -23,9 +23,9 @@ Arcade.register({
         px += (laneX(lane) - px) * Math.min(1, dt * 12);
         next -= dt;
         if (next <= 0) {
-          const free = api.randi(L);
+          const free = api.randi(LANES);
           const n = 1 + (dist > 4000 ? api.randi(2) : 0) + (dist > 12000 ? 1 : 0);
-          const lanes = api.shuffle([...Array(L).keys()].filter((i) => i !== free)).slice(0, Math.min(n, L - 1));
+          const lanes = api.shuffle([...Array(LANES).keys()].filter((i) => i !== free)).slice(0, Math.min(n, LANES - 1));
           for (const l of lanes) cars.push({ lane: l, y: -ch, v: api.rand(0.35, 0.6), color: api.pick(C.palette) });
           next = Math.max(0.42, 0.95 - dist / 30000);
         }
@@ -43,7 +43,7 @@ Arcade.register({
       }
       x.fillStyle = '#2b2f36'; x.fillRect(0, 0, g.W, g.H);
       x.strokeStyle = 'rgba(255,255,255,.35)'; x.lineWidth = 3; x.setLineDash([26, 22]); x.lineDashOffset = -dist % 48;
-      for (let i = 1; i < L; i++) { x.beginPath(); x.moveTo(g.W * 0.25 * i, 0); x.lineTo(g.W * 0.25 * i, g.H); x.stroke(); }
+      for (let i = 1; i < LANES; i++) { x.beginPath(); x.moveTo(g.W * 0.25 * i, 0); x.lineTo(g.W * 0.25 * i, g.H); x.stroke(); }
       x.setLineDash([]);
       for (const c of cars) car(laneX(c.lane), c.y, c.color, cw, ch);
       car(px, py, dead ? C.hint : C.accent, cw, ch);

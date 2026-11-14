@@ -27,6 +27,18 @@ SELECT ?p ?pl ?al ?y ?dy ?sl WHERE {
   OPTIONAL { ?a wdt:P570 ?dd. BIND(YEAR(?dd) AS ?dy) }
   FILTER(?sl >= 2)
 } ORDER BY DESC(?sl) LIMIT 3000""",
+    # самые известные картины мира (для английского интерфейса): художники из списка, по числу статей Википедии
+    "paintings_world": """
+SELECT ?p ?pl ?al ?y ?dy ?sl WHERE {
+  VALUES ?an { "Leonardo da Vinci"@en "Michelangelo"@en "Raphael"@en "Sandro Botticelli"@en "Titian"@en "Caravaggio"@en "Rembrandt"@en "Johannes Vermeer"@en "Diego Velázquez"@en "Francisco Goya"@en "El Greco"@en "Peter Paul Rubens"@en "Pieter Bruegel the Elder"@en "Hieronymus Bosch"@en "Jan van Eyck"@en "Albrecht Dürer"@en "J. M. W. Turner"@en "John Constable"@en "Eugène Delacroix"@en "Gustave Courbet"@en "Édouard Manet"@en "Claude Monet"@en "Pierre-Auguste Renoir"@en "Edgar Degas"@en "Paul Cézanne"@en "Vincent van Gogh"@en "Paul Gauguin"@en "Georges Seurat"@en "Henri de Toulouse-Lautrec"@en "Edvard Munch"@en "Gustav Klimt"@en "Pablo Picasso"@en "Henri Matisse"@en "Salvador Dalí"@en "René Magritte"@en "Wassily Kandinsky"@en "Kazimir Malevich"@en "Piet Mondrian"@en "Frida Kahlo"@en "Edward Hopper"@en "Grant Wood"@en "Jackson Pollock"@en "Andy Warhol"@en "Katsushika Hokusai"@en "Caspar David Friedrich"@en "Jean-François Millet"@en "James McNeill Whistler"@en "John Singer Sargent"@en "Ilya Repin"@en "Ivan Aivazovsky"@en "Jacques-Louis David"@en "Jean-Auguste-Dominique Ingres"@en "Théodore Géricault"@en "Joan Miró"@en "Marc Chagall"@en "Amedeo Modigliani"@en "Hans Holbein the Younger"@en "Giotto"@en "Thomas Gainsborough"@en "William Blake"@en }
+  ?a rdfs:label ?an.
+  ?p wdt:P170 ?a; wdt:P31 wd:Q3305213; wikibase:sitelinks ?sl.
+  FILTER(?sl >= 6)
+  ?p rdfs:label ?pl FILTER(lang(?pl) = "en").
+  BIND(STR(?an) AS ?al)
+  OPTIONAL { ?p wdt:P571 ?d. BIND(YEAR(?d) AS ?y) }
+  OPTIONAL { ?a wdt:P570 ?dd. BIND(YEAR(?dd) AS ?dy) }
+} ORDER BY DESC(?sl) LIMIT 4000""",
     # здания в России с указанным архитектором
     "arch": """
 SELECT ?b ?bl ?al ?sl WHERE {

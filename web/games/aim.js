@@ -1,5 +1,5 @@
 Arcade.register({
-  howto: 'Попадай по мишеням. Они уменьшаются и исчезают всё быстрее. Промах — минус очко. 30 секунд.',
+  howto: L('Попадай по мишеням. Они уменьшаются и исчезают всё быстрее. Промах — минус очко. 30 секунд.', 'Hit the targets. They shrink and vanish faster and faster. A miss costs a point. 30 seconds.'),
   start(api) {
     const g = api.canvas(), x = g.ctx, C = api.colors;
     let tg = null, pops = [];

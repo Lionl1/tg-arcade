@@ -1,8 +1,8 @@
 Arcade.register({
-  howto: 'Тапни пример, который даёт БОЛЬШЕ. Ошибка — минус 3 секунды. 30 секунд.',
+  howto: L('Тапни пример, который даёт БОЛЬШЕ. Ошибка — минус 3 секунды. 30 секунд.', 'Tap the expression that gives MORE. A mistake costs 3 seconds. 30 seconds.'),
   start(api) {
     const box = api.el('div', 'fill');
-    const q = api.el('div', 'hint', box, 'Что больше?');
+    const q = api.el('div', 'hint', box, L('Что больше?', 'Which is bigger?'));
     const ch = api.el('div', 'choices', box);
     ch.style.gridTemplateColumns = '1fr';
     const btns = [0, 1].map((i) => {

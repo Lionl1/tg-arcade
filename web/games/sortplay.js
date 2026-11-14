@@ -1,11 +1,11 @@
 // «Будь сортировкой»: выполняй алгоритм сам — делай ровно те обмены, которые сделал бы он
 Arcade.register({
-  howto: 'Сверху — правило алгоритма. Тапни два столбика, которые алгоритм поменяет местами следующими. Ошиблись — подсказка и минус 3 секунды. Пузырёк → выбор → вставки. 2 минуты.',
+  howto: L('Сверху — правило алгоритма. Тапни два столбика, которые алгоритм поменяет местами следующими. Ошиблись — подсказка и минус 3 секунды. Пузырёк → выбор → вставки. 2 минуты.', 'The algorithm’s rule is on top. Tap the two bars the algorithm will swap next. A mistake shows a hint and costs 3 seconds. Bubble → selection → insertion. 2 minutes.'),
   start(api) {
     const ALGOS = {
-      bubble: { name: 'Пузырёк', rule: 'Идём слева направо и меняем СОСЕДЕЙ, если левый больше правого. Проход за проходом.' },
-      selection: { name: 'Выбором', rule: 'Находим МИНИМУМ в неотсортированной части и меняем его с первым элементом этой части.' },
-      insertion: { name: 'Вставками', rule: 'Берём следующий элемент и двигаем его ВЛЕВО обменами с соседом, пока сосед больше.' },
+      bubble: { name: L('Пузырёк', 'Bubble'), rule: L('Идём слева направо и меняем СОСЕДЕЙ, если левый больше правого. Проход за проходом.', 'Go left to right and swap NEIGHBOURS when the left one is larger. Pass after pass.') },
+      selection: { name: L('Выбором', 'Selection'), rule: L('Находим МИНИМУМ в неотсортированной части и меняем его с первым элементом этой части.', 'Find the MINIMUM in the unsorted part and swap it with the first element of that part.') },
+      insertion: { name: L('Вставками', 'Insertion'), rule: L('Берём следующий элемент и двигаем его ВЛЕВО обменами с соседом, пока сосед больше.', 'Take the next element and move it LEFT by swapping with its neighbour while the neighbour is larger.') },
     };
     // последовательность обменов, которую сделает алгоритм
     function swaps(kind, a) {
@@ -32,7 +32,7 @@ Arcade.register({
       kind = ['bubble', 'selection', 'insertion'][Math.min(2, Math.floor(solved / 2))];
       do { arr = api.shuffle([...Array(api.score > 20 ? 8 : 6)].map((_, i) => (i + 1) * 10 + api.randi(9))); plan = swaps(kind, arr); } while (plan.length < 2);
       step = 0; sel = null;
-      title.textContent = `Сортировка ${ALGOS[kind].name}`;
+      title.textContent = L(`Сортировка ${ALGOS[kind].name}`, `${ALGOS[kind].name} sort`);
       rule.textContent = ALGOS[kind].rule;
       draw();
     }
@@ -45,7 +45,7 @@ Arcade.register({
           background:${i === sel ? 'var(--warn)' : hint && hint.includes(i) ? 'var(--good)' : 'var(--accent)'};display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px`;
         b.textContent = v; b.dataset.i = i;
       });
-      info.textContent = `Обмен ${step + 1} из ${plan.length}`;
+      info.textContent = L(`Обмен ${step + 1} из ${plan.length}`, `Swap ${step + 1} of ${plan.length}`);
     }
     api.on(row, 'click', (e) => {
       const b = e.target.closest('button');
@@ -57,12 +57,12 @@ Arcade.register({
       if ((sel === x && i === y) || (sel === y && i === x)) {
         [arr[x], arr[y]] = [arr[y], arr[x]];
         step++; sel = null; api.addScore(1); api.haptic('light'); api.tone(600 + step * 30, 50);
-        if (step >= plan.length) { solved++; api.haptic('success'); info.textContent = '✅ Отсортировано!'; draw(); api.after(700, next); return; }
+        if (step >= plan.length) { solved++; api.haptic('success'); info.textContent = L('✅ Отсортировано!', '✅ Sorted!'); draw(); api.after(700, next); return; }
         draw();
       } else {
         api.haptic('error'); api.shake(row); sel = null; tm.add(-3);
         draw([x, y]); // подсказка: какие два элемента поменял бы алгоритм
-        info.textContent = `Алгоритм поменял бы ${arr[x]} и ${arr[y]}`;
+        info.textContent = L(`Алгоритм поменял бы ${arr[x]} и ${arr[y]}`, `The algorithm would swap ${arr[x]} and ${arr[y]}`);
       }
     });
     next();

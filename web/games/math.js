@@ -1,5 +1,5 @@
 Arcade.register({
-  howto: 'Выбирай правильный ответ. Примеры усложняются. Ошибка — минус 3 секунды. Всего 30 секунд.',
+  howto: L('Выбирай правильный ответ. Примеры усложняются. Ошибка — минус 3 секунды. Всего 30 секунд.', 'Pick the right answer. The sums get harder. A mistake costs 3 seconds. 30 seconds in total.'),
   start(api) {
     const box = api.el('div', 'fill');
     const q = api.el('div', '', box);

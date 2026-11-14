@@ -1,6 +1,6 @@
 // Матрицы в духе тестов на логическое мышление: найди закономерность в таблице 3×3
 Arcade.register({
-  howto: 'В каждой строке фигуры меняются по правилу: форма, цвет, количество. Найди, что должно стоять вместо «?». С ростом счёта меняется больше признаков сразу. Ошибка −5 с. 90 секунд.',
+  howto: L('В каждой строке фигуры меняются по правилу: форма, цвет, количество. Найди, что должно стоять вместо «?». С ростом счёта меняется больше признаков сразу. Ошибка −5 с. 90 секунд.', 'In each row the shapes change by a rule: shape, colour, count. Find what belongs in place of “?”. As your score grows, more features change at once. A mistake costs 5 s. 90 seconds.'),
   start(api) {
     const SHAPES = ['●', '▲', '■', '◆'];
     const COLORS = ['#e5534b', '#3fb950', '#4a90e2', '#e3b341'];
@@ -8,7 +8,7 @@ Arcade.register({
     box.style.gap = '12px';
     const grid = api.el('div', 'grid g3', box);
     grid.style.maxWidth = 'min(80vw, 40vh)';
-    api.el('div', 'hint', box, 'Что вместо «?»');
+    api.el('div', 'hint', box, L('Что вместо «?»', 'What replaces “?”'));
     const opts = api.el('div', 'grid g4', box);
     opts.style.maxWidth = 'min(92vw, 46vh)';
     const tm = api.timer(90);

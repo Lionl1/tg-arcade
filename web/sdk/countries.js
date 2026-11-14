@@ -76,9 +76,66 @@ window.COUNTRIES = (() => {
     ['WS', 'Самоа', 'Апиа', O], ['SB', 'Соломоновы Острова', 'Хониара', O], ['TO', 'Тонга', 'Нукуалофа', O],
     ['TV', 'Тувалу', 'Фунафути', O], ['VU', 'Вануату', 'Порт-Вила', O],
   ];
+  // английские названия и столицы — из mledoze/countries (ODbL 1.0), спорные случаи сведены с русской версией
+  const EN = {
+    AL: ["Albania", "Tirana"], AD: ["Andorra", "Andorra la Vella"], AT: ["Austria", "Vienna"], BY: ["Belarus", "Minsk"],
+    BE: ["Belgium", "Brussels"], BA: ["Bosnia and Herzegovina", "Sarajevo"], BG: ["Bulgaria", "Sofia"], HR: ["Croatia", "Zagreb"],
+    CY: ["Cyprus", "Nicosia"], CZ: ["Czechia", "Prague"], DK: ["Denmark", "Copenhagen"], EE: ["Estonia", "Tallinn"],
+    FI: ["Finland", "Helsinki"], FR: ["France", "Paris"], DE: ["Germany", "Berlin"], GR: ["Greece", "Athens"],
+    HU: ["Hungary", "Budapest"], IS: ["Iceland", "Reykjavik"], IE: ["Ireland", "Dublin"], IT: ["Italy", "Rome"],
+    LV: ["Latvia", "Riga"], LI: ["Liechtenstein", "Vaduz"], LT: ["Lithuania", "Vilnius"], LU: ["Luxembourg", "Luxembourg"],
+    MT: ["Malta", "Valletta"], MD: ["Moldova", "Chișinău"], MC: ["Monaco", "Monaco"], ME: ["Montenegro", "Podgorica"],
+    NL: ["Netherlands", "Amsterdam"], MK: ["North Macedonia", "Skopje"], NO: ["Norway", "Oslo"], PL: ["Poland", "Warsaw"],
+    PT: ["Portugal", "Lisbon"], RO: ["Romania", "Bucharest"], RU: ["Russia", "Moscow"], SM: ["San Marino", "City of San Marino"],
+    RS: ["Serbia", "Belgrade"], SK: ["Slovakia", "Bratislava"], SI: ["Slovenia", "Ljubljana"], ES: ["Spain", "Madrid"],
+    SE: ["Sweden", "Stockholm"], CH: ["Switzerland", "Bern"], UA: ["Ukraine", "Kyiv"], GB: ["United Kingdom", "London"],
+    VA: ["Vatican City", "Vatican City"], AF: ["Afghanistan", "Kabul"], AM: ["Armenia", "Yerevan"], AZ: ["Azerbaijan", "Baku"],
+    BH: ["Bahrain", "Manama"], BD: ["Bangladesh", "Dhaka"], BT: ["Bhutan", "Thimphu"], BN: ["Brunei", "Bandar Seri Begawan"],
+    KH: ["Cambodia", "Phnom Penh"], CN: ["China", "Beijing"], GE: ["Georgia", "Tbilisi"], IN: ["India", "New Delhi"],
+    ID: ["Indonesia", "Jakarta"], IR: ["Iran", "Tehran"], IQ: ["Iraq", "Baghdad"], IL: ["Israel", "Jerusalem"],
+    JP: ["Japan", "Tokyo"], JO: ["Jordan", "Amman"], KZ: ["Kazakhstan", "Astana"], KW: ["Kuwait", "Kuwait City"],
+    KG: ["Kyrgyzstan", "Bishkek"], LA: ["Laos", "Vientiane"], LB: ["Lebanon", "Beirut"], MY: ["Malaysia", "Kuala Lumpur"],
+    MV: ["Maldives", "Malé"], MN: ["Mongolia", "Ulan Bator"], MM: ["Myanmar", "Naypyidaw"], NP: ["Nepal", "Kathmandu"],
+    KP: ["North Korea", "Pyongyang"], OM: ["Oman", "Muscat"], PK: ["Pakistan", "Islamabad"], PH: ["Philippines", "Manila"],
+    QA: ["Qatar", "Doha"], SA: ["Saudi Arabia", "Riyadh"], SG: ["Singapore", "Singapore"], KR: ["South Korea", "Seoul"],
+    LK: ["Sri Lanka", "Sri Jayawardenepura Kotte"], SY: ["Syria", "Damascus"], TJ: ["Tajikistan", "Dushanbe"], TH: ["Thailand", "Bangkok"],
+    TL: ["Timor-Leste", "Dili"], TR: ["Turkey", "Ankara"], TM: ["Turkmenistan", "Ashgabat"], AE: ["United Arab Emirates", "Abu Dhabi"],
+    UZ: ["Uzbekistan", "Tashkent"], VN: ["Vietnam", "Hanoi"], YE: ["Yemen", "Sana'a"], DZ: ["Algeria", "Algiers"],
+    AO: ["Angola", "Luanda"], BJ: ["Benin", "Porto-Novo"], BW: ["Botswana", "Gaborone"], BF: ["Burkina Faso", "Ouagadougou"],
+    BI: ["Burundi", "Gitega"], CV: ["Cabo Verde", "Praia"], CM: ["Cameroon", "Yaoundé"], CF: ["Central African Republic", "Bangui"],
+    TD: ["Chad", "N'Djamena"], KM: ["Comoros", "Moroni"], CG: ["Congo", "Brazzaville"], CD: ["DR Congo", "Kinshasa"],
+    CI: ["Côte d'Ivoire", "Yamoussoukro"], DJ: ["Djibouti", "Djibouti"], EG: ["Egypt", "Cairo"], GQ: ["Equatorial Guinea", "Ciudad de la Paz"],
+    ER: ["Eritrea", "Asmara"], SZ: ["Eswatini", "Mbabane"], ET: ["Ethiopia", "Addis Ababa"], GA: ["Gabon", "Libreville"],
+    GM: ["Gambia", "Banjul"], GH: ["Ghana", "Accra"], GN: ["Guinea", "Conakry"], GW: ["Guinea-Bissau", "Bissau"],
+    KE: ["Kenya", "Nairobi"], LS: ["Lesotho", "Maseru"], LR: ["Liberia", "Monrovia"], LY: ["Libya", "Tripoli"],
+    MG: ["Madagascar", "Antananarivo"], MW: ["Malawi", "Lilongwe"], ML: ["Mali", "Bamako"], MR: ["Mauritania", "Nouakchott"],
+    MU: ["Mauritius", "Port Louis"], MA: ["Morocco", "Rabat"], MZ: ["Mozambique", "Maputo"], NA: ["Namibia", "Windhoek"],
+    NE: ["Niger", "Niamey"], NG: ["Nigeria", "Abuja"], RW: ["Rwanda", "Kigali"], ST: ["São Tomé and Príncipe", "São Tomé"],
+    SN: ["Senegal", "Dakar"], SC: ["Seychelles", "Victoria"], SL: ["Sierra Leone", "Freetown"], SO: ["Somalia", "Mogadishu"],
+    ZA: ["South Africa", "Pretoria"], SS: ["South Sudan", "Juba"], SD: ["Sudan", "Khartoum"], TZ: ["Tanzania", "Dodoma"],
+    TG: ["Togo", "Lomé"], TN: ["Tunisia", "Tunis"], UG: ["Uganda", "Kampala"], ZM: ["Zambia", "Lusaka"],
+    ZW: ["Zimbabwe", "Harare"], AG: ["Antigua and Barbuda", "Saint John's"], BS: ["Bahamas", "Nassau"], BB: ["Barbados", "Bridgetown"],
+    BZ: ["Belize", "Belmopan"], CA: ["Canada", "Ottawa"], CR: ["Costa Rica", "San José"], CU: ["Cuba", "Havana"],
+    DM: ["Dominica", "Roseau"], DO: ["Dominican Republic", "Santo Domingo"], SV: ["El Salvador", "San Salvador"], GD: ["Grenada", "St. George's"],
+    GT: ["Guatemala", "Guatemala City"], HT: ["Haiti", "Port-au-Prince"], HN: ["Honduras", "Tegucigalpa"], JM: ["Jamaica", "Kingston"],
+    MX: ["Mexico", "Mexico City"], NI: ["Nicaragua", "Managua"], PA: ["Panama", "Panama City"], KN: ["Saint Kitts and Nevis", "Basseterre"],
+    LC: ["Saint Lucia", "Castries"], VC: ["Saint Vincent and the Grenadines", "Kingstown"], TT: ["Trinidad and Tobago", "Port of Spain"], US: ["United States", "Washington, D.C."],
+    AR: ["Argentina", "Buenos Aires"], BO: ["Bolivia", "Sucre"], BR: ["Brazil", "Brasília"], CL: ["Chile", "Santiago"],
+    CO: ["Colombia", "Bogotá"], EC: ["Ecuador", "Quito"], GY: ["Guyana", "Georgetown"], PY: ["Paraguay", "Asunción"],
+    PE: ["Peru", "Lima"], SR: ["Suriname", "Paramaribo"], UY: ["Uruguay", "Montevideo"], VE: ["Venezuela", "Caracas"],
+    AU: ["Australia", "Canberra"], FJ: ["Fiji", "Suva"], KI: ["Kiribati", "South Tarawa"], MH: ["Marshall Islands", "Majuro"],
+    FM: ["Micronesia", "Palikir"], NR: ["Nauru", "Yaren"], NZ: ["New Zealand", "Wellington"], PW: ["Palau", "Ngerulmud"],
+    PG: ["Papua New Guinea", "Port Moresby"], WS: ["Samoa", "Apia"], SB: ["Solomon Islands", "Honiara"], TO: ["Tonga", "Nuku'alofa"],
+    TV: ["Tuvalu", "Funafuti"], VU: ["Vanuatu", "Port Vila"],
+  };
+  const PARTS_EN = { [E]: 'Europe', [A]: 'Asia', [F]: 'Africa', [N]: 'North America', [S]: 'South America', [O]: 'Oceania' };
+  const en = window.LANG === 'en';
   const flag = (iso) => String.fromCodePoint(...[...iso].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65));
   // сложность для учёбы: 1 — самые известные, 2 — Европа, Азия, Южная Америка, 3 — остальные (Африка, Океания, Карибы)
   const FAMOUS = new Set('RU US CN JP DE FR GB IT ES CA BR AU IN MX KR TR EG AR UA BY KZ PL GR PT NL SE NO FI CH AT IL SA AE TH VN ID GE AM UZ CU'.split(' '));
   const d = (iso, part) => (FAMOUS.has(iso) ? 1 : [E, A, S].includes(part) ? 2 : 3);
-  return list.map(([iso, name, capital, part]) => ({ iso, name, capital, part, flag: flag(iso), d: d(iso, part) }));
+  return list.map(([iso, name, capital, part]) => ({
+    iso, flag: flag(iso), d: d(iso, part),
+    name: en ? EN[iso][0] : name, capital: en ? EN[iso][1] : capital, part: en ? PARTS_EN[part] : part,
+  }));
 })();

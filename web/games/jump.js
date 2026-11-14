@@ -1,5 +1,5 @@
 Arcade.register({
-  howto: 'Шарик прыгает сам. Веди пальцем влево-вправо (или стрелки) и забирайся как можно выше. Жёлтые платформы ломаются.',
+  howto: L('Шарик прыгает сам. Веди пальцем влево-вправо (или стрелки) и забирайся как можно выше. Жёлтые платформы ломаются.', 'The ball bounces by itself. Drag left and right (or use the arrows) and climb as high as you can. Yellow platforms break.'),
   start(api) {
     const g = api.canvas(), x = g.ctx, C = api.colors, keys = api.keys();
     const r = 12, G = 1500, JUMP = -760, pw = 72, ph = 10;

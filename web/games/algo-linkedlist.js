@@ -1,23 +1,23 @@
 // Разворот связного списка
 Arcade.register(Algo.viz({
-  about: 'Связный список: каждый узел хранит значение и ссылку на следующий. Чтобы развернуть его на месте, идём по узлам и перекидываем стрелку каждого узла на предыдущий. Нужны три указателя: prev, head, next.',
-  complexity: 'O(n) время, O(1) памяти',
-  code: ['prev = None', 'while head:', '  nxt = head.next', '  head.next = prev   # разворачиваем стрелку', '  prev = head; head = nxt', 'return prev         # новая голова'],
+  about: L('Связный список: каждый узел хранит значение и ссылку на следующий. Чтобы развернуть его на месте, идём по узлам и перекидываем стрелку каждого узла на предыдущий. Нужны три указателя: prev, head, next.', 'A linked list: every node stores a value and a link to the next one. To reverse it in place, walk the nodes and point each node’s arrow at the previous one. Three pointers are needed: prev, head, next.'),
+  complexity: L('O(n) время, O(1) памяти', 'O(n) time, O(1) memory'),
+  code: ['prev = None', 'while head:', '  nxt = head.next', L('  head.next = prev   # разворачиваем стрелку', '  head.next = prev   # flip the arrow'), '  prev = head; head = nxt', L('return prev         # новая голова', 'return prev         # the new head')],
   make(api) { return [...Array(5)].map(() => api.randi(90) + 10); },
   run(vals) {
     const n = vals.length, next = vals.map((_, i) => (i + 1 < n ? i + 1 : null)), F = [];
     let prev = null, head = 0;
     const p = (l, t, nx) => F.push({ s: { vals, next: next.slice(), prev, head, nx }, l, t });
-    p(0, 'prev = None, head — первый узел');
+    p(0, L('prev = None, head — первый узел', 'prev = None, head is the first node'));
     while (head !== null) {
       const nx = next[head];
-      p(2, `Запоминаем next = ${nx === null ? 'None' : vals[nx]}`, nx);
+      p(2, L(`Запоминаем next = ${nx === null ? 'None' : vals[nx]}`, `Remember next = ${nx === null ? 'None' : vals[nx]}`), nx);
       next[head] = prev;
-      p(3, `Стрелка ${vals[head]} теперь указывает на ${prev === null ? 'None' : vals[prev]}`, nx);
+      p(3, L(`Стрелка ${vals[head]} теперь указывает на ${prev === null ? 'None' : vals[prev]}`, `The arrow of ${vals[head]} now points to ${prev === null ? 'None' : vals[prev]}`), nx);
       prev = head; head = nx;
-      p(4, 'Сдвигаем prev и head вперёд', nx);
+      p(4, L('Сдвигаем prev и head вперёд', 'Move prev and head forward'), nx);
     }
-    p(5, `Список развёрнут, новая голова — ${vals[prev]}`, null);
+    p(5, L(`Список развёрнут, новая голова — ${vals[prev]}`, `The list is reversed, the new head is ${vals[prev]}`), null);
     return F;
   },
   draw(ctx, W, H, f, C) {

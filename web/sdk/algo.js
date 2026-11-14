@@ -12,6 +12,13 @@
 (() => {
   'use strict';
 
+  // комментарии в настоящем коде — на языке интерфейса (словарь ALGO_CODE_EN в algo-code.js)
+  function codeFor(src) {
+    if (window.LANG !== 'en') return src;
+    for (const [ru, en] of window.ALGO_CODE_EN || []) src = src.split(ru).join(en);
+    return src;
+  }
+
   function viz(cfg) {
     return {
       app: true,
@@ -20,7 +27,7 @@
         const box = api.el('div', 'appbox');
         box.style.gap = '8px';
         const about = api.el('div', 'hint', box);
-        about.innerHTML = `${cfg.about}${cfg.complexity ? `<br><b>Сложность:</b> ${cfg.complexity}` : ''}`;
+        about.innerHTML = `${cfg.about}${cfg.complexity ? `<br><b>${L('Сложность', 'Complexity')}:</b> ${cfg.complexity}` : ''}`;
         about.style.cssText = 'font-size:13px;line-height:1.35';
         const wrap = api.el('div', '', box);
         wrap.style.cssText = 'flex:1;min-height:180px;position:relative;border-radius:14px;background:var(--card);overflow:hidden';
@@ -32,14 +39,14 @@
         const real = (window.ALGO_CODE || {})[api.gameId];
         const tabs = api.el('div', 'seg', box);
         tabs.style.margin = '0';
-        const TABS = [['pseudo', 'Псевдокод']].concat(real ? [['py', 'Python'], ['js', 'JavaScript']] : []);
+        const TABS = [['pseudo', L('Псевдокод', 'Pseudocode')]].concat(real ? [['py', 'Python'], ['js', 'JavaScript']] : []);
         const code = api.el('pre', '', box);
         code.style.cssText = 'margin:0;padding:8px 10px;border-radius:12px;background:color-mix(in srgb, var(--fg) 6%, transparent);font:12px/1.45 ui-monospace,Menlo,monospace;overflow:auto;max-height:24vh;-webkit-user-select:text;user-select:text';
         let lines = [];
         function showTab(t) {
           [...tabs.children].forEach((b) => b.classList.toggle('on', b.dataset.t === t));
           code.innerHTML = '';
-          const src = t === 'pseudo' ? cfg.code : real[t].split('\n');
+          const src = t === 'pseudo' ? cfg.code : codeFor(real[t]).split('\n');
           lines = src.map((txt) => { const d = document.createElement('div'); d.textContent = txt || ' '; d.style.cssText = 'padding:0 4px;border-radius:4px;white-space:pre'; code.appendChild(d); return d; });
           if (t !== 'pseudo') lines = []; // подсветка шагов — только в псевдокоде
           copyBtn.hidden = t === 'pseudo';
@@ -47,15 +54,15 @@
           render();
         }
         for (const [t, label] of TABS) { const b = api.el('button', '', tabs, label); b.dataset.t = t; api.on(b, 'click', () => showTab(t)); }
-        const copyBtn = api.el('button', '', tabs, '📋 Копировать');
+        const copyBtn = api.el('button', '', tabs, L('📋 Копировать', '📋 Copy'));
         copyBtn.hidden = true;
         api.on(copyBtn, 'click', async () => {
-          try { await navigator.clipboard.writeText(real[copyBtn.dataset.t]); api.toast('Код скопирован'); } catch (e) { api.toast('Выдели код и скопируй вручную'); }
+          try { await navigator.clipboard.writeText(codeFor(real[copyBtn.dataset.t])); api.toast(L('Код скопирован', 'Code copied')); } catch (e) { api.toast(L('Выдели код и скопируй вручную', 'Select the code and copy it manually')); }
         });
         const bar = api.el('div', 'toolbar', box);
         const bNew = api.el('button', 'btn ghost', bar, '🔀');
         const bBack = api.el('button', 'btn ghost', bar, '◀');
-        const bPlay = api.el('button', 'btn', bar, '▶ Пуск');
+        const bPlay = api.el('button', 'btn', bar, L('▶ Пуск', '▶ Run'));
         const bStep = api.el('button', 'btn ghost', bar, '▶|');
         const bSpeed = api.el('button', 'btn ghost', bar, '');
         const SPEEDS = [[1500, '×0.5'], [700, '×1'], [300, '×2'], [90, '×5']];
@@ -78,7 +85,7 @@
           lines.forEach((d, k) => { d.style.background = k === f.l ? 'color-mix(in srgb, var(--accent) 35%, transparent)' : ''; });
           if (lines[f.l]) lines[f.l].scrollIntoView({ block: 'nearest' });
         }
-        function stop() { playing = false; clearTimeout(timer); bPlay.textContent = '▶ Пуск'; }
+        function stop() { playing = false; clearTimeout(timer); bPlay.textContent = L('▶ Пуск', '▶ Run'); }
         function tick() {
           if (!playing) return;
           if (i < frames.length - 1) { i++; render(); timer = setTimeout(tick, SPEEDS[sp][0]); }
@@ -92,7 +99,7 @@
         api.on(bPlay, 'click', () => {
           if (playing) return stop();
           if (i >= frames.length - 1) i = 0;
-          playing = true; bPlay.textContent = '⏸ Пауза'; tick();
+          playing = true; bPlay.textContent = L('⏸ Пауза', '⏸ Pause'); tick();
         });
         api.on(bStep, 'click', () => { stop(); if (i < frames.length - 1) { i++; render(); } });
         api.on(bBack, 'click', () => { stop(); if (i > 0) { i--; render(); } });

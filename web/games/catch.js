@@ -1,5 +1,5 @@
 Arcade.register({
-  howto: 'Двигай корзину пальцем и лови фрукты. Пропустишь 3 фрукта или поймаешь бомбу 💣 — конец.',
+  howto: L('Двигай корзину пальцем и лови фрукты. Пропустишь 3 фрукта или поймаешь бомбу 💣 — конец.', 'Move the basket with your finger and catch fruit. Miss 3 fruits or catch a bomb 💣 and it is over.'),
   start(api) {
     const g = api.canvas(), x = g.ctx, C = api.colors, keys = api.keys();
     const FRUITS = ['🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍒', '🍑'];

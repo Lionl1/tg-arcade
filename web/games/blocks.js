@@ -1,6 +1,6 @@
 // Укладка: перетаскивай фигуры на поле 8×8, заполненные строки и столбцы исчезают
 Arcade.register({
-  howto: 'Перетаскивай фигуры снизу на поле. Заполнил строку или столбец целиком — они исчезают. Очки: клетки + бонус за линии (несколько сразу — больше). Конец, когда ни одна фигура не помещается.',
+  howto: L('Перетаскивай фигуры снизу на поле. Заполнил строку или столбец целиком — они исчезают. Очки: клетки + бонус за линии (несколько сразу — больше). Конец, когда ни одна фигура не помещается.', 'Drag the pieces from below onto the board. Fill a whole row or column and it clears. Points: cells + a bonus for lines (several at once give more). The game ends when no piece fits.'),
   start(api) {
     const g = api.canvas(), x = g.ctx, C = api.colors;
     const N = 8;
@@ -36,15 +36,15 @@ Arcade.register({
       const bx = (g.W - cell * N) / 2, by = Math.max(10, (g.H - cell * N - cell * 3.4) / 2);
       return { cell, bx, by, ty: by + cell * N + cell * 0.6, tw: g.W / 3, tc: Math.floor(cell * 0.55) };
     }
-    function cellAt(L, px, py, p) {
+    function cellAt(LT, px, py, p) {
       const [w, h] = size(p.cells);
-      return [Math.round((px - L.bx) / L.cell - w / 2), Math.round((py - L.cell * 1.6 - L.by) / L.cell - h / 2)];
+      return [Math.round((px - LT.bx) / LT.cell - w / 2), Math.round((py - LT.cell * 1.6 - LT.by) / LT.cell - h / 2)];
     }
 
     api.on(api.stage, 'pointerdown', (e) => {
-      const L = layout(), { x: px, y: py } = api.pos(e);
-      if (py < L.ty - 10) return;
-      const i = Math.floor(px / L.tw);
+      const LT = layout(), { x: px, y: py } = api.pos(e);
+      if (py < LT.ty - 10) return;
+      const i = Math.floor(px / LT.tw);
       if (!tray[i]) return;
       drag = { i, px, py };
       api.haptic('select');
@@ -52,8 +52,8 @@ Arcade.register({
     api.on(api.stage, 'pointermove', (e) => { if (drag) { const p = api.pos(e); drag.px = p.x; drag.py = p.y; } });
     api.on(window, 'pointerup', () => {
       if (!drag) return;
-      const L = layout(), p = tray[drag.i];
-      const [gx, gy] = cellAt(L, drag.px, drag.py, p);
+      const LT = layout(), p = tray[drag.i];
+      const [gx, gy] = cellAt(LT, drag.px, drag.py, p);
       if (fits(p.cells, gx, gy)) place(p, gx, gy, drag.i);
       drag = null;
     });
@@ -80,35 +80,35 @@ Arcade.register({
     }
 
     api.loop((dt) => {
-      const L = layout();
+      const LT = layout();
       x.fillStyle = C.bg; x.fillRect(0, 0, g.W, g.H);
       for (let i = 0; i < N * N; i++) {
-        const X = L.bx + (i % N) * L.cell, Y = L.by + Math.floor(i / N) * L.cell;
+        const X = LT.bx + (i % N) * LT.cell, Y = LT.by + Math.floor(i / N) * LT.cell;
         x.fillStyle = board[i] || C.card;
-        api.rr(x, X + 1.5, Y + 1.5, L.cell - 3, L.cell - 3, 5); x.fill();
+        api.rr(x, X + 1.5, Y + 1.5, LT.cell - 3, LT.cell - 3, 5); x.fill();
       }
       for (const f of flash) {
         f.a -= dt * 3;
         x.globalAlpha = Math.max(0, f.a); x.fillStyle = '#fff';
-        api.rr(x, L.bx + (f.idx % N) * L.cell + 1.5, L.by + Math.floor(f.idx / N) * L.cell + 1.5, L.cell - 3, L.cell - 3, 5); x.fill();
+        api.rr(x, LT.bx + (f.idx % N) * LT.cell + 1.5, LT.by + Math.floor(f.idx / N) * LT.cell + 1.5, LT.cell - 3, LT.cell - 3, 5); x.fill();
       }
       x.globalAlpha = 1;
       flash = flash.filter((f) => f.a > 0);
       if (drag) { // подсказка, куда встанет фигура
-        const p = tray[drag.i], [gx, gy] = cellAt(L, drag.px, drag.py, p);
+        const p = tray[drag.i], [gx, gy] = cellAt(LT, drag.px, drag.py, p);
         if (fits(p.cells, gx, gy)) {
           x.globalAlpha = 0.35; x.fillStyle = p.color;
-          for (const [cx, cy] of p.cells) { api.rr(x, L.bx + (gx + cx) * L.cell + 1.5, L.by + (gy + cy) * L.cell + 1.5, L.cell - 3, L.cell - 3, 5); x.fill(); }
+          for (const [cx, cy] of p.cells) { api.rr(x, LT.bx + (gx + cx) * LT.cell + 1.5, LT.by + (gy + cy) * LT.cell + 1.5, LT.cell - 3, LT.cell - 3, 5); x.fill(); }
           x.globalAlpha = 1;
         }
       }
       tray.forEach((p, i) => {
         if (!p) return;
         const dragging = drag && drag.i === i;
-        const c = dragging ? L.cell : L.tc;
+        const c = dragging ? LT.cell : LT.tc;
         const [w, h] = size(p.cells);
-        const ox = dragging ? drag.px - (w * c) / 2 : L.tw * i + (L.tw - w * c) / 2;
-        const oy = dragging ? drag.py - L.cell * 1.6 - (h * c) / 2 : L.ty + (L.cell * 2.6 - h * c) / 2;
+        const ox = dragging ? drag.px - (w * c) / 2 : LT.tw * i + (LT.tw - w * c) / 2;
+        const oy = dragging ? drag.py - LT.cell * 1.6 - (h * c) / 2 : LT.ty + (LT.cell * 2.6 - h * c) / 2;
         x.globalAlpha = !dragging && !fitsAnywhere(p) ? 0.35 : 1;
         x.fillStyle = p.color;
         for (const [cx, cy] of p.cells) { api.rr(x, ox + cx * c + 1, oy + cy * c + 1, c - 2, c - 2, 4); x.fill(); }

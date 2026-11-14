@@ -20,6 +20,10 @@ from aiogram.types import (
     InputTextMessageContent,
 )
 
+from .i18n import tr
+
+CANT_WRITE = ("Бот не может написать в этот чат. В личке нажми «Старт» у бота.",
+              "The bot can't write to this chat. Open the bot in private messages and tap “Start”.")
 log = logging.getLogger("arcade.share")
 
 MAX_IMAGE = 3 * 1024 * 1024
@@ -50,7 +54,7 @@ class Sharer:
 
     # ---------- защита групп от спама через бота ----------
 
-    async def guard(self, chat_id: int, user_id: int) -> None:
+    async def guard(self, chat_id: int, user_id: int, lang: str = "ru") -> None:
         """Публиковать в группу может только её участник, не чаще раза в USER_GAP с и не больше CHAT_PER_HOUR постов в час на чат."""
         if chat_id >= 0 or not self.bot:
             return  # личка игрока — без ограничений, кроме общего throttle
@@ -64,29 +68,29 @@ class Sharer:
                 ok = False
             self._members[(chat_id, user_id)] = (ok, now)
         if not ok:
-            raise ShareError(403, "Публиковать в группу могут только её участники")
+            raise ShareError(403, tr(lang, "Публиковать в группу могут только её участники", "Only members can post to this group"))
         if now - self._last_post.get((chat_id, user_id), -1e9) < USER_GAP:
-            raise ShareError(429, f"Не чаще раза в {USER_GAP} секунд — дай чату передохнуть")
+            raise ShareError(429, tr(lang, f"Не чаще раза в {USER_GAP} секунд — дай чату передохнуть", f"At most once every {USER_GAP} seconds — give the chat a break"))
         recent = [t for t in self._chat_posts.get(chat_id, []) if now - t < 3600]
         if len(recent) >= CHAT_PER_HOUR:
-            raise ShareError(429, "В этот чат уже много отправлено за час — попробуй позже")
+            raise ShareError(429, tr(lang, "В этот чат уже много отправлено за час — попробуй позже", "Lots of posts in this chat this hour — try again later"))
         recent.append(now)
         self._chat_posts[chat_id] = recent
         self._last_post[(chat_id, user_id)] = now
 
     # ---------- картинки ----------
 
-    def save_image(self, data_url: str, user_id: int) -> tuple[str, bytes]:
+    def save_image(self, data_url: str, user_id: int, lang: str = "ru") -> tuple[str, bytes]:
         """PNG (для файла) или JPEG (для пересылки: Telegram принимает в inline-фото только JPEG)."""
         m = re.match(r"^data:image/(png|jpeg);base64,(.+)$", data_url or "", re.S)
         if not m:
-            raise ShareError(400, "Нужна картинка PNG или JPEG")
+            raise ShareError(400, tr(lang, "Нужна картинка PNG или JPEG", "A PNG or JPEG image is required"))
         kind, raw = m.group(1), base64.b64decode(m.group(2), validate=False)
         if len(raw) > MAX_IMAGE or not raw.startswith(SIG[kind]):
-            raise ShareError(400, "Картинка слишком большая или повреждена")
+            raise ShareError(400, tr(lang, "Картинка слишком большая или повреждена", "The image is too large or damaged"))
         day = time.strftime("%Y%m%d")
         if self._uploads.get((user_id, day), 0) >= MAX_UPLOADS_PER_DAY:
-            raise ShareError(429, "На сегодня лимит картинок исчерпан")
+            raise ShareError(429, tr(lang, "На сегодня лимит картинок исчерпан", "Daily image limit reached"))
         self._uploads[(user_id, day)] = self._uploads.get((user_id, day), 0) + 1
         name = f"{uuid.uuid4().hex}.{'png' if kind == 'png' else 'jpg'}"
         (self.uploads / name).write_bytes(raw)
@@ -116,10 +120,10 @@ class Sharer:
     def _file(raw: bytes) -> BufferedInputFile:
         return BufferedInputFile(raw, "picture.jpg" if raw.startswith(SIG["jpeg"]) else "picture.png")
 
-    async def send_photo(self, chat_id: int, raw: bytes, caption: str, user_id: int) -> bool:
+    async def send_photo(self, chat_id: int, raw: bytes, caption: str, user_id: int, lang: str = "ru") -> bool:
         if not self.bot:
             return False
-        await self.guard(chat_id, user_id)
+        await self.guard(chat_id, user_id, lang)
         try:
             msg = await self.bot.send_photo(chat_id, self._file(raw), caption=caption)
             p = msg.photo[-1] if msg.photo else None
@@ -127,7 +131,7 @@ class Sharer:
             return True
         except TelegramAPIError as e:
             log.warning("send_photo %s: %s", chat_id, e)
-            raise ShareError(403, "Бот не может написать в этот чат. В личке нажми «Старт» у бота.")
+            raise ShareError(403, CANT_WRITE[lang == "en"])
 
     async def upload_file_id(self, user_id: int, raw: bytes) -> str | None:
         """Загружаем картинку в сам Telegram (в личку игроку, тихо, и сразу удаляем сообщение) → file_id.
@@ -144,16 +148,16 @@ class Sharer:
             log.info("upload_file_id %s: %s — пробую по ссылке", user_id, e)
             return None
 
-    async def send_text(self, chat_id: int, html: str, user_id: int) -> bool:
+    async def send_text(self, chat_id: int, html: str, user_id: int, lang: str = "ru") -> bool:
         if not self.bot:
             return False
-        await self.guard(chat_id, user_id)
+        await self.guard(chat_id, user_id, lang)
         try:
             await self.bot.send_message(chat_id, html)
             return True
         except TelegramAPIError as e:
             log.warning("send_text %s: %s", chat_id, e)
-            raise ShareError(403, "Бот не может написать в этот чат. В личке нажми «Старт» у бота.")
+            raise ShareError(403, CANT_WRITE[lang == "en"])
 
     async def prepare(self, user_id: int, *, photo_name: str | None = None, raw: bytes | None = None, text: str | None = None) -> str | None:
         """Подготовленное сообщение для Telegram.WebApp.shareMessage — пользователь сам выберет любой чат."""
@@ -170,7 +174,7 @@ class Sharer:
             else:
                 return None
         else:
-            result = InlineQueryResultArticle(id=rid, title="Результат", input_message_content=InputTextMessageContent(message_text=text))
+            result = InlineQueryResultArticle(id=rid, title="🎮", input_message_content=InputTextMessageContent(message_text=text))
         try:
             msg = await self.bot.save_prepared_inline_message(
                 user_id=user_id, result=result, allow_user_chats=True, allow_bot_chats=True,
@@ -186,31 +190,34 @@ class Sharer:
 
     @staticmethod
     def roll(kind: str, *, n: int = 1, sides: int = 6, lo: int = 1, hi: int = 100,
-             items: list[str] | None = None, teams: int = 2) -> dict:
+             items: list[str] | None = None, teams: int = 2, lang: str = "ru") -> dict:
+        L = lang
         items = [i.strip()[:60] for i in (items or []) if i.strip()][:50]
         if kind == "dice":
             n, sides = max(1, min(n, 10)), max(2, min(sides, 100))
             vals = [SR.randint(1, sides) for _ in range(n)]
             return {"kind": kind, "values": vals, "total": sum(vals), "text": f"🎲 {n}d{sides}: {' + '.join(map(str, vals))}" + (f" = <b>{sum(vals)}</b>" if n > 1 else "")}
         if kind == "coin":
-            v = SR.choice(["Орёл", "Решка"])
-            return {"kind": kind, "value": v, "text": f"🪙 Монетка: <b>{v}</b>"}
+            heads = SR.random() < 0.5
+            v = tr(L, "Орёл", "Heads") if heads else tr(L, "Решка", "Tails")
+            return {"kind": kind, "value": v, "heads": heads, "text": f"🪙 {tr(L, 'Монетка', 'Coin')}: <b>{v}</b>"}
         if kind == "number":
             lo, hi = sorted((max(-10**9, lo), min(10**9, hi)))
             v = SR.randint(lo, hi)
-            return {"kind": kind, "value": v, "text": f"🔢 Случайное число от {lo} до {hi}: <b>{v}</b>"}
+            return {"kind": kind, "value": v, "text": tr(L, f"🔢 Случайное число от {lo} до {hi}: <b>{v}</b>", f"🔢 Random number from {lo} to {hi}: <b>{v}</b>")}
         if kind == "pick":
             if len(items) < 2:
-                raise ShareError(400, "Нужно хотя бы 2 варианта")
+                raise ShareError(400, tr(L, "Нужно хотя бы 2 варианта", "At least 2 options are needed"))
             i = SR.randrange(len(items))
-            return {"kind": kind, "index": i, "value": items[i], "text": f"🎡 Колесо выбрало: <b>{escape(items[i])}</b>\n<i>из: {escape(', '.join(items))}</i>"}
+            return {"kind": kind, "index": i, "value": items[i],
+                    "text": tr(L, "🎡 Колесо выбрало", "🎡 The wheel picked") + f": <b>{escape(items[i])}</b>\n<i>{tr(L, 'из', 'from')}: {escape(', '.join(items))}</i>"}
         if kind == "teams":
             if len(items) < 2:
-                raise ShareError(400, "Нужно хотя бы 2 участника")
+                raise ShareError(400, tr(L, "Нужно хотя бы 2 участника", "At least 2 players are needed"))
             teams = max(2, min(teams, len(items)))
             order = items[:]
             SR.shuffle(order)
             out = [order[k::teams] for k in range(teams)]
-            lines = [f"<b>Команда {k + 1}:</b> {escape(', '.join(t))}" for k, t in enumerate(out)]
-            return {"kind": kind, "teams": out, "text": "👥 Команды:\n" + "\n".join(lines)}
-        raise ShareError(400, "Неизвестный жребий")
+            lines = [f"<b>{tr(L, 'Команда', 'Team')} {k + 1}:</b> {escape(', '.join(t))}" for k, t in enumerate(out)]
+            return {"kind": kind, "teams": out, "text": tr(L, "👥 Команды:\n", "👥 Teams:\n") + "\n".join(lines)}
+        raise ShareError(400, tr(L, "Неизвестный жребий", "Unknown draw"))
