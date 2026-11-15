@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🧠 Brain Arcade</title>
+<style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#17212b;color:#8a9aa9;font:15px system-ui}</style>
+</head>
+<body>
+<p id="m">🧠 …</p>
+<script>
+// Постоянный адрес Mini App для BotFather: берём текущий адрес сервера из url.json (без кэша)
+// и переходим туда, сохраняя параметры Telegram (?tgWebAppStartParam=… и #tgWebAppData=…).
+(function () {
+  var tail = location.search + location.hash;
+  fetch('url.json?t=' + Date.now(), { cache: 'no-store' })
+    .then(function (r) { return r.json(); })
+    .then(function (d) { location.replace(d.url.replace(/\/$/, '') + '/play.html' + tail); })
+    .catch(function () { document.getElementById('m').textContent = '⚠️ Сервер недоступен, попробуй через минуту · Server unavailable, try again in a minute'; });
+})();
+</script>
+</body>
+</html>
